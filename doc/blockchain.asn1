@@ -48,7 +48,7 @@ Genesis                 ::=SEQUENCE {
 -- Validators vote if they agree with the round leader
 Validation              ::=SEQUENCE {
     verified            BOOLEAN,
-    authAddress         Adresss,
+    authAddress         Addresss,
     signature           Signature
 }
 
@@ -59,7 +59,7 @@ Reconciliation          ::=SEQUENCE {
     -- Monotomically increments every reconciliation block starting at zero
     chainId             INTEGER (0..MAX),
     -- Ordered hashes of the last node of every sub-chain
-    prevHashes          SEQUENCE OF Hash,
+    shardHashes         SEQUENCE OF Hash,
     -- The round leader for the reconciliation block
     leader              Address,
     -- Signature over [chainId | prevHashes]

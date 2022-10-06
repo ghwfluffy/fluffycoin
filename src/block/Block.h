@@ -1,8 +1,8 @@
 #pragma once
 
 #include <fluffycoin/block/Genesis.h>
-#if 0
 #include <fluffycoin/block/Reconciliation.h>
+#if 0
 #include <fluffycoin/block/Node.h>
 #endif
 
@@ -49,10 +49,10 @@ class Block
         const std::unique_ptr<Genesis> &getGenesis() const;
         void setGenesis(Genesis genesis);
 
-#if 0
         const std::unique_ptr<Reconciliation> &getReconciliation() const;
         void setReconciliation(Reconciliation reconciliation);
 
+#if 0
         const std::unique_ptr<Node> &getNode() const;
         void setNode(Node node);
 #endif
@@ -63,8 +63,8 @@ class Block
     private:
         Type type;
         std::unique_ptr<Genesis> genesis;
-#if 0
         std::unique_ptr<Reconciliation> reconciliation;
+#if 0
         std::unique_ptr<Node> node;
 #endif
 };

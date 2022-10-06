@@ -11,4 +11,5 @@ find_package(OpenSSL REQUIRED)
 
 add_subdirectory(src/log)
 add_subdirectory(src/utils)
+add_subdirectory(src/ossl)
 add_subdirectory(src/block)

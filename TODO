@@ -21,11 +21,8 @@ Design
 
 Block
     Core
-    [ ] Asn1Encode
-    [ ] Asn1Decode
     [ ] BlockDecode
     [\] Block
-    [ ] Reconciliation
     [ ] Node
     [ ] Transaction
     Mining
@@ -70,6 +67,7 @@ Marketing
     [ ] McBucks
 
 Build
+    [ ] Make distributables
     [ ] Dockers
 
 Licensing
