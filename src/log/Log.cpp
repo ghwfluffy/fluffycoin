@@ -64,7 +64,6 @@ void log::msg(Level eLevel, const std::string &str)
         return;
 
     // Get the level and pad it to a static length
-    bool bEven = false;
     std::string strLevel = to_string_upper(eLevel);
 
     // Calculate timestamp
