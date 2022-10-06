@@ -1,0 +1,51 @@
+# g++ release flags
+string(APPEND
+    CMAKE_CXX_FLAGS_RELEASE
+    " -O3"
+)
+
+# g++ debug flags
+string(APPEND
+    CMAKE_CXX_FLAGS_DEBUG
+    " -pedantic"
+    " -Wall"
+    " -Werror"
+    " -Wextra"
+    " -Wabi=7"
+    " -Waggregate-return"
+    " -Wcast-align"
+    " -Wcast-qual"
+    " -Wconversion"
+    " -Wctor-dtor-privacy"
+    " -Wdisabled-optimization"
+    " -Wformat=2"
+    " -Winit-self"
+    " -Winline"
+    " -Winvalid-pch"
+    " -Wlogical-op"
+    " -Wmissing-declarations"
+    " -Wmissing-format-attribute"
+    " -Wmissing-include-dirs"
+    " -Wno-unused"
+    " -Wnoexcept"
+    " -Wnormalized"
+    " -Wold-style-cast"
+    " -Woverloaded-virtual"
+    " -Wredundant-decls"
+    " -Wsign-conversion"
+    " -Wsign-promo"
+    " -Wstack-protector"
+    " -Wstrict-null-sentinel"
+    " -Wstrict-overflow=5"
+    " -Wswitch-default"
+    " -Wswitch-enum"
+    " -Wundef"
+    " -Wunsafe-loop-optimizations"
+    " -Wzero-as-null-pointer-constant"
+    " -Wno-aggregate-return"
+    " -Wno-effc++"
+    " -Wno-padded"
+    " -Wno-shadow"
+    " -Wno-suggest-attribute=format"
+    " -Og -ggdb"
+)

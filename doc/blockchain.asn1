@@ -1,0 +1,234 @@
+-- The blockchain is DER encoded ASN.1
+-- This file contains the ASN.1 descriptions
+
+-- milliseconds since june 19th 1999 07:00:00.000 UTC
+Time                    ::=INTEGER
+
+-- Collision safe hash
+Hash                    ::=SEQUENCE {
+    sha2                OCTET STRING SIZE (32),
+    sha3                OCTET STRING SIZE (32)
+}
+
+-- Curve25519 x coordinate
+Public Key              ::=OCTET STRING SIZE (32)
+
+-- SHA2-256(SHA3-256(public x coordinate))
+Address                 ::=OCTET STRING SIZE (32)
+
+-- 32-byte x coordinate || 32-byte y coordinate
+Signature               ::=OCTET STRING SIZE (64)
+
+-- Describes an amount of fluffycoins
+Specie                  ::=SEQUENCE {
+    coins               INTEGER (0..MAX) OPTIONAL,
+    -- 1/100000000 of a coin
+    fluffs              INTEGER (0..99999999)
+}
+
+-- First block
+Genesis                 ::=SEQUENCE {
+    -- Protocol version
+    protocol            INTEGER (0),
+    -- Name of blockchain (ASCII "FluffyCoin" unless forked)
+    name                UTF8STRING,
+    -- Instance number of blockchain
+    version             INTEGER (0..MAX),
+    -- Time when genesis block is instantiated
+    creation            Time,
+    -- Address for blockchain creator
+    creator             Address,
+    -- Initial coins given to blockchain creator
+    -- The proof of stake requires coins to exist for mining to happen
+    greed               Specie,
+    -- Personalize blockchain
+    seed                OCTET STRING SIZE (0..68719476736)
+}
+
+-- Validators vote if they agree with the round leader
+Validation              ::=SEQUENCE {
+    verified            BOOLEAN,
+    authAddress         Adresss,
+    signature           Signature
+}
+
+-- Every so often all of the chains recombine into a single block
+-- This is a bit of a bottleneck that synchronizes all of the sub-chains
+-- It is used to count an arbitrary amount of time in blockchain operations
+Reconciliation          ::=SEQUENCE {
+    -- Monotomically increments every reconciliation block starting at zero
+    chainId             INTEGER (0..MAX),
+    -- Ordered hashes of the last node of every sub-chain
+    prevHashes          SEQUENCE OF Hash,
+    -- The round leader for the reconciliation block
+    leader              Address,
+    -- Signature over [chainId | prevHashes]
+    signature           Signature,
+    -- Distributed validation of the reconciliation block
+    votes               SET OF Validation SIZE (1..MAX)
+}
+
+-- A normal node in the blockchain where all the transactions happen
+Node                    ::=SEQUENCE {
+    --
+    chainId             INTEGER (0..MAX),
+    shardId             INTEGER (0..64),
+    index               INTEGER (0..10240),
+    prevHash            Hash,
+    transactions        SEQUENCE SIZE (1..104857600) OF Transaction,
+    nonce               OCTET STRING SIZE (8),
+    miner               Address,
+    signature           Signature,
+    votes               SET OF Validation SIZE (1..MAX)
+}
+
+-- Wrapper for a block in the blockchain that identifies what kind of block it is
+Block                   ::=CHOICE {
+    null                [0] NULL,
+    genesis             [1] Genesis,
+    reconciliation      [2] Reconciliation,
+    node                [3] Node
+}
+
+Transaction             ::=SEQUENCE {
+    protocol            INTEGER (0),
+    time                Time,
+    CHOICE {
+        register            [0] Register,
+        unregister          [1] Unregister,
+        updateCreds         [2] CredentialChange,
+        transfer            [3] Transfer,
+        lotto               [4] LotteryTicket,
+        newPrivateStock     [5] NewPrivateStock,
+        newPublicStock      [6] NewPublicStock
+        newVote             [7] NewVote,
+        vote                [8] PublicVote,
+        burn                [9] Donation,
+        offerLoan           [10] NewLoan,
+        cancelLoan          [11] CancelLoan,
+        acceptLoan          [12] AcceptLoan,
+        forgiveLoan         [13] ForgiveLoan,
+        forwardLoan         [14] ForwardLoan,
+        prepayLoan          [15] PrepayLoan
+    },
+    signer              Address,
+    newAddress          Address
+}
+
+Register                ::=SEQUENCE {
+    authAddress         Address,
+    authSignature       Signature
+}
+
+Unregister              ::=SEQUENCE {
+    authAddress         Address,
+    authSignature       Signature
+}
+
+CredentialChange        ::=SEQUENCE {
+    authAddress         Address,
+    newAddress          Address,
+    authSignature       Signature,
+    newSignature        Signature
+}
+
+Transfer                ::=SEQUENCE {
+    receiver            OCTET STRING,
+    amount              Specie,
+    currency            UTF8STRING OPTIONAL
+}
+
+LotteryTicket           ::=SEQUENCE {
+    seed                OCTET STRING SIZE (0..16),
+    bet                 Specie
+}
+
+NewPrivateStock         ::=SEQUENCE {
+    ticker              PRINTABLESTRING SIZE (3..MAX),
+    shares              INTEGER (1..10000000000),
+    -- Must be at least 1 coin
+    burn                Specie
+}
+
+-- Invisible wallet receives all initial bids of matching price during the IPO
+-- After the IPO, that wallet automatically buys stocks at or below the IPO price until out of money
+NewPublicStock          ::=SEQUENCE {
+    ticker              PRINTABLESTRING SIZE (3..MAX),
+    shares              INTEGER (1..10000000000),
+    price               Specie,
+    -- How many reconsiliation blocks until IPO ends
+    ipoDuration         INTEGER (1..100),
+    -- Must be at least 1 coin
+    burn                Specie
+}
+
+Donation                ::=Specie
+
+VoteAnswer              ::=SEQUENCE {
+    vote                UTF8STRING,
+    -- You committment can't be traded until the next reconsiliation block
+    committment         Specie
+}
+
+NewVote                 ::=SEQUENCE {
+    uuid                UTF8STRING SIZE (1..128),
+    context             OCTET STRING SIZE (16..MAX),
+    answer              CHOICE {
+        yesno           [0] NULL,
+        choice          [1] SEQUENCE OF VoteAnswer SIZE (2..MAX),
+        any             [2] NULL
+    }
+}
+
+PublicVote              ::=SEQEUNCE {
+    uuid                UTF8STRING (128),
+    vote                OCTET STRING
+}
+
+-- Loans take effect at the next reconsiliation block
+NewLoan                 ::=SEQUENCE {
+    -- Total tokens loaning at this agreement
+    amount              Specie,
+    -- McBucks (Must be at least 1 coin in outstanding owed loans)
+    currency            UTF8STRING OPTIONAL,
+    -- Amount extra needed to pay every reconsiliation block
+    interest            Specie,
+    -- The loan automatically expires after this many reconsiliation blocks
+    offerExpiration     INTEGER,
+    -- The loan needs to be payed back in full after this many reconsiliation blocks after accepting
+    loanExpiration      INTEGER,
+}
+
+CancelLoan              ::=SEQUENCE {
+    loanid              HashId,
+    index               INTEGER (0..MAX) OPTIONAL
+}
+
+AcceptLoan              ::=SEQUENCE {
+    loanid              HashId,
+    amount              Specie,
+    burn                Specie,
+    -- McBucks
+    currency            OCTET STRING
+}
+
+ForgiveLoan             ::=SEQUENCE {
+    loanid              HashId,
+    index               INTEGER (0..MAX) OPTIONAL,
+    amount              Specie
+}
+
+ForwardLoan             ::=SEQUENCE {
+    loanid              HashId,
+    index               INTEGER (0..MAX) OPTIONAL,
+    newAddress          Address,
+    forwardTime         Time,
+    accept              Signature
+}
+
+PrepayLoan              ::=SEQUENCE {
+    loanid              HashId,
+    index               INTEGER (0..MAX) OPTIONAL,
+    amount              Specie
+}
+

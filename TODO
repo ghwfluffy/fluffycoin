@@ -1,0 +1,123 @@
+More warnings
+-pedantic  \
+-pedantic-errors -Wextra -Waggregate-return -Wcast-align \
+-Wcast-qual -Wconversion \
+-Wdisabled-optimization \
+-Werror -Wfloat-equal -Wformat=2 \
+-Wformat-nonliteral -Wformat-security  \
+-Wformat-y2k \
+-Wimplicit  -Wimport  -Winit-self  -Winline \
+-Winvalid-pch   \
+-Wlong-long \
+-Wmissing-field-initializers -Wmissing-format-attribute   \
+-Wmissing-include-dirs -Wmissing-noreturn \
+-Wpacked  -Wpadded -Wpointer-arith \
+-Wredundant-decls \
+-Wshadow -Wstack-protector \
+-Wstrict-aliasing=2 -Wswitch-default \
+-Wswitch-enum \
+-Wunreachable-code -Wunused \
+-Wunused-parameter \
+-Wvariadic-macros \
+-Wwrite-strings
+-pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
+-std=c++17 -Wall -Weffc++ -Wno-error=effc++ -pedantic \
+ -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-newline-eof  \
+-pedantic-errors -Wextra -Waggregate-return -Wcast-align \
+-Wcast-qual -Wconversion \
+-Wdisabled-optimization \
+-Werror -Wfloat-equal -Wformat=2 \
+-Wformat-nonliteral -Wformat-security  \
+-Wformat-y2k \
+-Wimplicit  -Wimport  -Winit-self  -Winline -Winvalid-pch   \
+-Wlong-long \
+-Wmissing-field-initializers -Wmissing-format-attribute   \
+-Wmissing-include-dirs -Wmissing-noreturn \
+-Wpacked  -Wpadded -Wpointer-arith \
+-Wredundant-decls \
+-Wshadow -Wstack-protector \
+-Wstrict-aliasing=2 -Wswitch-default \
+-Wswitch-enum \
+-Wunreachable-code -Wunused \
+-Wunused-parameter \
+-Wvariadic-macros \
+-Wwrite-strings
+
+
+Design
+    APIs
+    [ ] Validator
+    [ ] Kiosk
+    [ ] Registry
+    Maths
+    [ ] Lottery
+    [ ] Transaction fees
+    [ ] Karma
+    [ ] Leader election
+    [ ] Loans
+    [ ] Stocks
+    Blocks
+    [ ] NFTs
+    [ ] Statements
+    [ ] Constitutions
+    [ ] Stocks
+        [ ] Calls/Puts
+        [ ] Bids/Accepts/Cancel
+    [ ] McBuck sub-borrowers
+
+Block
+    Core
+    [ ] Asn1Encode
+    [ ] Asn1Decode
+    [ ] BlockDecode
+    [\] Block
+    [ ] Reconciliation
+    [ ] Node
+    [ ] Transaction
+    Mining
+    [ ] Register
+    [ ] Unregister
+    [ ] CredentiaChange
+    Actions
+    [ ] Transfer
+    [ ] Lottery
+    [ ] Donation
+    Stock
+    [ ] NewPrivateStock
+    [ ] NewPublicStock
+    Votes
+    [ ] VoteAnswer
+    [ ] NewVote
+    [ ] PublicVote
+    Loans
+    [ ] NewLoan
+    [ ] CancelLoan
+    [ ] AcceptLoan
+    [ ] ForgiveLoan
+    [ ] ForwardLoan
+    [ ] PrepayLoan
+
+Utils
+    [ ] case insensitive ascii
+    [ ] multiple log backups
+
+Database
+    [ ] Chains
+    [ ] Miners
+    [ ] Wallets
+
+Crypto
+    [ ] Keys
+    [ ] Address
+    [ ] Hash
+
+Marketing
+    Feature blurbs
+    [ ] McBucks
+
+Build
+    [ ] Dockers
+
+Licensing
+    [ ] fmt license
+    [ ] Open source promise

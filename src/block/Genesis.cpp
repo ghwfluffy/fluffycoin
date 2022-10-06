@@ -1,0 +1,138 @@
+#include <fluffycoin/block/Genesis.h>
+
+#include <openssl/asn1t.h>
+
+namespace fluffycoin
+{
+
+namespace asn1
+{
+
+typedef struct Genesis_st
+{
+    ASN1_INTEGER *protocol;
+    ASN1_UTF8STRING *name;
+    ASN1_INTEGER *version;
+    ASN1_INTEGER *creation;
+    ASN1_OCTET_STRING *creator;
+    Specie *greed;
+    ASN1_OCTET_STRING *seed;
+} Genesis;
+
+ASN1_SEQUENCE(Genesis) =
+{
+    ASN1_SIMPLE(Genesis, protocol, ASN1_INTEGER)
+  , ASN1_SIMPLE(Genesis, name, ASN1_UTF8STRING)
+  , ASN1_SIMPLE(Genesis, version, ASN1_INTEGER)
+  , ASN1_SIMPLE(Genesis, creation, ASN1_INTEGER)
+  , ASN1_SIMPLE(Genesis, creator, ASN1_OCTET_STRING)
+  , ASN1_SIMPLE(Genesis, greed, Specie)
+  , ASN1_SIMPLE(Genesis, seed, ASN1_OCTET_STRING)
+} ASN1_SEQUENCE_END(Genesis)
+
+IMPLEMENT_ASN1_FUNCTIONS(Genesis)
+
+}
+
+}
+
+using namespace fluffycoin;
+using namespace fluffycoin::block;
+
+Genesis::Genesis()
+{
+    protocol = 0;
+    version = 0;
+}
+
+uint32_t Genesis::getProtocol() const
+{
+    return protocol;
+}
+
+void Genesis::setProtocol(uint32_t protocol)
+{
+    this->protocol = protocol;
+}
+
+const std::string &Genesis::getName() const
+{
+    return name;
+}
+
+void Genesis::setName(std::string name)
+{
+    this->name = std::move(name);
+}
+
+uint32_t Genesis::getVersion() const
+{
+    return version;
+}
+
+void Genesis::setVersion(uint32_t version)
+{
+    this->version = version;
+}
+
+const Time &Genesis::getCreation() const
+{
+    return creation;
+}
+
+void Genesis::setCreation(Time time)
+{
+    this->creation = std::move(time);
+}
+
+const Address &Genesis::getCreator() const
+{
+    return creator;
+}
+
+void Genesis::setCreator(Address creator)
+{
+    this->creator = std::move(creator);
+}
+
+const Specie &Genesis::getGreed() const
+{
+    return greed;
+}
+
+void Genesis::setGreed(Specie specie)
+{
+    this->greed = specie;
+}
+
+const BinData &Genesis::getSeed() const
+{
+    return seed;
+}
+
+void Genesis::setSeed(BinData data)
+{
+    this->seed = std::move(data);
+}
+
+void Genesis::toASN1(asn1::Genesis &t) const
+{
+    ASN1_INTEGER_set_uint64(t.protocol, static_cast<uint64_t>(protocol));
+    ASN1_STRING_set(t.name, name.data(), static_cast<int>(name.length()));
+    ASN1_INTEGER_set_uint64(t.version, static_cast<uint64_t>(version));
+    creation.toASN1(*t.creation);
+    creator.toASN1(*t.creator);
+    greed.toASN1(*t.greed);
+    ASN1_STRING_set(t.seed, seed.data(), static_cast<int>(seed.length()));
+}
+
+void Genesis::fromASN1(const asn1::Genesis &t)
+{
+    protocol = static_cast<uint32_t>(ASN1_INTEGER_get(t.protocol));
+    name.assign(reinterpret_cast<const char *>(ASN1_STRING_get0_data(t.name)), static_cast<size_t>(ASN1_STRING_length(t.name)));
+    version = static_cast<uint32_t>(ASN1_INTEGER_get(t.version));
+    creation.fromASN1(*t.creation);
+    creator.fromASN1(*t.creator);
+    greed.fromASN1(*t.greed);
+    seed.setData(ASN1_STRING_get0_data(t.seed), static_cast<size_t>(ASN1_STRING_length(t.seed)));
+}
