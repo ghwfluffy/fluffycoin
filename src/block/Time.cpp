@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Time.h>
+#include <fluffycoin/ossl/convert.h>
 
 using namespace fluffycoin;
 using namespace fluffycoin::block;
@@ -52,12 +53,12 @@ void Time::setNow()
 
 void Time::toASN1(ASN1_INTEGER &t) const
 {
-    ASN1_INTEGER_set_uint64(&t, sinceEpoch);
+    ossl::fromUInt64(t, sinceEpoch);
 }
 
 void Time::fromASN1(const ASN1_INTEGER &t)
 {
-    sinceEpoch = static_cast<uint64_t>(ASN1_INTEGER_get(&t));
+    sinceEpoch = ossl::toUInt64(t);
 }
 
 bool Time::operator<(const Time &rhs) const

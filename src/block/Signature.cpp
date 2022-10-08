@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Signature.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <string.h>
 
@@ -17,12 +18,12 @@ void Signature::set(BinData point)
 
 void Signature::toASN1(ASN1_OCTET_STRING &t) const
 {
-    ASN1_STRING_set(&t, point.data(), static_cast<int>(point.length()));
+    ossl::fromBin(t, point);
 }
 
 void Signature::fromASN1(const ASN1_OCTET_STRING &t)
 {
-    point.setData(ASN1_STRING_get0_data(&t), static_cast<size_t>(ASN1_STRING_length(&t)));
+    point = ossl::toBin(t);
 }
 
 bool Signature::operator==(const Signature &rhs) const

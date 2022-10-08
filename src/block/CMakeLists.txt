@@ -5,5 +5,6 @@ fluffylib(
     PUBLIC
         fluffycoin-log
         fluffycoin-utils
+        fluffycoin-ossl
         OpenSSL::Crypto
 )

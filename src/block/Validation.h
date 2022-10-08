@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <openssl/asn1.h>
 
@@ -12,6 +13,7 @@ namespace asn1
     typedef struct Validation_st Validation;
     DECLARE_ASN1_FUNCTIONS(Validation)
     SKM_DEFINE_STACK_OF(Validation, Validation, Validation)
+    FLUFFYCOIN_DEFINE_STACK_FUNCTIONS(Validation)
 }
 
 namespace block

@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Validation.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <openssl/asn1t.h>
 
@@ -69,13 +70,13 @@ void Validation::setSignature(BinData signature)
 void Validation::toASN1(asn1::Validation &t) const
 {
     *t.verified = static_cast<int>(verified);
-    ASN1_STRING_set(t.authAddress, address.data(), static_cast<int>(address.length()));
-    ASN1_STRING_set(t.signature, signature.data(), static_cast<int>(signature.length()));
+    ossl::fromBin(*t.authAddress, address);
+    ossl::fromBin(*t.signature, signature);
 }
 
 void Validation::fromASN1(const asn1::Validation &t)
 {
     verified = static_cast<bool>(*t.verified);
-    address.setData(ASN1_STRING_get0_data(t.authAddress), static_cast<size_t>(ASN1_STRING_length(t.authAddress)));
-    signature.setData(ASN1_STRING_get0_data(t.signature), static_cast<size_t>(ASN1_STRING_length(t.signature)));
+    address = ossl::toBin(*t.authAddress);
+    signature = ossl::toBin(*t.signature);
 }

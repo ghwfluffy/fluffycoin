@@ -55,29 +55,41 @@ Validation              ::=SEQUENCE {
 -- Every so often all of the chains recombine into a single block
 -- This is a bit of a bottleneck that synchronizes all of the sub-chains
 -- It is used to count an arbitrary amount of time in blockchain operations
-Reconciliation          ::=SEQUENCE {
+ReconciliationContent   ::=SEQUENCE {
+    -- Protocol version can change any time by concensus
+    -- All nodes after a reconciliation protocol change use the new protocol
+    protocol            INTEGER (0),
+    -- Time of reconciliation
+    time                Time,
     -- Monotomically increments every reconciliation block starting at zero
     chainId             INTEGER (0..MAX),
     -- Ordered hashes of the last node of every sub-chain
-    shardHashes         SEQUENCE OF Hash,
+    shardHashes         SEQUENCE OF Hash SIZE (1..64),
     -- The round leader for the reconciliation block
     leader              Address,
-    -- Signature over [chainId | prevHashes]
+    newAddress          Address
+}
+Reconciliation          ::=SEQUENCE {
+    content             ReconciliationContent,
+    -- Signature over content
     signature           Signature,
     -- Distributed validation of the reconciliation block
     votes               SET OF Validation SIZE (1..MAX)
 }
 
 -- A normal node in the blockchain where all the transactions happen
-Node                    ::=SEQUENCE {
-    --
+NodeContent             ::=SEQUENCE {
     chainId             INTEGER (0..MAX),
-    shardId             INTEGER (0..64),
+    shardId             INTEGER (0..63),
     index               INTEGER (0..10240),
     prevHash            Hash,
     transactions        SEQUENCE SIZE (1..104857600) OF Transaction,
     nonce               OCTET STRING SIZE (8),
-    miner               Address,
+    leader              Address,
+    newLeaderAddress    Address
+}
+Node                    ::=SEQUENCE {
+    copnmtent           NodeContent,
     signature           Signature,
     votes               SET OF Validation SIZE (1..MAX)
 }
@@ -90,29 +102,60 @@ Block                   ::=CHOICE {
     node                [3] Node
 }
 
-Transaction             ::=SEQUENCE {
-    protocol            INTEGER (0),
+TransactionContent      ::=SEQUENCE {
     time                Time,
     CHOICE {
-        register            [0] Register,
-        unregister          [1] Unregister,
-        updateCreds         [2] CredentialChange,
-        transfer            [3] Transfer,
-        lotto               [4] LotteryTicket,
-        newPrivateStock     [5] NewPrivateStock,
-        newPublicStock      [6] NewPublicStock
-        newVote             [7] NewVote,
-        vote                [8] PublicVote,
-        burn                [9] Donation,
-        offerLoan           [10] NewLoan,
-        cancelLoan          [11] CancelLoan,
-        acceptLoan          [12] AcceptLoan,
-        forgiveLoan         [13] ForgiveLoan,
-        forwardLoan         [14] ForwardLoan,
-        prepayLoan          [15] PrepayLoan
+        null                [0] NULL,
+        transfer            [1] Transfer,
+        lotto               [2] LotteryTicket,
+        burn                [3] Donation,
+        mining              [3] MiningAction,
+        stock               [4] StockAction,
+        voting              [5] VoteAction,
+        loan                [6] LoanAction,
     },
-    signer              Address,
     newAddress          Address
+}
+Transaction             ::=SEQUENCE {
+    content             TransactionContent,
+    signer              Address,
+}
+
+MiningAction            ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        register            [1] Register,
+        unregister          [2] Unregister,
+        updateCreds         [3] CredentialChange
+    }
+}
+
+StockAction             ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        newPrivateStock     [1] NewPrivateStock,
+        newPublicStock      [2] NewPublicStock
+    }
+}
+
+VoteAction              ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        newVote             [1] NewVote,
+        vote                [2] PublicVote,
+    }
+}
+
+LoanAction              ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        offerLoan           [1] NewLoan,
+        cancelLoan          [2] CancelLoan,
+        acceptLoan          [3] AcceptLoan,
+        forgiveLoan         [4] ForgiveLoan,
+        forwardLoan         [5] ForwardLoan,
+        prepayLoan          [6] PrepayLoan
+    }
 }
 
 Register                ::=SEQUENCE {
@@ -133,9 +176,9 @@ CredentialChange        ::=SEQUENCE {
 }
 
 Transfer                ::=SEQUENCE {
-    receiver            OCTET STRING,
+    receiver            Address,
     amount              Specie,
-    currency            UTF8STRING OPTIONAL
+    coin                UTF8STRING OPTIONAL
 }
 
 LotteryTicket           ::=SEQUENCE {
@@ -190,7 +233,7 @@ NewLoan                 ::=SEQUENCE {
     -- Total tokens loaning at this agreement
     amount              Specie,
     -- McBucks (Must be at least 1 coin in outstanding owed loans)
-    currency            UTF8STRING OPTIONAL,
+    coin                UTF8STRING OPTIONAL,
     -- Amount extra needed to pay every reconsiliation block
     interest            Specie,
     -- The loan automatically expires after this many reconsiliation blocks
@@ -209,7 +252,7 @@ AcceptLoan              ::=SEQUENCE {
     amount              Specie,
     burn                Specie,
     -- McBucks
-    currency            OCTET STRING
+    coin                OCTET STRING
 }
 
 ForgiveLoan             ::=SEQUENCE {

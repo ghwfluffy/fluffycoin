@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Address.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,12 +19,12 @@ void Address::set(BinData address)
 
 void Address::toASN1(ASN1_OCTET_STRING &t) const
 {
-    ASN1_STRING_set(&t, address.data(), static_cast<int>(address.length()));
+    ossl::fromBin(t, address);
 }
 
 void Address::fromASN1(const ASN1_OCTET_STRING &t)
 {
-    address.setData(ASN1_STRING_get0_data(&t), static_cast<size_t>(ASN1_STRING_length(&t)));
+    address = ossl::toBin(t);
 }
 
 bool Address::operator==(const Address &rhs) const

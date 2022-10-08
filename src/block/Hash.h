@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <openssl/asn1.h>
 
@@ -12,6 +13,7 @@ namespace asn1
     typedef struct Hash_st Hash;
     DECLARE_ASN1_FUNCTIONS(Hash)
     SKM_DEFINE_STACK_OF(Hash, Hash, Hash)
+    FLUFFYCOIN_DEFINE_STACK_FUNCTIONS(Hash)
 }
 
 namespace block

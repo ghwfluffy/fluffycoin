@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Genesis.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <openssl/asn1t.h>
 
@@ -117,22 +118,22 @@ void Genesis::setSeed(BinData data)
 
 void Genesis::toASN1(asn1::Genesis &t) const
 {
-    ASN1_INTEGER_set_uint64(t.protocol, static_cast<uint64_t>(protocol));
-    ASN1_STRING_set(t.name, name.data(), static_cast<int>(name.length()));
-    ASN1_INTEGER_set_uint64(t.version, static_cast<uint64_t>(version));
+    ossl::fromUInt64(*t.protocol, protocol);
+    ossl::fromBin(*t.name, name);
+    ossl::fromUInt64(*t.version, version);
     creation.toASN1(*t.creation);
     creator.toASN1(*t.creator);
     greed.toASN1(*t.greed);
-    ASN1_STRING_set(t.seed, seed.data(), static_cast<int>(seed.length()));
+    ossl::fromBin(*t.seed, seed);
 }
 
 void Genesis::fromASN1(const asn1::Genesis &t)
 {
-    protocol = static_cast<uint32_t>(ASN1_INTEGER_get(t.protocol));
-    name.assign(reinterpret_cast<const char *>(ASN1_STRING_get0_data(t.name)), static_cast<size_t>(ASN1_STRING_length(t.name)));
-    version = static_cast<uint32_t>(ASN1_INTEGER_get(t.version));
+    protocol = ossl::toUInt32(*t.protocol);
+    name = ossl::toString(*t.name);
+    version = ossl::toUInt32(*t.version);
     creation.fromASN1(*t.creation);
     creator.fromASN1(*t.creator);
     greed.fromASN1(*t.greed);
-    seed.setData(ASN1_STRING_get0_data(t.seed), static_cast<size_t>(ASN1_STRING_length(t.seed)));
+    seed = ossl::toBin(*t.seed);
 }

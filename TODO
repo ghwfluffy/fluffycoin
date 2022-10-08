@@ -28,9 +28,8 @@ Block
     Mining
     [ ] Register
     [ ] Unregister
-    [ ] CredentiaChange
+    [ ] CredentialChange
     Actions
-    [ ] Transfer
     [ ] Lottery
     [ ] Donation
     Stock

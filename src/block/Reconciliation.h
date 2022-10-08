@@ -35,6 +35,9 @@ class Reconciliation
         Reconciliation &operator=(const Reconciliation &) = default;
         ~Reconciliation() = default;
 
+        uint32_t getProtocol() const;
+        void setProtocol(uint32_t protocol);
+
         uint64_t getChainId() const;
         void setChainId(uint64_t chainId);
 
@@ -53,10 +56,14 @@ class Reconciliation
         void toASN1(asn1::Reconciliation &) const;
         void fromASN1(const asn1::Reconciliation &);
 
+        BinData toContent() const;
+
     private:
+        uint32_t protocol;
         uint64_t chainId;
         std::list<Hash> shardHashes;
         BinData leader;
+        BinData newAddress;
         BinData signature;
         std::list<Validation> votes;
 };

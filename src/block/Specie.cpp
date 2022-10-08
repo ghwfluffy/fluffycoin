@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Specie.h>
+#include <fluffycoin/ossl/convert.h>
 
 #include <openssl/asn1t.h>
 
@@ -56,12 +57,12 @@ void Specie::setFluffs(uint32_t fluffs)
 
 void Specie::toASN1(asn1::Specie &t) const
 {
-    ASN1_INTEGER_set_uint64(t.coins, coins);
-    ASN1_INTEGER_set_uint64(t.fluffs, static_cast<uint64_t>(fluffs));
+    ossl::fromUInt64(*t.coins, coins);
+    ossl::fromUInt32(*t.fluffs, fluffs);
 }
 
 void Specie::fromASN1(const asn1::Specie &t)
 {
-    coins = static_cast<uint64_t>(ASN1_INTEGER_get(t.coins));
-    fluffs = static_cast<uint32_t>(ASN1_INTEGER_get(t.fluffs)); // TODO: What validates this
+    coins = ossl::toUInt64(*t.coins);
+    fluffs = ossl::toUInt32(*t.fluffs);
 }

@@ -2,6 +2,8 @@
 
 #include <fluffycoin/utils/BinData.h>
 
+#include <openssl/asn1.h>
+
 namespace fluffycoin
 {
 
