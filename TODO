@@ -19,6 +19,10 @@ Design
         [ ] Bids/Accepts/Cancel
     [ ] McBuck sub-borrowers
 
+CLI
+    [\] genesis
+    [ ] newprivkey
+
 Block
     Core
     [ ] BlockDecode
@@ -48,6 +52,7 @@ Block
     [ ] PrepayLoan
 
 Utils
+    [ ] Log console colors
     [ ] case insensitive ascii
     [ ] multiple log backups
 

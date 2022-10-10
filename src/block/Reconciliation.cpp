@@ -1,6 +1,9 @@
 #include <fluffycoin/block/Reconciliation.h>
 #include <fluffycoin/block/Time.h>
 
+#include <fluffycoin/ossl/convert.h>
+#include <fluffycoin/ossl/encode.h>
+
 #include <openssl/asn1t.h>
 
 namespace fluffycoin
@@ -147,15 +150,7 @@ BinData Reconciliation::toContent() const
 {
     asn1::Reconciliation *obj = asn1::Reconciliation_new();
     toASN1(*obj);
-
-    int len = i2d_ReconciliationContent(obj->content, nullptr);
-    BinData data;
-    data.resize(static_cast<size_t>(len));
-
-    unsigned char *pauc = data.data();
-    i2d_ReconciliationContent(obj->content, &pauc);
-
+    BinData data = ossl::encode(*obj->content, asn1::i2d_ReconciliationContent);
     asn1::Reconciliation_free(obj);
-
     return data;
 }

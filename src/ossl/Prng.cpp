@@ -3,6 +3,8 @@
 
 #include <openssl/rand.h>
 
+#include <algorithm>
+
 using namespace fluffycoin;
 using namespace fluffycoin::ossl;
 
@@ -22,12 +24,8 @@ unsigned int Prng::randInt(unsigned int min, unsigned int max)
     if (min == max)
         return min;
 
-    if (max > min)
-    {
-        unsigned int tmp = min;
-        min = max;
-        max = tmp;
-    }
+    if (min > max)
+        std::swap(min, max);
 
     unsigned int range = max - min;
     unsigned long long maxNum = static_cast<unsigned long long>(UINT_MAX);

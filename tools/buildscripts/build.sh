@@ -55,7 +55,7 @@ done
 
 # Directories
 BUILD_DIR=".cmake"
-TOP_DIR="$(dirname $(dirname $(readlink -f "${0}")))"
+TOP_DIR="$(dirname $(dirname $(dirname $(readlink -f "${0}"))))"
 
 # Cleanup previous build
 if [ ${CLEAN} -gt 0 ]; then

@@ -27,6 +27,9 @@ void fromUInt32(ASN1_INTEGER &t, uint32_t ui);
 uint64_t toUInt64(const ASN1_INTEGER &t);
 void fromUInt64(ASN1_INTEGER &t, uint64_t ui);
 
+int toNid(const ASN1_OBJECT &t);
+void fromNid(ASN1_OBJECT *&pt, int nid);
+
 #define FLUFFYCOIN_DEFINE_STACK_FUNCTIONS(Type) \
     template<typename BlockType> \
     static void to##Type##Stack(asn1::stack_st_##Type &st, const std::list<BlockType> &objs) \

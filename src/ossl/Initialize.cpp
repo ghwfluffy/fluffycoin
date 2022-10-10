@@ -1,4 +1,5 @@
 #include <fluffycoin/ossl/Initialize.h>
+#include <fluffycoin/ossl/Entropy.h>
 
 #include <atomic>
 
@@ -21,8 +22,7 @@ void ossl::Initialize::initialize()
         return;
 
     OPENSSL_init();
-    ERR_load_crypto_strings();
-    OpenSSL_add_all_algorithms();
+    Entropy::seed();
 }
 
 void ossl::Initialize::cleanup()
@@ -30,8 +30,5 @@ void ossl::Initialize::cleanup()
     if (--giInitRef != 0)
         return;
 
-    ERR_free_strings();
-    EVP_cleanup();
-    CRYPTO_cleanup_all_ex_data();
     OPENSSL_cleanup();
 }

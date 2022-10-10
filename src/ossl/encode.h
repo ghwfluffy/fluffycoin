@@ -2,6 +2,8 @@
 
 #include <fluffycoin/utils/BinData.h>
 
+#include <memory>
+
 namespace fluffycoin
 {
 
@@ -11,19 +13,19 @@ namespace ossl
 /**
  * Encode OpenSSL structs into binary data
  */
-template<typename uptr, typename I2D>
-BinData encode(uptr ptStruct, I2D pfEncode)
+template<typename DataType=BinData, typename T, typename I2D>
+DataType encode(const T &tStruct, I2D pfEncode)
 {
-    BinData ret;
-    if (!ptStruct || !pfEncode)
+    DataType ret;
+    if (!pfEncode)
         return ret;
 
-    int len = pfEncode(ptStruct.get(), nullptr);
+    int len = pfEncode(&tStruct, nullptr);
     if (len > 0)
     {
         ret.resize(static_cast<size_t>(len));
         unsigned char *ptr = ret.data();
-        pfEncode(ptStruct, &ptr);
+        pfEncode(&tStruct, &ptr);
     }
 
     return ret;

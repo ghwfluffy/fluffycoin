@@ -30,6 +30,13 @@ BinData::BinData(const unsigned char *buffer, size_t len)
     setData(buffer, len);
 }
 
+BinData::BinData(const char *psz)
+        : BinData()
+{
+    if (psz && *psz)
+        setData(reinterpret_cast<const unsigned char *>(psz), strlen(psz));
+}
+
 BinData::BinData(const std::string &str)
         : BinData()
 {
@@ -88,6 +95,11 @@ void BinData::cleanup()
     free(this->buffer);
     this->len = 0;
     this->buffer = nullptr;
+}
+
+void BinData::clear()
+{
+    cleanup();
 }
 
 void BinData::resize(size_t len)
@@ -154,4 +166,9 @@ void BinData::zeroize(void *pv, size_t len)
 {
     if (pv && len)
         volatile_memset(pv, 0, len);
+}
+
+bool BinData::empty() const
+{
+    return len == 0;
 }

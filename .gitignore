@@ -1,3 +1,5 @@
 *.swp
+.ctags
 .cmake/
 outfile.tmp
+commit-message.txt

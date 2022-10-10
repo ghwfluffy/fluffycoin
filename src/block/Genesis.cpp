@@ -1,5 +1,7 @@
 #include <fluffycoin/block/Genesis.h>
+
 #include <fluffycoin/ossl/convert.h>
+#include <fluffycoin/ossl/encode.h>
 
 #include <openssl/asn1t.h>
 
@@ -136,4 +138,13 @@ void Genesis::fromASN1(const asn1::Genesis &t)
     creator.fromASN1(*t.creator);
     greed.fromASN1(*t.greed);
     seed = ossl::toBin(*t.seed);
+}
+
+BinData Genesis::toContent() const
+{
+    asn1::Genesis *obj = asn1::Genesis_new();
+    toASN1(*obj);
+    BinData data = ossl::encode(*obj, asn1::i2d_Genesis);
+    asn1::Genesis_free(obj);
+    return data;
 }

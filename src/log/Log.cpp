@@ -26,7 +26,7 @@ std::string to_string_upper(log::Level eLevel);
 
 void log::setConsole(bool bConsole)
 {
-    bConsole = bConsole;
+    ::bConsole = bConsole;
 }
 
 void log::setFile(const std::string &file)
@@ -116,7 +116,7 @@ void log::msg(Level eLevel, const std::string &str)
 
 bool log::check(Level eLevel)
 {
-    return level >= eLevel;
+    return (bConsole || logFile.empty() || gpfCallback) && level >= eLevel;
 }
 
 void fluffycoin::from_string(const std::string &str, log::Level &eLevel)

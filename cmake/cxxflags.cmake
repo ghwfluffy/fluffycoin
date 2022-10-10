@@ -1,3 +1,12 @@
+# C++17
+set(CMAKE_CXX_STANDARD 17)
+
+# OpenSSL 3.1
+string(APPEND
+    CMAKE_CXX_FLAGS
+    " -DOPENSSL_NO_DEPRECATED"
+)
+
 # g++ release flags
 string(APPEND
     CMAKE_CXX_FLAGS_RELEASE

@@ -14,18 +14,22 @@ class BinData
         BinData();
         BinData(const unsigned char *data, size_t len);
         BinData(const std::string &str);
+        BinData(const char *psz);
         BinData(BinData &&);
         BinData(const BinData &);
         BinData &operator=(BinData &&);
         BinData &operator=(const BinData &);
         ~BinData();
 
+        void clear();
         void resize(size_t len);
         void setData(const unsigned char *data, size_t len);
 
         size_t length() const;
         unsigned char *data();
         const unsigned char *data() const;
+
+        bool empty() const;
 
     protected:
         BinData(bool bSecure);

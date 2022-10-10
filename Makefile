@@ -7,13 +7,13 @@ ifneq ($(JOBS), )
 endif
 
 debug: ## Build all debug distributables - Default
-	./build/build.sh $(ARGS) -d
+	./tools/buildscripts/build.sh $(ARGS) -d
 
 release: ## Build all release distributables
-	./build/build.sh $(ARGS)
+	./tools/buildscripts/build.sh $(ARGS)
 
 clean: ## Cleanup all previous build artifacts and distributables
-	./build/build.sh -C
+	./tools/buildscripts/build.sh -C
 
 .PHONY: help
 help:

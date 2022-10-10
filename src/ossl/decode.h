@@ -4,6 +4,8 @@
 
 #include <openssl/asn1.h>
 
+#include <memory>
+
 namespace fluffycoin
 {
 
@@ -16,11 +18,11 @@ namespace ossl
 template<typename uptr, typename D2I>
 uptr decode(const BinData &binData, D2I pfDecode)
 {
-    if (binData.empty() || !pfDecode)
+    if (binData.empty())
         return uptr();
 
     const unsigned char *ptr = binData.data();
-    return uptr(pfDecode(nullptr, &ptr, binData.length());
+    return uptr(pfDecode(nullptr, &ptr, static_cast<long>(binData.length())));
 }
 
 }

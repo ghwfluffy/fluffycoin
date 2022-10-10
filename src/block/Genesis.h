@@ -60,6 +60,8 @@ class Genesis
         void toASN1(asn1::Genesis &) const;
         void fromASN1(const asn1::Genesis &);
 
+        BinData toContent() const;
+
     private:
         uint32_t protocol;
         std::string name;
