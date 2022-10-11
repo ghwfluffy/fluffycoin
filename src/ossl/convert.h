@@ -31,6 +31,8 @@ int toNid(const ASN1_OBJECT &t);
 void fromNid(ASN1_OBJECT *&pt, int nid);
 
 #define FLUFFYCOIN_DEFINE_STACK_FUNCTIONS(Type) \
+    SKM_DEFINE_STACK_OF(Type, Type, Type) \
+ \
     template<typename BlockType> \
     static void to##Type##Stack(asn1::stack_st_##Type &st, const std::list<BlockType> &objs) \
     { \

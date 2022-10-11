@@ -175,9 +175,13 @@ CredentialChange        ::=SEQUENCE {
     newSignature        Signature
 }
 
-Transfer                ::=SEQUENCE {
+Exchange                ::=SEQUENCE {
     receiver            Address,
-    amount              Specie,
+    amount              Specie
+}
+
+Transfer                ::=SEQUENCE {
+    exchanges           SEQUENCE SIZE (1..MAX) OF Exchange,
     coin                UTF8STRING OPTIONAL
 }
 

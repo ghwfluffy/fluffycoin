@@ -11,15 +11,13 @@ namespace asn1
 
 typedef struct Transfer_st
 {
-    ASN1_OCTET_STRING *receiver;
-    Specie *amount;
+    STACK_OF(Exchange) *exchanges;
     ASN1_UTF8STRING *coin;
 } Transfer;
 
 ASN1_SEQUENCE(Transfer) =
 {
-    ASN1_SIMPLE(Transfer, receiver, ASN1_OCTET_STRING)
-  , ASN1_SIMPLE(Transfer, amount, Specie)
+    ASN1_SEQUENCE_OF(Transfer, exchanges, Exchange)
   , ASN1_SIMPLE(Transfer, coin, ASN1_UTF8STRING)
 } ASN1_SEQUENCE_END(Transfer)
 
@@ -30,24 +28,14 @@ ASN1_SEQUENCE(Transfer) =
 using namespace fluffycoin;
 using namespace fluffycoin::block;
 
-const BinData &Transfer::getReceiver() const
+const std::list<Exchange> &Transfer::getExchanges() const
 {
-    return receiver;
+    return exchanges;
 }
 
-void Transfer::setReceiver(BinData receiver)
+void Transfer::setExchanges(std::list<Exchange> exchanges)
 {
-    this->receiver = std::move(receiver);
-}
-
-const Specie &Transfer::getAmount() const
-{
-    return amount;
-}
-
-void Transfer::setAmount(Specie amount)
-{
-    this->amount = std::move(amount);
+    this->exchanges = std::move(exchanges);
 }
 
 const std::string &Transfer::getCoin() const
@@ -62,14 +50,12 @@ void Transfer::setCoin(std::string coin)
 
 void Transfer::toASN1(asn1::Transfer &t) const
 {
-    ossl::fromBin(*t.receiver, receiver);
-    amount.toASN1(*t.amount);
+    asn1::toExchangeStack(*t.exchanges, exchanges);
     ossl::fromString(*t.coin, coin);
 }
 
 void Transfer::fromASN1(const asn1::Transfer &t)
 {
-    receiver = ossl::toBin(*t.receiver);
-    amount.fromASN1(*t.amount);
+    asn1::fromExchangeStack(exchanges, *t.exchanges);
     coin = ossl::toString(*t.coin);
 }

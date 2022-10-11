@@ -12,7 +12,6 @@ namespace asn1
 {
     typedef struct Validation_st Validation;
     DECLARE_ASN1_FUNCTIONS(Validation)
-    SKM_DEFINE_STACK_OF(Validation, Validation, Validation)
     FLUFFYCOIN_DEFINE_STACK_FUNCTIONS(Validation)
 }
 
