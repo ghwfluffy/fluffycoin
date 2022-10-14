@@ -36,7 +36,6 @@ string(APPEND
     " -Wformat=2"
     " -Wimport"
     " -Winit-self"
-    " -Winline"
     " -Winvalid-pch"
     " -Wlogical-op"
     " -Wmissing-declarations"
@@ -71,6 +70,7 @@ string(APPEND
 
     " -Wno-aggregate-return"
     " -Wno-effc++"
+    " -Wno-inline"
     " -Wno-padded"
     " -Wno-shadow"
     " -Wno-suggest-attribute=format"

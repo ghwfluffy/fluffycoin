@@ -40,8 +40,8 @@ class Validation
         const BinData &getSignature() const;
         void setSignature(BinData signature);
 
-        void toASN1(asn1::Validation &) const;
-        void fromASN1(const asn1::Validation &);
+        void toAsn1(asn1::Validation &) const;
+        void fromAsn1(const asn1::Validation &);
 
     private:
         bool verified;

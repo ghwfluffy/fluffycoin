@@ -40,7 +40,7 @@ void fromNid(ASN1_OBJECT *&pt, int nid);
         for (const BlockType &cur : (objs)) \
         { \
             asn1::Type *pt = asn1::Type##_new(); \
-            cur.toASN1(*pt); \
+            cur.toAsn1(*pt); \
             asn1::sk_##Type##_push(&(st), pt); \
         } \
     } \
@@ -53,7 +53,7 @@ void fromNid(ASN1_OBJECT *&pt, int nid);
         { \
             asn1::Type *pt = asn1::sk_##Type##_value(&(st), i); \
             BlockType cur; \
-            cur.fromASN1(*pt); \
+            cur.fromAsn1(*pt); \
             objs.emplace_back(std::move(cur)); \
         } \
     }

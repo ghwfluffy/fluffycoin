@@ -51,13 +51,13 @@ void Hash::setSha3(BinData hash)
     this->sha3 = std::move(hash);
 }
 
-void Hash::toASN1(asn1::Hash &t) const
+void Hash::toAsn1(asn1::Hash &t) const
 {
     ossl::fromBin(*t.sha2, sha2);
     ossl::fromBin(*t.sha3, sha3);
 }
 
-void Hash::fromASN1(const asn1::Hash &t)
+void Hash::fromAsn1(const asn1::Hash &t)
 {
     sha2 = ossl::toBin(*t.sha2);
     sha3 = ossl::toBin(*t.sha3);

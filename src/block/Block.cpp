@@ -16,9 +16,7 @@ typedef struct Block_st
         ASN1_NULL *null;
         Genesis *genesis;
         Reconciliation *reconciliation;
-#if 0
         Node *node;
-#endif
     } u;
 } Block;
 
@@ -27,9 +25,7 @@ ASN1_CHOICE(Block) =
     ASN1_SIMPLE(Block, u.null, ASN1_NULL)
   , ASN1_IMP(Block, u.genesis, Genesis, 1)
   , ASN1_IMP(Block, u.reconciliation, Reconciliation, 2)
-#if 0
   , ASN1_IMP(Block, u.node, Node, 3)
-#endif
 } ASN1_CHOICE_END(Block)
 
 }
@@ -41,7 +37,7 @@ using namespace fluffycoin::block;
 
 Block::Block()
 {
-    this->type = Type::None;
+    resetChoice();
 }
 
 Block::Block(Block &&rhs)
@@ -53,27 +49,31 @@ Block &Block::operator=(Block &&rhs)
 {
     if (this != &rhs)
     {
-        this->type = rhs.type;
-        rhs.type = Type::None;
+        resetChoice();
 
+        this->type = rhs.type;
         this->genesis = std::move(rhs.genesis);
         this->reconciliation = std::move(rhs.reconciliation);
-#if 0
         this->node = std::move(rhs.node);
-#endif
+
+        rhs.resetChoice();
     }
 
     return (*this);
 }
 
+void Block::resetChoice()
+{
+    type = Type::None;
+
+    genesis.reset();
+    reconciliation.reset();
+    node.reset();
+}
+
 Block::Type Block::getType() const
 {
     return type;
-}
-
-void Block::setType(Type type)
-{
-    this->type = type;
 }
 
 const std::unique_ptr<Genesis> &Block::getGenesis() const
@@ -83,12 +83,9 @@ const std::unique_ptr<Genesis> &Block::getGenesis() const
 
 void Block::setGenesis(Genesis genesis)
 {
+    resetChoice();
     type = Type::Genesis;
     this->genesis = std::make_unique<Genesis>(std::move(genesis));
-    reconciliation.reset();
-#if 0
-    node.reset();
-#endif
 }
 
 const std::unique_ptr<Reconciliation> &Block::getReconciliation() const
@@ -98,15 +95,11 @@ const std::unique_ptr<Reconciliation> &Block::getReconciliation() const
 
 void Block::setReconciliation(Reconciliation reconciliation)
 {
+    resetChoice();
     type = Type::Reconciliation;
-    genesis.reset();
     this->reconciliation = std::make_unique<Reconciliation>(std::move(reconciliation));
-#if 0
-    node.reset();
-#endif
 }
 
-#if 0
 const std::unique_ptr<Node> &Block::getNode() const
 {
     return node;
@@ -114,14 +107,12 @@ const std::unique_ptr<Node> &Block::getNode() const
 
 void Block::setNode(Node node)
 {
+    resetChoice();
     type = Type::Node;
-    genesis.reset();
-    reconciliation.reset();
     this->node = std::make_unique<Node>(std::move(node));
 }
-#endif
 
-void Block::toASN1(asn1::Block &t) const
+void Block::toAsn1(asn1::Block &t) const
 {
     // Cleanup any current memory
     switch (static_cast<Block::Type>(t.type))
@@ -139,15 +130,12 @@ void Block::toASN1(asn1::Block &t) const
             t.u.reconciliation = nullptr;
             break;
         case Type::Node:
-#if 0
             asn1::Node_free(t.u.node);
             t.u.node = nullptr;
-#endif
             break;
         default:
-
             if (t.u.null)
-                log::error("Invalid toASN1 cleanup block type {}.", t.type);
+                log::error("Invalid toAsn1 cleanup block type {}.", t.type);
             break;
     }
 
@@ -160,27 +148,25 @@ void Block::toASN1(asn1::Block &t) const
             break;
         case Type::Genesis:
             t.u.genesis = asn1::Genesis_new();
-            genesis->toASN1(*t.u.genesis);
+            genesis->toAsn1(*t.u.genesis);
             break;
         case Type::Reconciliation:
             t.u.reconciliation = asn1::Reconciliation_new();
-            reconciliation->toASN1(*t.u.reconciliation);
+            reconciliation->toAsn1(*t.u.reconciliation);
             break;
         case Type::Node:
-#if 0
             t.u.node = asn1::Node_new();
-            node->toASN1(*t.u.node);
-#endif
+            node->toAsn1(*t.u.node);
             break;
         default:
-            log::error("Invalid toASN1 block type {}.", static_cast<int>(type));
+            log::error("Invalid toAsn1 block type {}.", static_cast<int>(type));
             break;
     }
 }
 
-void Block::fromASN1(const asn1::Block &t)
+void Block::fromAsn1(const asn1::Block &t)
 {
-    (*this) = Block();
+    resetChoice();
     switch (static_cast<Block::Type>(t.type))
     {
         case Type::None:
@@ -188,22 +174,20 @@ void Block::fromASN1(const asn1::Block &t)
         case Type::Genesis:
             type = Type::Genesis;
             genesis = std::make_unique<Genesis>();
-            genesis->fromASN1(*t.u.genesis);
+            genesis->fromAsn1(*t.u.genesis);
             break;
         case Type::Reconciliation:
             type = Type::Reconciliation;
             reconciliation = std::make_unique<Reconciliation>();
-            reconciliation->fromASN1(*t.u.reconciliation);
+            reconciliation->fromAsn1(*t.u.reconciliation);
             break;
         case Type::Node:
-#if 0
             type = Type::Node;
             node = std::make_unique<Node>();
-            node->fromASN1(*t.u.node);
-#endif
+            node->fromAsn1(*t.u.node);
             break;
         default:
-            log::error("Invalid fromASN1 block type {}.", t.type);
+            log::error("Invalid fromAsn1 block type {}.", t.type);
             break;
     }
 }

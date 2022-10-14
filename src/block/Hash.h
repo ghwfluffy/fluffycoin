@@ -37,8 +37,8 @@ class Hash
         const BinData &getSha3() const;
         void setSha3(BinData hash);
 
-        void toASN1(asn1::Hash &) const;
-        void fromASN1(const asn1::Hash &);
+        void toAsn1(asn1::Hash &) const;
+        void fromAsn1(const asn1::Hash &);
 
         bool operator==(const Hash &rhs) const;
         bool operator!=(const Hash &rhs) const;

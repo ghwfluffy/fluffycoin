@@ -37,8 +37,8 @@ class Time
         void set(uint64_t time);
         void set(std::chrono::time_point<std::chrono::system_clock> time);
 
-        void toASN1(ASN1_INTEGER &) const;
-        void fromASN1(const ASN1_INTEGER &);
+        void toAsn1(ASN1_INTEGER &) const;
+        void fromAsn1(const ASN1_INTEGER &);
 
         bool operator<(const Time &rhs) const;
         bool operator<=(const Time &rhs) const;

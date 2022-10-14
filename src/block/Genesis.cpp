@@ -118,32 +118,32 @@ void Genesis::setSeed(BinData data)
     this->seed = std::move(data);
 }
 
-void Genesis::toASN1(asn1::Genesis &t) const
+void Genesis::toAsn1(asn1::Genesis &t) const
 {
     ossl::fromUInt64(*t.protocol, protocol);
     ossl::fromBin(*t.name, name);
     ossl::fromUInt64(*t.version, version);
-    creation.toASN1(*t.creation);
-    creator.toASN1(*t.creator);
-    greed.toASN1(*t.greed);
+    creation.toAsn1(*t.creation);
+    creator.toAsn1(*t.creator);
+    greed.toAsn1(*t.greed);
     ossl::fromBin(*t.seed, seed);
 }
 
-void Genesis::fromASN1(const asn1::Genesis &t)
+void Genesis::fromAsn1(const asn1::Genesis &t)
 {
     protocol = ossl::toUInt32(*t.protocol);
     name = ossl::toString(*t.name);
     version = ossl::toUInt32(*t.version);
-    creation.fromASN1(*t.creation);
-    creator.fromASN1(*t.creator);
-    greed.fromASN1(*t.greed);
+    creation.fromAsn1(*t.creation);
+    creator.fromAsn1(*t.creator);
+    greed.fromAsn1(*t.greed);
     seed = ossl::toBin(*t.seed);
 }
 
 BinData Genesis::toContent() const
 {
     asn1::Genesis *obj = asn1::Genesis_new();
-    toASN1(*obj);
+    toAsn1(*obj);
     BinData data = ossl::encode(*obj, asn1::i2d_Genesis);
     asn1::Genesis_free(obj);
     return data;

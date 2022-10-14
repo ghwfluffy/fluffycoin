@@ -55,13 +55,13 @@ void Specie::setFluffs(uint32_t fluffs)
     this->fluffs = fluffs;
 }
 
-void Specie::toASN1(asn1::Specie &t) const
+void Specie::toAsn1(asn1::Specie &t) const
 {
     ossl::fromUInt64(*t.coins, coins);
     ossl::fromUInt32(*t.fluffs, fluffs);
 }
 
-void Specie::fromASN1(const asn1::Specie &t)
+void Specie::fromAsn1(const asn1::Specie &t)
 {
     coins = ossl::toUInt64(*t.coins);
     fluffs = ossl::toUInt32(*t.fluffs);

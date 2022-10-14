@@ -26,8 +26,8 @@ class Signature
         const BinData &get() const;
         void set(BinData point);
 
-        void toASN1(ASN1_OCTET_STRING &t) const;
-        void fromASN1(const ASN1_OCTET_STRING &t);
+        void toAsn1(ASN1_OCTET_STRING &t) const;
+        void fromAsn1(const ASN1_OCTET_STRING &t);
 
         bool operator==(const Signature &) const;
         bool operator!=(const Signature &) const;

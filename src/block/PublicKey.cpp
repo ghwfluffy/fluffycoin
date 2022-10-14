@@ -16,12 +16,12 @@ void PublicKey::set(BinData point)
     this->point = std::move(point);
 }
 
-void PublicKey::toASN1(ASN1_OCTET_STRING &t) const
+void PublicKey::toAsn1(ASN1_OCTET_STRING &t) const
 {
     ossl::fromBin(t, point);
 }
 
-void PublicKey::fromASN1(const ASN1_OCTET_STRING &t)
+void PublicKey::fromAsn1(const ASN1_OCTET_STRING &t)
 {
     point = ossl::toBin(t);
 }

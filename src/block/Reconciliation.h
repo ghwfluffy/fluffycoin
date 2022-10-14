@@ -53,8 +53,8 @@ class Reconciliation
         const std::list<Validation> &getVotes() const;
         void setVotes(std::list<Validation> votes);
 
-        void toASN1(asn1::Reconciliation &) const;
-        void fromASN1(const asn1::Reconciliation &);
+        void toAsn1(asn1::Reconciliation &) const;
+        void fromAsn1(const asn1::Reconciliation &);
 
         BinData toContent() const;
 

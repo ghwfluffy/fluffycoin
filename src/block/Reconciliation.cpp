@@ -21,11 +21,13 @@ typedef struct ReconciliationContent_t
     ASN1_OCTET_STRING *leader;
     ASN1_OCTET_STRING *newAddress;
 } ReconciliationContent;
-DECLARE_ASN1_FUNCTIONS(ReconciliationContent);
+
+DECLARE_ASN1_FUNCTIONS(ReconciliationContent)
 
 ASN1_SEQUENCE(ReconciliationContent) =
 {
     ASN1_SIMPLE(ReconciliationContent, protocol, ASN1_INTEGER)
+  , ASN1_SIMPLE(ReconciliationContent, time, ASN1_INTEGER)
   , ASN1_SIMPLE(ReconciliationContent, chainId, ASN1_INTEGER)
   , ASN1_SEQUENCE_OF(ReconciliationContent, shardHashes, Hash)
   , ASN1_SIMPLE(ReconciliationContent, leader, ASN1_OCTET_STRING)
@@ -124,7 +126,7 @@ void Reconciliation::setVotes(std::list<Validation> votes)
     this->votes = std::move(votes);
 }
 
-void Reconciliation::toASN1(asn1::Reconciliation &t) const
+void Reconciliation::toAsn1(asn1::Reconciliation &t) const
 {
     ossl::fromUInt32(*t.content->protocol, protocol);
     ossl::fromUInt64(*t.content->chainId, chainId);
@@ -135,7 +137,7 @@ void Reconciliation::toASN1(asn1::Reconciliation &t) const
     asn1::toValidationStack(*t.votes, votes);
 }
 
-void Reconciliation::fromASN1(const asn1::Reconciliation &t)
+void Reconciliation::fromAsn1(const asn1::Reconciliation &t)
 {
     protocol = ossl::toUInt32(*t.content->protocol);
     chainId = ossl::toUInt64(*t.content->chainId);
@@ -149,7 +151,7 @@ void Reconciliation::fromASN1(const asn1::Reconciliation &t)
 BinData Reconciliation::toContent() const
 {
     asn1::Reconciliation *obj = asn1::Reconciliation_new();
-    toASN1(*obj);
+    toAsn1(*obj);
     BinData data = ossl::encode(*obj->content, asn1::i2d_ReconciliationContent);
     asn1::Reconciliation_free(obj);
     return data;

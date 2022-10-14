@@ -37,8 +37,8 @@ class Transfer
         const std::string &getCoin() const;
         void setCoin(std::string coin);
 
-        void toASN1(asn1::Transfer &) const;
-        void fromASN1(const asn1::Transfer &);
+        void toAsn1(asn1::Transfer &) const;
+        void fromAsn1(const asn1::Transfer &);
 
     private:
         std::list<Exchange> exchanges;

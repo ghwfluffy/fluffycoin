@@ -48,14 +48,14 @@ void Exchange::setAmount(Specie amount)
     this->amount = std::move(amount);
 }
 
-void Exchange::toASN1(asn1::Exchange &t) const
+void Exchange::toAsn1(asn1::Exchange &t) const
 {
     ossl::fromBin(*t.receiver, receiver);
-    amount.toASN1(*t.amount);
+    amount.toAsn1(*t.amount);
 }
 
-void Exchange::fromASN1(const asn1::Exchange &t)
+void Exchange::fromAsn1(const asn1::Exchange &t)
 {
     receiver = ossl::toBin(*t.receiver);
-    amount.fromASN1(*t.amount);
+    amount.fromAsn1(*t.amount);
 }

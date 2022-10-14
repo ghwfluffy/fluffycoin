@@ -12,6 +12,7 @@ Design
     [ ] Stocks
     Blocks
     [ ] NFTs
+        [ ] Delete
     [ ] Statements
     [ ] Constitutions
     [ ] Stocks
@@ -23,12 +24,10 @@ CLI
     [\] genesis
     [ ] newprivkey
 
+Tests
+    [ ] Basic blockchain
+
 Block
-    Core
-    [ ] BlockDecode
-    [\] Block
-    [ ] Node
-    [ ] Transaction
     Mining
     [ ] Register
     [ ] Unregister

@@ -57,8 +57,8 @@ class Genesis
         const BinData &getSeed() const;
         void setSeed(BinData data);
 
-        void toASN1(asn1::Genesis &) const;
-        void fromASN1(const asn1::Genesis &);
+        void toAsn1(asn1::Genesis &) const;
+        void fromAsn1(const asn1::Genesis &);
 
         BinData toContent() const;
 

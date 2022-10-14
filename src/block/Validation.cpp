@@ -67,14 +67,14 @@ void Validation::setSignature(BinData signature)
     this->signature = std::move(signature);
 }
 
-void Validation::toASN1(asn1::Validation &t) const
+void Validation::toAsn1(asn1::Validation &t) const
 {
     *t.verified = static_cast<int>(verified);
     ossl::fromBin(*t.authAddress, address);
     ossl::fromBin(*t.signature, signature);
 }
 
-void Validation::fromASN1(const asn1::Validation &t)
+void Validation::fromAsn1(const asn1::Validation &t)
 {
     verified = static_cast<bool>(*t.verified);
     address = ossl::toBin(*t.authAddress);

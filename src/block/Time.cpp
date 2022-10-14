@@ -51,12 +51,12 @@ void Time::setNow()
     set(std::chrono::system_clock::now());
 }
 
-void Time::toASN1(ASN1_INTEGER &t) const
+void Time::toAsn1(ASN1_INTEGER &t) const
 {
     ossl::fromUInt64(t, sinceEpoch);
 }
 
-void Time::fromASN1(const ASN1_INTEGER &t)
+void Time::fromAsn1(const ASN1_INTEGER &t)
 {
     sinceEpoch = ossl::toUInt64(t);
 }

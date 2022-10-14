@@ -36,8 +36,8 @@ class Specie
         uint32_t getFluffs() const;
         void setFluffs(uint32_t fluffs);
 
-        void toASN1(asn1::Specie &) const;
-        void fromASN1(const asn1::Specie &);
+        void toAsn1(asn1::Specie &) const;
+        void fromAsn1(const asn1::Specie &);
 
     private:
         uint64_t coins;

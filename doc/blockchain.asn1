@@ -48,7 +48,7 @@ Genesis                 ::=SEQUENCE {
 -- Validators vote if they agree with the round leader
 Validation              ::=SEQUENCE {
     verified            BOOLEAN,
-    authAddress         Addresss,
+    authAddress         Address, -- TODO: Needs to be part of the signature
     signature           Signature
 }
 
@@ -89,7 +89,7 @@ NodeContent             ::=SEQUENCE {
     newLeaderAddress    Address
 }
 Node                    ::=SEQUENCE {
-    copnmtent           NodeContent,
+    content             NodeContent,
     signature           Signature,
     votes               SET OF Validation SIZE (1..MAX)
 }
@@ -104,24 +104,25 @@ Block                   ::=CHOICE {
 
 TransactionContent      ::=SEQUENCE {
     time                Time,
-    CHOICE {
+    action              ::CHOICE {
         null                [0] NULL,
         transfer            [1] Transfer,
         lotto               [2] LotteryTicket,
         burn                [3] Donation,
-        mining              [3] MiningAction,
+        mine                [3] MineAction,
         stock               [4] StockAction,
-        voting              [5] VoteAction,
+        vote                [5] VoteAction,
         loan                [6] LoanAction,
     },
+    signer              Address,
     newAddress          Address
 }
 Transaction             ::=SEQUENCE {
     content             TransactionContent,
-    signer              Address,
+    signature           Signature,
 }
 
-MiningAction            ::=SEQUENCE {
+MineAction              ::=SEQUENCE {
     CHOICE {
         null                [0] NULL,
         register            [1] Register,
@@ -221,9 +222,9 @@ NewVote                 ::=SEQUENCE {
     uuid                UTF8STRING SIZE (1..128),
     context             OCTET STRING SIZE (16..MAX),
     answer              CHOICE {
-        yesno           [0] NULL,
-        choice          [1] SEQUENCE OF VoteAnswer SIZE (2..MAX),
-        any             [2] NULL
+        yesno               [0] NULL,
+        choice              [1] SEQUENCE OF VoteAnswer SIZE (2..MAX),
+        any                 [2] NULL
     }
 }
 

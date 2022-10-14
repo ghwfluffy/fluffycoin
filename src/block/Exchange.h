@@ -40,8 +40,8 @@ class Exchange
         const Specie &getAmount() const;
         void setAmount(Specie amount);
 
-        void toASN1(asn1::Exchange &) const;
-        void fromASN1(const asn1::Exchange &);
+        void toAsn1(asn1::Exchange &) const;
+        void fromAsn1(const asn1::Exchange &);
 
     private:
         BinData receiver;

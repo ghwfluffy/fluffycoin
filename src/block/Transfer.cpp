@@ -48,13 +48,13 @@ void Transfer::setCoin(std::string coin)
     this->coin = std::move(coin);
 }
 
-void Transfer::toASN1(asn1::Transfer &t) const
+void Transfer::toAsn1(asn1::Transfer &t) const
 {
     asn1::toExchangeStack(*t.exchanges, exchanges);
     ossl::fromString(*t.coin, coin);
 }
 
-void Transfer::fromASN1(const asn1::Transfer &t)
+void Transfer::fromAsn1(const asn1::Transfer &t)
 {
     asn1::fromExchangeStack(exchanges, *t.exchanges);
     coin = ossl::toString(*t.coin);

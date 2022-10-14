@@ -17,12 +17,12 @@ void Address::set(BinData address)
     this->address = std::move(address);
 }
 
-void Address::toASN1(ASN1_OCTET_STRING &t) const
+void Address::toAsn1(ASN1_OCTET_STRING &t) const
 {
     ossl::fromBin(t, address);
 }
 
-void Address::fromASN1(const ASN1_OCTET_STRING &t)
+void Address::fromAsn1(const ASN1_OCTET_STRING &t)
 {
     address = ossl::toBin(t);
 }

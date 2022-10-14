@@ -2,9 +2,7 @@
 
 #include <fluffycoin/block/Genesis.h>
 #include <fluffycoin/block/Reconciliation.h>
-#if 0
 #include <fluffycoin/block/Node.h>
-#endif
 
 #include <openssl/asn1.h>
 
@@ -44,7 +42,6 @@ class Block
         };
 
         Type getType() const;
-        void setType(Type type);
 
         const std::unique_ptr<Genesis> &getGenesis() const;
         void setGenesis(Genesis genesis);
@@ -52,21 +49,19 @@ class Block
         const std::unique_ptr<Reconciliation> &getReconciliation() const;
         void setReconciliation(Reconciliation reconciliation);
 
-#if 0
         const std::unique_ptr<Node> &getNode() const;
         void setNode(Node node);
-#endif
 
-        void toASN1(asn1::Block &) const;
-        void fromASN1(const asn1::Block &);
+        void toAsn1(asn1::Block &) const;
+        void fromAsn1(const asn1::Block &);
 
     private:
+        void resetChoice();
+
         Type type;
         std::unique_ptr<Genesis> genesis;
         std::unique_ptr<Reconciliation> reconciliation;
-#if 0
         std::unique_ptr<Node> node;
-#endif
 };
 
 }
