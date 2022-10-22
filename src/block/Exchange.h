@@ -1,10 +1,9 @@
 #pragma once
 
 #include <fluffycoin/block/Specie.h>
+#include <fluffycoin/block/Address.h>
 
 #include <fluffycoin/ossl/convert.h>
-
-#include <fluffycoin/utils/BinData.h>
 
 #include <openssl/asn1.h>
 
@@ -34,8 +33,8 @@ class Exchange
         Exchange &operator=(const Exchange &) = default;
         ~Exchange() = default;
 
-        const BinData &getReceiver() const;
-        void setReceiver(BinData receiver);
+        const Address &getReceiver() const;
+        void setReceiver(Address receiver);
 
         const Specie &getAmount() const;
         void setAmount(Specie amount);
@@ -44,7 +43,7 @@ class Exchange
         void fromAsn1(const asn1::Exchange &);
 
     private:
-        BinData receiver;
+        Address receiver;
         Specie amount;
 };
 

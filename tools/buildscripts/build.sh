@@ -54,12 +54,13 @@ while [ $# -gt 0 ]; do
 done
 
 # Directories
-BUILD_DIR=".cmake"
 TOP_DIR="$(dirname $(dirname $(dirname $(readlink -f "${0}"))))"
+BUILD_DIR="${TOP_DIR}/.cmake"
+DIST_DIR="${TOP_DIR}/dist"
 
 # Cleanup previous build
 if [ ${CLEAN} -gt 0 ]; then
-    rm -rf "${BUILD_DIR}"
+    rm -rf "${BUILD_DIR}" "${DIST_DIR}"
     if [ ${CLEAN} -gt 1 ]; then
         exit 0
     fi
@@ -76,4 +77,3 @@ mkdir -p "${BUILD_DIR}"
     cmake --build . \
         -j ${JOBS}
 )
-

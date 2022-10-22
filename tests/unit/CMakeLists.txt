@@ -26,4 +26,12 @@ target_link_libraries(
         fluffycoin-utils
         fluffycoin-ossl
         fluffycoin-block
+        fluffycoin-alg
 )
+
+# Create the fluffytest/ header namespace
+include(cmake/headers.cmake)
+fluffytestlib(alg)
+fluffytestlib(block)
+fluffytestlib(ossl)
+fluffytestlib(utils)

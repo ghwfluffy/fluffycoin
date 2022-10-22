@@ -61,6 +61,13 @@ void Time::fromAsn1(const ASN1_INTEGER &t)
     sinceEpoch = ossl::toUInt64(t);
 }
 
+Time Time::now()
+{
+    Time ret;
+    ret.setNow();
+    return ret;
+}
+
 bool Time::operator<(const Time &rhs) const
 {
     return sinceEpoch < rhs.sinceEpoch;

@@ -52,6 +52,7 @@ typedef struct TransactionContent_st
     ASN1_INTEGER *time;
     TransactionChoice *action;
     ASN1_OCTET_STRING *signer;
+    ASN1_OCTET_STRING *signerKey;
     ASN1_OCTET_STRING *newAddress;
 } TransactionContent;
 
@@ -62,6 +63,7 @@ ASN1_SEQUENCE(TransactionContent) =
     ASN1_SIMPLE(TransactionContent, time, ASN1_INTEGER)
   , ASN1_SIMPLE(TransactionContent, action, TransactionChoice)
   , ASN1_SIMPLE(TransactionContent, signer, ASN1_OCTET_STRING)
+  , ASN1_SIMPLE(TransactionContent, signerKey, ASN1_OCTET_STRING)
   , ASN1_SIMPLE(TransactionContent, newAddress, ASN1_OCTET_STRING)
 } ASN1_SEQUENCE_END(TransactionContent)
 
@@ -246,6 +248,16 @@ void Transaction::setSigner(Address signer)
     this->signer = std::move(signer);
 }
 
+const PublicKey &Transaction::getSignerKey() const
+{
+    return signerKey;
+}
+
+void Transaction::setSignerKey(PublicKey key)
+{
+    this->signerKey = std::move(key);
+}
+
 const Address &Transaction::getNewAddress() const
 {
     return newAddress;
@@ -357,6 +369,7 @@ void Transaction::toAsn1(asn1::Transaction &t) const
 
     time.toAsn1(*t.content->time);
     signer.toAsn1(*t.content->signer);
+    signerKey.toAsn1(*t.content->signerKey);
     newAddress.toAsn1(*t.content->newAddress);
     signature.toAsn1(*t.signature);
 }
@@ -414,6 +427,7 @@ void Transaction::fromAsn1(const asn1::Transaction &t)
 
     time.fromAsn1(*t.content->time);
     signer.fromAsn1(*t.content->signer);
+    signerKey.fromAsn1(*t.content->signerKey);
     newAddress.fromAsn1(*t.content->newAddress);
     signature.fromAsn1(*t.signature);
 }

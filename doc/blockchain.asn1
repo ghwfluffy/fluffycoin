@@ -11,7 +11,7 @@ Hash                    ::=SEQUENCE {
 }
 
 -- Curve25519 x coordinate
-Public Key              ::=OCTET STRING SIZE (32)
+PublicKey               ::=OCTET STRING SIZE (32)
 
 -- SHA2-256(SHA3-256(public x coordinate))
 Address                 ::=OCTET STRING SIZE (32)
@@ -30,7 +30,7 @@ Specie                  ::=SEQUENCE {
 Genesis                 ::=SEQUENCE {
     -- Protocol version
     protocol            INTEGER (0),
-    -- Name of blockchain (ASCII "FluffyCoin" unless forked)
+    -- Name of blockchain (ASCII "Fluffycoin" unless forked)
     name                UTF8STRING,
     -- Instance number of blockchain
     version             INTEGER (0..MAX),
@@ -67,6 +67,7 @@ ReconciliationContent   ::=SEQUENCE {
     shardHashes         SEQUENCE OF Hash SIZE (1..64),
     -- The round leader for the reconciliation block
     leader              Address,
+    leaderKey           PublicKey,
     newAddress          Address
 }
 Reconciliation          ::=SEQUENCE {
@@ -86,7 +87,7 @@ NodeContent             ::=SEQUENCE {
     transactions        SEQUENCE SIZE (1..104857600) OF Transaction,
     nonce               OCTET STRING SIZE (8),
     leader              Address,
-    newLeaderAddress    Address
+    newAddress          Address
 }
 Node                    ::=SEQUENCE {
     content             NodeContent,
@@ -115,6 +116,7 @@ TransactionContent      ::=SEQUENCE {
         loan                [6] LoanAction,
     },
     signer              Address,
+    signerKey           PublicKey,
     newAddress          Address
 }
 Transaction             ::=SEQUENCE {
@@ -159,8 +161,18 @@ LoanAction              ::=SEQUENCE {
     }
 }
 
-Register                ::=SEQUENCE {
+RegisterContent         ::=SEQUENCE {
+    stakeAmount         Specie,
+    stakeAddress        Address,
+    stakeKey            PublicKey,
+    newAddress          Address,
     authAddress         Address,
+    authKey             PublicKey
+}
+
+Register                ::=SEQUENCE {
+    content             RegisterConent,
+    stakeSignature      Signature,
     authSignature       Signature
 }
 
@@ -169,11 +181,26 @@ Unregister              ::=SEQUENCE {
     authSignature       Signature
 }
 
-CredentialChange        ::=SEQUENCE {
+CredentialChangeContent ::=SEQUENCE {
+    -- Existing auth address
     authAddress         Address,
-    newAddress          Address,
+    -- New auth address
+    newAuthAddress      Address,
+    -- New auth public key
+    newAuthKey          PublicKey,
+    -- Existing stake address
+    stakeAddress        Address,
+    -- Existing stake key
+    stakeKey            PublicKey,
+    -- New stake address
+    newStakeAddress     Address
+}
+
+CredentialChange        ::=SEQUENCE {
+    content             CredentialChangeContent,
     authSignature       Signature,
-    newSignature        Signature
+    newAuthSignature    Signature,
+    stakeSignature      Signature
 }
 
 Exchange                ::=SEQUENCE {

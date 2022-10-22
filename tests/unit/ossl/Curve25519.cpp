@@ -3,6 +3,10 @@
 #include <fluffycoin/ossl/Curve25519.h>
 #include <fluffycoin/ossl/Prng.h>
 
+#include <fluffycoin/utils/Hex.h>
+
+#include <fluffycoin/log/Log.h>
+
 using namespace fluffycoin;
 
 TEST(Curve25519, GenerateKeyPair)
@@ -18,12 +22,14 @@ TEST(Curve25519, EncodeKey)
 
     BinData pubkey = ossl::Curve25519::toPublic(*key);
     EXPECT_EQ(pubkey.length(), 32);
+    log::traffic("Public key: {}",  Hex::encode(pubkey));
 
     ossl::EvpPkeyPtr pub = ossl::Curve25519::fromPublic(pubkey);
     EXPECT_NE(pub.get(), nullptr);
 
     SafeData privkey = ossl::Curve25519::toPrivate(*key);
     EXPECT_GT(privkey.length(), pubkey.length());
+    log::traffic("Private key: {}",  Hex::encode(privkey));
 
     ossl::EvpPkeyPtr priv = ossl::Curve25519::fromPrivate(privkey);
     EXPECT_NE(priv.get(), nullptr);

@@ -17,6 +17,7 @@ class Address
 {
     public:
         Address() = default;
+        Address(BinData address);
         Address(Address &&) = default;
         Address(const Address &) = default;
         Address &operator=(Address &&) = default;

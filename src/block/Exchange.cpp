@@ -28,12 +28,12 @@ ASN1_SEQUENCE(Exchange) =
 using namespace fluffycoin;
 using namespace fluffycoin::block;
 
-const BinData &Exchange::getReceiver() const
+const Address &Exchange::getReceiver() const
 {
     return receiver;
 }
 
-void Exchange::setReceiver(BinData receiver)
+void Exchange::setReceiver(Address receiver)
 {
     this->receiver = std::move(receiver);
 }
@@ -50,12 +50,12 @@ void Exchange::setAmount(Specie amount)
 
 void Exchange::toAsn1(asn1::Exchange &t) const
 {
-    ossl::fromBin(*t.receiver, receiver);
+    receiver.toAsn1(*t.receiver);
     amount.toAsn1(*t.amount);
 }
 
 void Exchange::fromAsn1(const asn1::Exchange &t)
 {
-    receiver = ossl::toBin(*t.receiver);
+    receiver.fromAsn1(*t.receiver);
     amount.fromAsn1(*t.amount);
 }

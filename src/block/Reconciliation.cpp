@@ -19,6 +19,7 @@ typedef struct ReconciliationContent_t
     ASN1_INTEGER *chainId;
     STACK_OF(Hash) *shardHashes;
     ASN1_OCTET_STRING *leader;
+    ASN1_OCTET_STRING *leaderKey;
     ASN1_OCTET_STRING *newAddress;
 } ReconciliationContent;
 
@@ -96,22 +97,42 @@ void Reconciliation::setShardHashes(std::list<Hash> hashes)
     this->shardHashes = std::move(hashes);
 }
 
-const BinData &Reconciliation::getLeader() const
+const Address &Reconciliation::getLeader() const
 {
     return leader;
 }
 
-void Reconciliation::setLeader(BinData leader)
+void Reconciliation::setLeader(Address leader)
 {
     this->leader = std::move(leader);
 }
 
-const BinData &Reconciliation::getSignature() const
+const PublicKey &Reconciliation::getLeaderKey() const
+{
+    return leaderKey;
+}
+
+void Reconciliation::setLeaderKey(PublicKey key)
+{
+    this->leaderKey = std::move(key);
+}
+
+const Address &Reconciliation::getNewAddress() const
+{
+    return newAddress;
+}
+
+void Reconciliation::setNewAddress(Address newAddress)
+{
+    this->newAddress = std::move(newAddress);
+}
+
+const Signature &Reconciliation::getSignature() const
 {
     return signature;
 }
 
-void Reconciliation::setSignature(BinData signature)
+void Reconciliation::setSignature(Signature signature)
 {
     this->signature = std::move(signature);
 }
@@ -131,9 +152,10 @@ void Reconciliation::toAsn1(asn1::Reconciliation &t) const
     ossl::fromUInt32(*t.content->protocol, protocol);
     ossl::fromUInt64(*t.content->chainId, chainId);
     asn1::toHashStack(*t.content->shardHashes, shardHashes);
-    ossl::fromBin(*t.content->leader, leader);
-    ossl::fromBin(*t.content->newAddress, newAddress);
-    ossl::fromBin(*t.signature, signature);
+    leader.toAsn1(*t.content->leader);
+    leaderKey.toAsn1(*t.content->leaderKey);
+    newAddress.toAsn1(*t.content->newAddress);
+    signature.toAsn1(*t.signature);
     asn1::toValidationStack(*t.votes, votes);
 }
 
@@ -142,9 +164,10 @@ void Reconciliation::fromAsn1(const asn1::Reconciliation &t)
     protocol = ossl::toUInt32(*t.content->protocol);
     chainId = ossl::toUInt64(*t.content->chainId);
     asn1::fromHashStack(shardHashes, *t.content->shardHashes);
-    leader = ossl::toBin(*t.content->leader);
-    newAddress = ossl::toBin(*t.content->newAddress);
-    signature = ossl::toBin(*t.signature);
+    leader.fromAsn1(*t.content->leader);
+    leaderKey.fromAsn1(*t.content->leaderKey);
+    newAddress.fromAsn1(*t.content->newAddress);
+    signature.fromAsn1(*t.signature);
     asn1::fromValidationStack(votes, *t.votes);
 }
 

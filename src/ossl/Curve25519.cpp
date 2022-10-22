@@ -24,8 +24,7 @@ constexpr const unsigned char pubinfo[] =
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-constexpr const size_t PUBLIC_LEN = 32;
-constexpr const size_t ENCODING_LEN = sizeof(pubinfo) - PUBLIC_LEN;
+constexpr const size_t ENCODING_LEN = sizeof(pubinfo) - Curve25519::PUBLIC_LEN;
 
 }
 

@@ -37,6 +37,8 @@ class Time
         void set(uint64_t time);
         void set(std::chrono::time_point<std::chrono::system_clock> time);
 
+        static Time now();
+
         void toAsn1(ASN1_INTEGER &) const;
         void fromAsn1(const ASN1_INTEGER &);
 

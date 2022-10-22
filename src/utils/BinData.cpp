@@ -1,4 +1,7 @@
 #include <fluffycoin/utils/BinData.h>
+
+#include <fluffycoin/log/Log.h>
+
 #include <string.h>
 
 using namespace fluffycoin;
@@ -147,6 +150,85 @@ void BinData::setData(const unsigned char *buffer, size_t len)
     }
 }
 
+void BinData::setBuffer(unsigned char *data, size_t len)
+{
+    // Free old buffer
+    cleanup();
+    if (!len)
+        free(data);
+    else if (!data)
+        log::error("{} length for null buffer provided.", len);
+    else
+    {
+        this->buffer = data;
+        this->len = len;
+    }
+}
+
+BinData BinData::sub(size_t pos, size_t len) const
+{
+    BinData ret(bSecure);
+    if (len == 0)
+        return ret;
+
+    if (pos > this->len)
+    {
+        log::error("Attempted to retrieve data from position {} of {} length data.", pos, this->len);
+        pos = 0;
+        len = 0;
+    }
+    else if (pos + len > this->len)
+    {
+        log::error("Attempted to retrieve {} bytes from position {} of {} length data.", len, pos, this->len);
+        len = this->len - pos;
+    }
+
+    ret.setData(this->buffer + pos, len);
+    return ret;
+}
+
+void BinData::append(const unsigned char *data, size_t len)
+{
+    if (len == 0)
+        return;
+    if (!data)
+    {
+        log::error("Attempting to append null data.");
+        return;
+    }
+
+    size_t newLen = this->len + len;
+    unsigned char *newBuffer = reinterpret_cast<unsigned char *>(malloc(newLen));
+
+    memcpy(newBuffer, buffer, this->len);
+    memcpy(newBuffer + this->len, data, len);
+
+    cleanup();
+    this->buffer = newBuffer;
+    this->len = newLen;
+}
+
+void BinData::prepend(const unsigned char *data, size_t len)
+{
+    if (len == 0)
+        return;
+    if (!data)
+    {
+        log::error("Attempting to prepend null data.");
+        return;
+    }
+
+    size_t newLen = this->len + len;
+    unsigned char *newBuffer = reinterpret_cast<unsigned char *>(malloc(newLen));
+
+    memcpy(newBuffer, data, len);
+    memcpy(newBuffer + len, buffer, this->len);
+
+    cleanup();
+    this->buffer = newBuffer;
+    this->len = newLen;
+}
+
 size_t BinData::length() const
 {
     return len;
@@ -171,4 +253,16 @@ void BinData::zeroize(void *pv, size_t len)
 bool BinData::empty() const
 {
     return len == 0;
+}
+
+BinData &BinData::operator+=(const BinData &data)
+{
+    append(data.data(), data.length());
+    return (*this);
+}
+
+bool BinData::operator==(const BinData &rhs) const
+{
+    return length() == rhs.length() &&
+            memcmp(data(), rhs.data(), length()) == 0;
 }

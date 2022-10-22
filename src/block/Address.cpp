@@ -7,6 +7,11 @@
 using namespace fluffycoin;
 using namespace fluffycoin::block;
 
+Address::Address(BinData address)
+        : address(std::move(address))
+{
+}
+
 const BinData &Address::get() const
 {
     return address;

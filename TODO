@@ -1,3 +1,18 @@
+High Level
+    [ ] Database for tracking blockchain info
+    [ ] Docker to run validator in
+    [ ] IPC for peers
+    [ ] Docker to run registrar in
+    [ ] IPC for registrar
+    [ ] Algorithm for transaction feeds, choosing leaders, gettting consensus
+    [ ] Test harness for network
+
+Node Types:
+    Validator: Does the mining (0mq)
+    Registrar: Tracks how to contact the peers (0mq)
+    Kiosk: Accepts and tracks transactions (HTTP REST)
+    Historian: Get information about the blockchain (HTTP REST)
+
 Design
     APIs
     [ ] Validator
@@ -24,14 +39,7 @@ CLI
     [\] genesis
     [ ] newprivkey
 
-Tests
-    [ ] Basic blockchain
-
 Block
-    Mining
-    [ ] Register
-    [ ] Unregister
-    [ ] CredentialChange
     Actions
     [ ] Lottery
     [ ] Donation

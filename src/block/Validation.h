@@ -1,6 +1,8 @@
 #pragma once
 
-#include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/block/Address.h>
+#include <fluffycoin/block/Signature.h>
+
 #include <fluffycoin/ossl/convert.h>
 
 #include <openssl/asn1.h>
@@ -34,19 +36,19 @@ class Validation
         bool isVerified() const;
         void setVerified(bool verified);
 
-        const BinData &getAddress() const;
-        void setAddress(BinData address);
+        const Address &getAddress() const;
+        void setAddress(Address address);
 
-        const BinData &getSignature() const;
-        void setSignature(BinData signature);
+        const Signature &getSignature() const;
+        void setSignature(Signature signature);
 
         void toAsn1(asn1::Validation &) const;
         void fromAsn1(const asn1::Validation &);
 
     private:
         bool verified;
-        BinData address;
-        BinData signature;
+        Address address;
+        Signature signature;
 };
 
 }

@@ -16,6 +16,8 @@ string(APPEND
 # g++ debug flags
 string(APPEND
     CMAKE_CXX_FLAGS_DEBUG
+    " -fdiagnostics-color"
+
     " -pedantic"
     " -pedantic-errors"
 

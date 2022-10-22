@@ -3,6 +3,7 @@
 #include <fluffycoin/block/Time.h>
 #include <fluffycoin/block/Address.h>
 #include <fluffycoin/block/Transfer.h>
+#include <fluffycoin/block/PublicKey.h>
 #include <fluffycoin/block/Signature.h>
 
 #if 0
@@ -13,6 +14,8 @@
 #include <fluffycoin/block/VoteAction.h>
 #include <fluffycoin/block/LoanAction.h>
 #endif
+
+#include <fluffycoin/utils/BinData.h>
 
 #include <fluffycoin/ossl/convert.h>
 
@@ -91,6 +94,9 @@ class Transaction
         const Address &getSigner() const;
         void setSigner(Address signer);
 
+        const PublicKey &getSignerKey() const;
+        void setSignerKey(PublicKey key);
+
         const Address &getNewAddress() const;
         void setNewAddress(Address newAddress);
 
@@ -109,6 +115,7 @@ class Transaction
 
         Time time;
         Address signer;
+        PublicKey signerKey;
         Address newAddress;
         Signature signature;
 

@@ -2,6 +2,9 @@
 
 #include <fluffycoin/block/Validation.h>
 #include <fluffycoin/block/Hash.h>
+#include <fluffycoin/block/PublicKey.h>
+#include <fluffycoin/block/Address.h>
+#include <fluffycoin/block/Signature.h>
 
 #include <fluffycoin/utils/BinData.h>
 
@@ -44,11 +47,17 @@ class Reconciliation
         const std::list<Hash> &getShardHashes() const;
         void setShardHashes(std::list<Hash> hashes);
 
-        const BinData &getLeader() const;
-        void setLeader(BinData leader);
+        const Address &getLeader() const;
+        void setLeader(Address leader);
 
-        const BinData &getSignature() const;
-        void setSignature(BinData signature);
+        const PublicKey &getLeaderKey() const;
+        void setLeaderKey(PublicKey key);
+
+        const Address &getNewAddress() const;
+        void setNewAddress(Address newAddress);
+
+        const Signature &getSignature() const;
+        void setSignature(Signature signature);
 
         const std::list<Validation> &getVotes() const;
         void setVotes(std::list<Validation> votes);
@@ -62,9 +71,10 @@ class Reconciliation
         uint32_t protocol;
         uint64_t chainId;
         std::list<Hash> shardHashes;
-        BinData leader;
-        BinData newAddress;
-        BinData signature;
+        Address leader;
+        PublicKey leaderKey;
+        Address newAddress;
+        Signature signature;
         std::list<Validation> votes;
 };
 
