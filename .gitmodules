@@ -4,3 +4,6 @@
 [submodule "lib/protobuf"]
 	path = lib/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "lib/libzmq"]
+	path = lib/libzmq
+	url = https://github.com/zeromq/libzmq.git
