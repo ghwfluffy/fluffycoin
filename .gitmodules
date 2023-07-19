@@ -7,3 +7,6 @@
 [submodule "lib/libzmq"]
 	path = lib/libzmq
 	url = https://github.com/zeromq/libzmq.git
+[submodule "lib/libsodium"]
+	path = lib/libsodium
+	url = https://github.com/jedisct1/libsodium.git
