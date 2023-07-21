@@ -1,11 +1,11 @@
 #include "fluffytest.h"
 
 #include <fluffycoin/ossl/Curve25519.h>
-#include <fluffycoin/ossl/PbkdfKeyEncode.h>
+#include <fluffycoin/ossl/Pkcs8Key.h>
 
 using namespace fluffycoin;
 
-TEST(PbkdfKeyEncode, EncodeDecode)
+TEST(Pkcs8Key, EncodeDecode)
 {
     // Generate keypair
     ossl::EvpPkeyPtr key = ossl::Curve25519::generate();
@@ -14,11 +14,11 @@ TEST(PbkdfKeyEncode, EncodeDecode)
     constexpr const char *PASSWORD = "ghw";
 
     // Encrypt key for storage
-    BinData encoded = ossl::PbkdfKeyEncode::encode(*key, PASSWORD);
+    BinData encoded = ossl::Pkcs8Key::wrap(*key, PASSWORD);
     EXPECT_GT(encoded.length(), 0);
 
     // Decrypt and decode key
-    ossl::EvpPkeyPtr dupKey = ossl::PbkdfKeyEncode::decode(encoded, PASSWORD);
+    ossl::EvpPkeyPtr dupKey = ossl::Pkcs8Key::unwrap(encoded, PASSWORD);
     EXPECT_NE(dupKey.get(), nullptr);
 
     // Sign with original

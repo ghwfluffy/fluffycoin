@@ -1,4 +1,6 @@
 #include <fluffycoin/ossl/Prng.h>
+#include <fluffycoin/ossl/Error.h>
+
 #include <fluffycoin/log/Log.h>
 
 #include <openssl/rand.h>
@@ -16,7 +18,7 @@ void Prng::seed(const void *data, size_t dataLen)
 void Prng::rand(unsigned char *buffer, size_t bytes)
 {
     if (RAND_bytes(buffer, static_cast<int>(bytes)) != 1)
-        log::error("Failed to generate {} bytes of random data.", bytes);
+        log::error("Failed to generate {} bytes of random data: {}", bytes, ossl::Error::pop());
 }
 
 unsigned int Prng::randInt(unsigned int min, unsigned int max)

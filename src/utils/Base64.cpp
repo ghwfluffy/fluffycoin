@@ -111,10 +111,14 @@ BinData Base64::decode(const std::string &printable)
     size_t decodeLen = 0;
     unsigned char *decoded = reinterpret_cast<unsigned char *>(malloc(((printable.length() / 4) + 1) * 3));
 
+    size_t equals = 0;
+    while (equals < printable.length() - equals && printable[printable.length() - equals - 1] == '=')
+        equals++;
+
     // Convert to binary
     unsigned char bits = 0;
     unsigned char curVal = 0;
-    for (size_t ui = 0; ui < printable.length(); ui++)
+    for (size_t ui = 0; ui < printable.length() - equals; ui++)
     {
         char c = printable[ui];
         char intVal = charToVal(c);

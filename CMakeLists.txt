@@ -7,6 +7,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist)
 # gtest
 add_subdirectory(lib/googletest)
 
+# Local build dependencies
+include(cmake/sodium.cmake)
+include(cmake/zmq.cmake)
+include(cmake/protobuf.cmake)
+
 # Build configuration
 include(cmake/cxxflags.cmake)
 
@@ -25,6 +30,7 @@ add_subdirectory(src/utils)
 add_subdirectory(src/ossl)
 add_subdirectory(src/block)
 add_subdirectory(src/alg)
+add_subdirectory(src/zmq)
 
 # Executables
 add_subdirectory(src/cli)

@@ -1,4 +1,4 @@
-#include <fluffycoin/ossl/PbkdfKeyEncode.h>
+#include <fluffycoin/ossl/PbkdfKey.h>
 #include <fluffycoin/ossl/Curve25519.h>
 #include <fluffycoin/ossl/convert.h>
 #include <fluffycoin/ossl/decode.h>
@@ -186,7 +186,7 @@ BinData sign(
 
 }
 
-BinData PbkdfKeyEncode::encode(const EVP_PKEY &key, const BinData &pass)
+BinData PbkdfKey::wrap(const EVP_PKEY &key, const BinData &pass)
 {
     bool ok = true;
 
@@ -279,7 +279,7 @@ BinData PbkdfKeyEncode::encode(const EVP_PKEY &key, const BinData &pass)
     return ret;
 }
 
-EvpPkeyPtr PbkdfKeyEncode::decode(const BinData &key, const BinData &pass)
+EvpPkeyPtr PbkdfKey::unwrap(const BinData &key, const BinData &pass)
 {
     bool ok = true;
 

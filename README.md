@@ -1,1 +1,1 @@
-Fluffycoin Distributed Consensus System
+Fluffycoin Distributed Consensus Protocol

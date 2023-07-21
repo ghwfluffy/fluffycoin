@@ -8,6 +8,8 @@
 #include <openssl/evp.h>
 #include <openssl/x509.h>
 
+#include <functional>
+
 using namespace fluffycoin;
 using namespace fluffycoin::ossl;
 
@@ -39,7 +41,7 @@ EvpPkeyPtr Curve25519::generate()
 
     EvpPkeyPtr retKey;
     if (ret != 1 || !key)
-        log::error("Failed to generate ED25519 keypair.");
+        log::error("Failed to generate ED25519 keypair: {}", ossl::Error::pop());
     else
         retKey = EvpPkeyPtr(key);
 
@@ -79,7 +81,7 @@ EvpPkeyPtr Curve25519::fromPublic(const BinData &publicPoint)
         EVP_PKEY *key = nullptr;
         d2i_PUBKEY(&key, &pauc, static_cast<long>(sizeof(encoded)));
         if (!key)
-            log::error("Failed to decode ED25519 public point.");
+            log::error("Failed to decode ED25519 public point: {}", ossl::Error::pop());
         else
             retKey.reset(key);
     }
@@ -98,6 +100,15 @@ EvpPkeyPtr Curve25519::fromPrivate(const BinData &priv)
         std::bind(
             d2i_PrivateKey, EVP_PKEY_ED25519,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+}
+
+BinData Curve25519::privateToPublic(const BinData &priv)
+{
+    BinData ret;
+    EvpPkeyPtr key = fromPrivate(priv);
+    if (key)
+        ret = toPublic(*key);
+    return ret;
 }
 
 BinData Curve25519::sign(const EVP_PKEY &key, const BinData &data)

@@ -2,12 +2,13 @@
 
 set -eu -o pipefail
 
+JOBS="$(grep processor /proc/cpuinfo | wc -l)"
 usage() {
     echo "Usage: $(basename "${0}") <Options>
 
             -v --verbose            Verbose output
             -d --debug              Debug build
-            -j --jobs <Value>       Number of build threads
+            -j --jobs <Value>       Number of build threads (Default: ${JOBS})
 
             -c --clean              Clean run
             -C --clean-only         Clean and exit" 1>&2
@@ -16,7 +17,6 @@ usage() {
 CLEAN=0
 VERBOSE=""
 BUILD_TYPE="-DCMAKE_BUILD_TYPE=Release"
-JOBS="$(grep processor /proc/cpuinfo | wc -l)"
 while [ $# -gt 0 ]; do
     case "${1}" in
         -v|--verbose)
@@ -54,7 +54,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Directories
-TOP_DIR="$(dirname $(dirname $(dirname $(readlink -f "${0}"))))"
+TOP_DIR="$(dirname "$(dirname "$(dirname "$(readlink -f "${0}")")")")"
 BUILD_DIR="${TOP_DIR}/.cmake"
 DIST_DIR="${TOP_DIR}/dist"
 
@@ -73,6 +73,7 @@ mkdir -p "${BUILD_DIR}"
     cmake \
         ${VERBOSE} \
         ${BUILD_TYPE} \
+        -G Ninja \
         "${TOP_DIR}"
     cmake --build . \
         -j ${JOBS}

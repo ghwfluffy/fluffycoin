@@ -48,7 +48,7 @@ void osAesSeed()
         if (len != sizeof(buffer))
             log::error("Failed to read full buffer from urandom ({}/{}).", len, sizeof(buffer));
 
-        // Need at least an AES-128 blocks for this
+        // Need at least one AES block for this
         constexpr const size_t AES_LEN = 16;
         if (len < AES_LEN)
         {
@@ -56,7 +56,7 @@ void osAesSeed()
             continue;
         }
 
-        // Get some entropy from OpenSSL's current DRBG context
+        // Get some entropy from OpenSSL's current DRBG context to be an AES-128 key and IV
         unsigned char key_iv[AES_LEN * 2];
         int ret = RAND_bytes(key_iv, static_cast<int>(sizeof(key_iv)));
         if (ret != 1)
@@ -67,8 +67,8 @@ void osAesSeed()
 
         // Use the key to encipher the data
         EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), nullptr, key_iv, key_iv + AES_LEN);
-        unsigned char enciphered[INPUT_LEN];
         int enclen = 0;
+        unsigned char enciphered[INPUT_LEN];
         ret = EVP_EncryptUpdate(ctx, buffer, &enclen, enciphered, static_cast<int>(len));
         if (ret != 1 || enclen <= 0)
         {

@@ -1,5 +1,5 @@
-# C++17
-set(CMAKE_CXX_STANDARD 17)
+# C++20
+set(CMAKE_CXX_STANDARD 20)
 
 # OpenSSL 3.1
 string(APPEND
@@ -16,6 +16,7 @@ string(APPEND
 # g++ debug flags
 string(APPEND
     CMAKE_CXX_FLAGS_DEBUG
+    " -fabi-version=0"
     " -fdiagnostics-color"
 
     " -pedantic"
@@ -25,7 +26,7 @@ string(APPEND
     " -Werror"
     " -Wextra"
 
-    " -Wabi=7"
+    " -Wabi=18"
     " -Wcast-align"
     " -Wcast-qual"
     " -Wconversion"
@@ -51,6 +52,7 @@ string(APPEND
     " -Wold-style-cast"
     " -Woverloaded-virtual"
     " -Wpacked"
+    " -Wpessimizing-move"
     " -Wpointer-arith"
     " -Wredundant-decls"
     " -Wsign-conversion"

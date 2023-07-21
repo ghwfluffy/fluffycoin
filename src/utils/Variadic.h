@@ -4,7 +4,8 @@
 #include <stdarg.h>
 
 /**
- * Convert variadic arguments to std::string
+ * Convert variadic arguments to std::string.
+ * You should probably be using libfmt.
  *
  * @param format The char* format parameter
  * @param output The destination std::string

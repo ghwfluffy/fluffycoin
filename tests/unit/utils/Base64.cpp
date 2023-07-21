@@ -2,8 +2,6 @@
 
 #include <fluffycoin/utils/Base64.h>
 
-#include <fluffycoin/log/Log.h>
-
 using namespace fluffycoin;
 
 TEST(Base64, Encode)
@@ -22,4 +20,11 @@ TEST(Base64, Decode)
     EXPECT_EQ(Base64::decode("Rw"), BinData("G"));
     EXPECT_EQ(Base64::decode(""), BinData(""));
     EXPECT_EQ(Base64::decode("UmFuZG9tVGVzdA"), BinData("RandomTest"));
+}
+
+TEST(Base64, Equals)
+{
+    EXPECT_EQ(Base64::decode("R2h3"), BinData("Ghw"));
+    EXPECT_EQ(Base64::decode("R2g="), BinData("Gh"));
+    EXPECT_EQ(Base64::decode("Rw=="), BinData("G"));
 }
