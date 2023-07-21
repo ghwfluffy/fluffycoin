@@ -1,17 +1,37 @@
-High Level
-    [ ] Database for tracking blockchain info
-    [ ] Docker to run validator in
-    [ ] IPC for peers
-    [ ] Docker to run registrar in
-    [ ] IPC for registrar
-    [ ] Algorithm for transaction feeds, choosing leaders, gettting consensus
-    [ ] Test harness for network
+Build
+    [ ] Boost
+    [ ] async
+    [ ] svc
+    [ ] pb
+        [ ] protobuf patch
+        [ ] proto compiler
 
-Node Types:
-    Validator: Does the mining (0mq)
-    Registrar: Tracks how to contact the peers (0mq)
-    Kiosk: Accepts and tracks transactions (HTTP REST)
-    Historian: Get information about the blockchain (HTTP REST)
+Protobuf
+    [ ] Catalog
+    [ ] MsgInfo
+    [ ] remove google.api url from types
+    [ ] error codes
+
+Design
+    [ ] Async client
+    [ ] Event auth
+
+zmq
+    [ ] Publisher
+    [ ] Subscriber
+
+P2P service
+    [ ] service params
+    [ ] docker
+
+consistency
+    [ ] namespace ::
+    [ ] multi-line params
+    [ ] EOF newline
+
+database
+    [ ] PSQL dependency
+    [ ] ozo dependency
 
 Design
     APIs
@@ -34,6 +54,23 @@ Design
         [ ] Calls/Puts
         [ ] Bids/Accepts/Cancel
     [ ] McBuck sub-borrowers
+    Design review
+    [ ] How long do social votes last?
+    [ ] Futures invent
+    [ ] Change stake amount
+    Algorithm design
+    [ ] Lottery
+    [ ] Gas (catnip)
+    [ ] Stock dividens
+    Database
+    [\] Database for tracking blockchain info
+    [ ] Algorithm for transaction feeds, choosing leaders, gettting consensus
+    [ ] Test harness for network
+    Node Types
+    Validator: Does the mining (0mq)
+    Registrar: Tracks how to contact the peers (0mq)
+    Kiosk: Accepts and tracks transactions (HTTP REST)
+    Historian: Get information about the blockchain (HTTP REST)
 
 CLI
     [\] genesis
@@ -60,8 +97,6 @@ Block
 
 Utils
     [ ] Log console colors
-    [ ] case insensitive ascii
-    [ ] multiple log backups
 
 Database
     [ ] Chains
@@ -79,8 +114,12 @@ Marketing
 
 Build
     [ ] Make distributables
-    [ ] Dockers
 
 Licensing
-    [ ] fmt license
+    [ ] 3rd party licenses
+        [ ] fmt
+        [ ] openssl
+        [ ] protobuf
+        [ ] zmq
+        [ ] sodium
     [ ] Open source promise
