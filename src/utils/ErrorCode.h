@@ -32,10 +32,11 @@ enum class ErrorCode
     NotConnected = 300,
     ResolveError = 301,
     ConnectError = 302,
-    HandshakeError = 303,
-    ReadError = 304,
-    WriteError = 305,
-    ProtocolError = 306,
+    ConnectionError = 303,
+    HandshakeError = 304,
+    ReadError = 305,
+    WriteError = 306,
+    ProtocolError = 307,
 
     // Resource errors
     DatabaseError = 400,

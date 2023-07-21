@@ -21,6 +21,7 @@ std::string fluffycoin::to_string(ErrorCode code)
         case ErrorCode::NotConnected: return "Not Connected";
         case ErrorCode::ResolveError: return "Resolve Error";
         case ErrorCode::ConnectError: return "Connect Error";
+        case ErrorCode::ConnectionError: return "Connection Error";
         case ErrorCode::HandshakeError: return "Handshake Error";
         case ErrorCode::ReadError: return "Read Error";
         case ErrorCode::WriteError: return "Write Error";

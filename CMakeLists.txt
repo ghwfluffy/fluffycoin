@@ -32,6 +32,7 @@ add_subdirectory(src/ossl)
 add_subdirectory(src/block)
 add_subdirectory(src/alg)
 add_subdirectory(src/zmq)
+add_subdirectory(src/async)
 
 # Executables
 add_subdirectory(src/cli)
