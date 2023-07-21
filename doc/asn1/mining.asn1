@@ -1,0 +1,61 @@
+MineAction              ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        -- Stake some coins to become a validator
+        register            [1] Register,
+        -- Unstake your coins
+        unregister          [2] Unregister,
+        -- Rotate your authentication key for security
+        updateCreds         [3] CredentialChange
+    }
+}
+
+RegisterContent         ::=SEQUENCE {
+    -- This amount is frozen in your wallet as stake
+    -- The amount staked determines the amount received from fees
+    stakeAmount         Specie,
+    -- The wallet containing the stake amount
+    stakeAddress        Address,
+    -- The public key to verify the stake address
+    stakeKey            PublicKey,
+    -- The next address in the stake wallet
+    newAddress          Address,
+    -- The new address associated with your miner's authentication key
+    authAddress         Address,
+    -- The key to verify the miner's validation signatures
+    authKey             PublicKey
+}
+
+Register                ::=SEQUENCE {
+    content             RegisterConent,
+    -- Signatures of both addresses from the content
+    stakeSignature      Signature,
+    authSignature       Signature
+}
+
+Unregister              ::=SEQUENCE {
+    authAddress         Address,
+    authSignature       Signature
+}
+
+CredentialChangeContent ::=SEQUENCE {
+    -- Existing auth address
+    authAddress         Address,
+    -- New auth address
+    newAuthAddress      Address,
+    -- New auth public key
+    newAuthKey          PublicKey,
+    -- Existing stake address
+    stakeAddress        Address,
+    -- Existing stake key
+    stakeKey            PublicKey,
+    -- New stake address
+    newStakeAddress     Address
+}
+
+CredentialChange        ::=SEQUENCE {
+    content             CredentialChangeContent,
+    authSignature       Signature,
+    newAuthSignature    Signature,
+    stakeSignature      Signature
+}

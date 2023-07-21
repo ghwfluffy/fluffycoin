@@ -3,6 +3,9 @@
 namespace fluffycoin
 {
 
+/**
+ * Fluffycoin protocol utilities
+ */
 namespace alg
 {
     constexpr const uint32_t PROTOCOL_VERSION = 0;

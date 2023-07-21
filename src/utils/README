@@ -1,0 +1,5 @@
+Generic utilities.
+
+String manipulation, memory management, error tracking, etc.
+
+Stuff C++ doesn't give us or cleaner versions of C++ features.

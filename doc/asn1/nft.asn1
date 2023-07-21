@@ -1,0 +1,45 @@
+TrinketAction           ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        mint                [1] MintTrinket,
+        trade               [2] TradeTrinket,
+        gift                [3] GiftTrinket
+    }
+}
+
+-- SHA2-256(SHA2-256(data) >< SHA3-256(data)) >< SHA3-256(SHA3-256(data) >< SHA2-256(data))
+-- >< operator: shuffle so every other bit is from eachother
+TrinketId               ::=OCTET STRING (64)
+
+Trinket                 ::=SEQUENCE {
+    title               UTF8String (1..128),
+    format              CHOICE {
+        other               [0] PrintableString,
+        png                 [1] NULL,
+        jpg                 [2] NULL,
+        utf8                [3] NULL,
+        gzipUtf8            [4] NULL
+    },
+    data                OCTET STRING (1..MAX),
+    metaData            OCTET STRING (1..MAX) OPTIONAL
+}
+
+MintTrinket             ::=Trinket
+
+-- Transaction submitted by the seller
+SellTrinket             ::=SEQUENCE {
+    saleInfo            ::=SEQUENCE {
+        -- Time included to create uniqueness
+        -- Validators make sure time is within an hour
+        time            Time,
+        trinketId       TrinketId,
+        price           Specie
+    },
+    buyer               Address,
+    buyerSignature      Signnature
+}
+
+GiftTrinket             ::=SEQUENCE {
+    trinketId           TrinketId,
+    receiver            Address
+}

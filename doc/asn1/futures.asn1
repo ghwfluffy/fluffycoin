@@ -1,0 +1,59 @@
+FuturesAction           ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        coveredCall         [1] CoveredCall,
+        executeCall         [2] ExecuteCall,
+        create              [3] WriteFuture,
+        sell                [4] SellFuture,
+        buy                 [5] BuyFuture,
+        cancel              [6] CancelFuture,
+        gift                [7] GiftFuture
+    }
+}
+
+-- Truncate(SHA2-256(Address | CoveredCall), -2) | Truncate(SHA3-256(Address | CoveredCall), -3) | [5 byte index]
+CallId                  ::=OCTET STRING (64)
+
+-- Locks n shares for y reconciliation blocks at a strike price, and if call executed then trade is automatic at strike price
+CoveredCall             ::=SEQUENCE {
+    ticker              StockTicker,
+    -- 100 shares per
+    count               INTEGER (1..100000000000),
+    -- Number of reconciliation blocks till expiration
+    -- 0=Upcoming block
+    expiration          INTEGER (0..MAX),
+
+    nonce               OCTET STRING (1..8)
+}
+
+ExecuteCall             ::=SEQUENCE {
+    calls               SEQUENCE SIZE (1..MAX) OF CallId,
+}
+
+FutureId                ::=OCTET STRING (32)
+
+-- Bet on a stock's avg sale price in the reconsiliation block
+-- Exact, over, under
+-- Bet payout comes from anyone who bets against you
+-- Exact higher payout than over/under
+WriteFuture             ::=SEQUENCE {
+    ticker              StockTicker,
+    -- Number of reconciliation blocks till expiration
+    -- 0=Upcoming block
+    expiration          INTEGER (0..MAX),
+    -- Prediction of avg stock price at the reconciliation block
+    position            CHOICE {
+        -- Average will be less than this price
+        less            [0] Specie,
+        -- Average will be EXACTLY this price (round down)
+        equal           [1] Specie,
+        -- Average will be greater than this price
+        greater         [2] Specie
+    }
+}
+
+-- Trade calls
+SellFuture
+BuyFuture
+CancelFuture
+GiftFuture

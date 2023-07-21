@@ -1,0 +1,48 @@
+-- milliseconds since june 19th 1999 07:00:00.000 UTC
+Time                    ::=INTEGER
+
+-- Collision safe hash
+Hash                    ::=SEQUENCE {
+    sha2                OCTET STRING SIZE (32),
+    sha3                OCTET STRING SIZE (32)
+}
+
+-- Curve25519 x coordinate
+PublicKey               ::=OCTET STRING SIZE (32)
+
+-- SHA2-256(SHA3-256(public x coordinate))
+Address                 ::=OCTET STRING SIZE (32)
+
+-- 32-byte x coordinate || 32-byte y coordinate
+Signature               ::=OCTET STRING SIZE (64)
+
+-- Describes an amount of fluffycoins (or sub-coins)
+Specie                  ::=SEQUENCE {
+    coins               INTEGER (0..MAX) OPTIONAL,
+    -- 1/100000000 of a coin
+    fluffs              INTEGER (0..99999999)
+}
+
+-- The name of the coin being used
+-- Not providing this value signifies using the main fluffycoin
+-- If a name is provided it is a sub-coin created through a loan (eg: McBucks)
+CoinName                ::=UTF8String (1..MAX)
+
+-- First block
+Genesis                 ::=SEQUENCE {
+    -- Protocol version
+    protocol            INTEGER (0),
+    -- Name of blockchain (ASCII "Fluffycoin" unless forked)
+    name                UTF8String,
+    -- Instance number of blockchain
+    version             INTEGER (0..MAX),
+    -- Time when genesis block is instantiated
+    creation            Time,
+    -- Address for blockchain creator
+    creator             Address,
+    -- Initial coins given to blockchain creator
+    -- The proof of stake requires coins to exist for mining to happen
+    greed               Specie,
+    -- Personalize blockchain
+    seed                OCTET STRING SIZE (0..68719476736)
+}

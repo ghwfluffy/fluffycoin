@@ -1,0 +1,63 @@
+LoanAction              ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        -- Give your coins up for loan
+        offerLoan           [1] NewLoan,
+        -- Cancel a previous loan offer that has not been claimed
+        cancelLoan          [2] CancelLoan,
+        -- Agree to loan terms of an offered loan
+        acceptLoan          [3] AcceptLoan,
+        -- Decrease principal on an active loan
+        forgiveLoan         [4] ForgiveLoan,
+        -- Pay forward on an active loan
+        prepayLoan          [5] PrepayLoan,
+        -- Allow another wallet to use your sub-coin name
+        grantCoinship       [6] GrantCoinship
+    }
+}
+
+-- Loans take effect at the next reconsiliation block
+NewLoan                 ::=SEQUENCE {
+    -- Total tokens loaning at this agreement
+    amount              Specie,
+    -- The new name of the coin before it is payed back (eg: McBucks)
+    coin                CoinName,
+    -- Amount extra needed to pay every reconsiliation block
+    interest            Specie,
+    -- The loan automatically expires after this many reconsiliation blocks
+    offerExpiration     INTEGER,
+    -- The loan needs to be payed back in full after this many reconsiliation blocks after accepting
+    loanExpiration      INTEGER,
+}
+
+-- SHA2-256(NewLoan | Lender Address | Borrower Address) | SHA3-256(Borrower Address | Lender Address | NewLoan)
+LoanId                  ::=OCTET STRING (64)
+
+CancelLoan              ::=LoanId
+
+AcceptLoan              ::=SEQUENCE {
+    loanid              LoanId,
+    -- The amount of coins to borrow
+    amount              Specie,
+    -- If multiple people request the same loan,
+    -- the request with the larger downpayment gets it
+    downpayment         Specie,
+    -- The name of the coin before it is payed back (eg: McBucks)
+    -- Must be unique from all other sub-coin names
+    coin                CoinName
+}
+
+ForgiveLoan             ::=SEQUENCE {
+    loanid              LoanId,
+    amount              Specie
+}
+
+PrepayLoan              ::=SEQUENCE {
+    loanid              LoanId,
+    amount              Specie
+}
+
+GrantCoinship           ::=SEQUENCE {
+    coin                CoinName,
+    address             Address
+}

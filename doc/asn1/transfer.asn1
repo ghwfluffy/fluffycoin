@@ -1,0 +1,19 @@
+-- Send coins from one wallet to another
+Transfer                ::=SEQUENCE {
+    exchanges           SEQUENCE SIZE (1..MAX) OF Exchange,
+    coin                CoinName OPTIONAL
+}
+
+Exchange                ::=SEQUENCE {
+    receiver            Address,
+    amount              Specie
+}
+
+-- Buy a lottery ticket for the next reconciliation block lottery
+LotteryTicket           ::=SEQUENCE {
+    seed                OCTET STRING SIZE (0..16),
+    bet                 Specie
+}
+
+-- Remove coins in your wallet from the economy
+Donation                ::=Specie

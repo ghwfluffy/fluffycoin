@@ -1,0 +1,113 @@
+StockAction             ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        newPrivateStock     [1] NewPrivateStock,
+        newPublicStock      [2] NewPublicStock,
+        newClassicStock     [3] NewClasicStock,
+        sell                [4] SellStock,
+        buy                 [5] BuyStock,
+        cancel              [6] CancelStock
+        gift                [7] GiftStock,
+        pay                 [8] PayStock,
+        futures             [9] FuturesAction
+    }
+}
+
+StockTicker             ::=PrintableString SIZE (3..MAX)
+
+-- Stocks are owned by wallet that creates stocks
+NewPrivateStock         ::=SEQUENCE {
+    ticker              StockTicker,
+    shares              INTEGER (1..10000000000000),
+    -- Must be non-zero
+    burn                Specie
+}
+
+-- Invisible wallet receives all initial bids of matching price during the IPO
+-- Shares cannot be sold before IPO is complete
+-- After the IPO, invisible wallet automatically buys stocks at the IPO price
+-- Stocks bought by invisible wallet vanish
+-- Effectively creates a stock that has an artificial floor, and a market cap that only decreases
+-- XXX BREAKDOWN
+-- Trying to give some safety net for investors
+-- But isn't it just artificially inflating the value of the stock by a static amount
+-- If you make it so the "refund" amount increases, isn't that now just like dividends
+-- Is this a good way to invent a system for dividends?
+-- Normally dividens come from the company's revenue
+-- Could a percentage of gas spent on trading a stock go to this invisible pool
+-- How does it get distributed
+-- The refund amount just increases
+-- We have an issue where the market cap only decreases
+-- Is that an issue?
+-- If you get down to too few stocks it becomes less liquid when those few stocks trade hands less
+-- Or requesting a buy on this stock at IPO price is also auto granted
+    -- Thats just an artificial floor
+-- What if every stock sold back to invisible wallet is in a mini lottery for that stock
+    -- Special stock lottery gets the pot, or 'n' from the pot
+    -- Or maybe the sell stock transaction does it, to promote trading
+    -- Or selling and buying
+    -- Or buying over the IPO price & amount over increases chance or stocks received
+-- XXX FINAL
+-- Every transaction has a fee
+-- 90% of fees go to the validators
+-- 10% of fees normally get burned
+-- instead for this type of stock those coins go to the stock pool
+-- wallet buyback ipo price goes to the pool
+-- holding a stock is an entry to the lottery / your lottery ticket every reconciliation
+-- lottery winnings come from the pool in the form of a free stock (down in the description)
+NewPublicStock          ::=SEQUENCE {
+    ticker              StockTicker,
+    price               Specie,
+    -- How many reconsiliation blocks until IPO ends
+    ipoDuration         INTEGER (1..100),
+    -- Must be non-zero
+    burn                Specie
+}
+
+-- All buys at share price during IPO get filled by origin wallet
+-- Shares cannot be sold before IPO is complete
+NewClassicStock         ::=SEQUENCE {
+    ticker              StockTicker,
+    shares              INTEGER (1..10000000000000),
+    price               Specie,
+    -- How many reconsiliation blocks until IPO ends
+    ipoDuration         INTEGER (1..100),
+    -- Must be at least 1 coin
+    burn                Specie
+}
+
+SellStock               ::=SEQUENCE {
+    ticker              StockTicker,
+    shares              INTEGER (1..10000000000000),
+    price               Specie,
+    -- How many reconciliation blocks until trade is canceled
+    -- 0=Always good, 1=Until the upcoming reconciliation block
+    goodUntil           INTEGER (0..MAX)
+}
+
+BuyStock                ::=SEQUENCE {
+    ticker              StockTicker,
+    shares              INTEGER (1..10000000000000),
+    price               Specie,
+    -- How many reconciliation blocks until trade is canceled
+    -- 0=Always good, 1=Until the upcoming reconciliation block
+    goodUntil           INTEGER (0..MAX)
+}
+
+-- SHA2-256(Address | *Stock) | SHA3-256(*Stock | Address)
+TradeId                 ::=OCTET STRING (64)
+
+CancelTrade             ::=SEQUENCE {
+    tradeUuid           TradeId
+}
+
+GiftStock               ::=SEQUENCE {
+    ticker              StockTicker,
+    shares              INTEGER (1..10000000000000),
+    receiver            Address
+}
+
+PayStock                ::=SEQUENCE {
+    ticker              StockTicker,
+    distribution        Specie
+}

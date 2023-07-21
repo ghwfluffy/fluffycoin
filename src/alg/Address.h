@@ -6,12 +6,12 @@
 
 #include <string>
 
-namespace fluffycoin
+namespace fluffycoin::alg
 {
 
-namespace alg
-{
-
+/**
+ * Utilities for generating/matching Fluffycoin wallet/validator addresses
+ */
 namespace Address
 {
     constexpr const size_t LENGTH = 26;
@@ -25,8 +25,6 @@ namespace Address
 
     std::string printable(const BinData &address);
     BinData unprintable(const std::string &address);
-}
-
 }
 
 }

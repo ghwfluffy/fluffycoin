@@ -1,0 +1,38 @@
+VoteAction              ::=SEQUENCE {
+    CHOICE {
+        null                [0] NULL,
+        -- Create a new vote
+        newVote             [1] NewVote,
+        -- Submit your vote
+        vote                [2] PublicVote,
+    }
+}
+
+-- SHA2-256(NewVote | Address) | SHA3-256(Address | NewVote)
+VoteId                  ::=OCTET STRING (64)
+
+NewVote                 ::=SEQUENCE {
+    -- Information that describes the vote
+    context             OCTET STRING SIZE (16..MAX),
+    -- The possible choices to vote
+    answer              CHOICE {
+        -- Binary choice
+        yesno               [0] NULL,
+        -- A set of possible things to vote for
+        choice              [1] SEQUENCE OF VoteAnswer SIZE (2..MAX),
+        -- Voter can provide any answer
+        any                 [2] NULL
+    }
+}
+
+VoteAnswer              ::=UTF8String
+
+PublicVote              ::=SEQUENCE {
+    voteId              VoteId,
+    -- 00/01 for no/yes
+    -- 00..n for choice sequence integer
+    -- Anything for any
+    vote                OCTET STRING,
+    -- Your committment can't be traded until the next reconsiliation block
+    commitment          Specie
+}

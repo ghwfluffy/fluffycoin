@@ -1,0 +1,3 @@
+This is the lowest module. It gives capabilities for developer logs. Nothing is more important than useful logs.
+
+Logs go to console and/or file. For syslog you should log to console and handle syslog using Kubernetes.
