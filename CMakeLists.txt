@@ -11,6 +11,7 @@ add_subdirectory(lib/googletest)
 include(cmake/sodium.cmake)
 include(cmake/zmq.cmake)
 include(cmake/protobuf.cmake)
+include(cmake/boost.cmake)
 
 # Build configuration
 include(cmake/cxxflags.cmake)
