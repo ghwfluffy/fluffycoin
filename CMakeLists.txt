@@ -26,6 +26,9 @@ include(cmake/fluffylib.cmake)
 find_package(fmt REQUIRED)
 find_package(OpenSSL REQUIRED)
 
+# Protobuf files
+add_subdirectory(proto)
+
 # Modules
 add_subdirectory(src/log)
 add_subdirectory(src/utils)

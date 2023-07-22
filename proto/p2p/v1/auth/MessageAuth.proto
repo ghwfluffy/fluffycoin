@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package fcpb.p2p.v1.auth;
+
+/**
+ * This goes into the auth field on the request
+ */
+message MessageAuth {
+    // The time of the request as a unix timestamp
+    int64 request_time = 1;
+    // A concatenation of the client and server session IDs from the authentication handshake
+    bytes session_id = 2;
+    // A signature calculated over the message using the agreed upon session HMAC key
+    bytes signature = 3;
+}

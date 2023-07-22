@@ -39,7 +39,7 @@ macro(fluffylib)
         COMMAND
             mkdir -p ${HEADER_DIR}
         COMMAND
-            cp -v ${HEADER_FILES} ${HEADER_DIR}/
+            ln -s ${HEADER_FILES} ${HEADER_DIR}/
         COMMAND
             touch ${HEADER_TIMESTAMP}
         DEPENDS

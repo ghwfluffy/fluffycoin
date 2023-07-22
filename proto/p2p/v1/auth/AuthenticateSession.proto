@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package fcpb.p2p.v1.auth;
+
+/**
+ * Request to authenticate as an active validator
+ */
+message AuthenticateSession {
+    // A random 8 byte identifier chosen by the client
+    bytes client_session_id = 1;
+    // Validator authentication public key
+    bytes auth_key = 2;
+}
+
+/**
+ * Response that establishes an authenticated session
+ */
+message AuthenticateSessionResponse {
+    // A random 8 byte identifier chosen by the server
+    string server_session_id = 1;
+    // Validator authentication public key
+    bytes auth_key = 2;
+}

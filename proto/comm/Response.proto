@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package fcpb.comm;
+
+/**
+ * Envelope that wraps every API response
+ */
+message Response {
+    // The response code as defined in ErrorCode.h
+    // TODO: Convert to protobuf enumeration
+    int32 code = 1;
+
+    // Additional context for an error.
+    // A combination of code and error_field can be used to programatically
+    // handle any error response received.
+    optional string error_field = 3;
+    // Human readable error string
+    optional string error_string = 4;
+
+    // The response-specific message body
+    optional google.protobuf.Any body = 5;
+
+    // The authentication material for the message (if required)
+    optional google.protobuf.Any auth = 6;
+}
