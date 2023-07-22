@@ -1,0 +1,40 @@
+diff --git a/src/google/protobuf/generated_message_tctable_lite.cc b/src/google/protobuf/generated_message_tctable_lite.cc
+index f2b36ee49..6b7b2249f 100644
+--- a/src/google/protobuf/generated_message_tctable_lite.cc
++++ b/src/google/protobuf/generated_message_tctable_lite.cc
+@@ -867,6 +867,7 @@ PROTOBUF_NOINLINE const char* TcParser::SingularVarBigint(
+   PROTOBUF_MUSTTAIL return ToTagDispatch(PROTOBUF_TC_PARAM_NO_DATA_PASS);
+ }
+ 
++#pragma GCC diagnostic ignored "-Wattributes"
+ template <typename FieldType>
+ PROTOBUF_ALWAYS_INLINE const char* TcParser::FastVarintS1(
+     PROTOBUF_TC_PARAM_DECL) {
+@@ -883,6 +884,7 @@ PROTOBUF_ALWAYS_INLINE const char* TcParser::FastVarintS1(
+   RefAt<FieldType>(msg, data.offset()) = res;
+   PROTOBUF_MUSTTAIL return ToTagDispatch(PROTOBUF_TC_PARAM_NO_DATA_PASS);
+ }
++#pragma GCC diagnostic pop
+ 
+ PROTOBUF_NOINLINE const char* TcParser::FastV8S1(PROTOBUF_TC_PARAM_DECL) {
+   using TagType = uint8_t;
+diff --git a/src/google/protobuf/parse_context.h b/src/google/protobuf/parse_context.h
+index 45c89cd65..7d2a8769e 100644
+--- a/src/google/protobuf/parse_context.h
++++ b/src/google/protobuf/parse_context.h
+@@ -1145,6 +1145,7 @@ PROTOBUF_NODISCARD const char* ParseContext::ParseMessage(T* msg,
+   return ptr;
+ }
+ 
++#pragma GCC diagnostic ignored "-Wattributes"
+ template <typename Func>
+ PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE const char*
+ ParseContext::ParseLengthDelimitedInlined(const char* ptr, const Func& func) {
+@@ -1156,6 +1157,7 @@ ParseContext::ParseLengthDelimitedInlined(const char* ptr, const Func& func) {
+   if (!PopLimit(std::move(old))) return nullptr;
+   return ptr;
+ }
++#pragma GCC diagnostic pop
+ 
+ inline const char* ParseContext::ReadSizeAndPushLimitAndDepthInlined(
+     const char* ptr, LimitToken* old_limit) {

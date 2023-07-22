@@ -1,0 +1,13 @@
+diff --git a/src/google/protobuf/any_lite.cc b/src/google/protobuf/any_lite.cc
+index 6f689af1a..917f60033 100644
+--- a/src/google/protobuf/any_lite.cc
++++ b/src/google/protobuf/any_lite.cc
+@@ -50,7 +50,7 @@ std::string GetTypeUrl(absl::string_view message_name,
+ }
+ 
+ const char kAnyFullTypeName[] = "google.protobuf.Any";
+-const char kTypeGoogleApisComPrefix[] = "type.googleapis.com/";
++const char kTypeGoogleApisComPrefix[] = "fc/";
+ const char kTypeGoogleProdComPrefix[] = "type.googleprod.com/";
+ 
+ bool AnyMetadata::InternalPackFrom(Arena* arena, const MessageLite& message,

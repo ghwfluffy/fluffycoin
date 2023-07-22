@@ -20,6 +20,7 @@ RUN set -eux; \
         libtool \
         linux-headers \
         make \
+        patch \
         ; \
     true
 

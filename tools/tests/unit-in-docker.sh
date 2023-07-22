@@ -14,6 +14,6 @@ docker run \
     -v /etc/passwd:/etc/passwd:ro \
     -v /proc/cpuinfo:/proc/cpuinfo:ro \
     -u $(id -u):$(id -g) \
-    --entrypoint "${TOP_DIR}/dist/fluffycoin-gtest" \
+    --entrypoint "${TOP_DIR}/dist/bin/fluffycoin-gtest" \
     "fcbuildenv:${FLUFFYCOIN_TAG}" \
     "${@}"

@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 project(fluffycoin)
 
 # Distributables
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist/lib)
 
 # gtest
 add_subdirectory(lib/googletest)
@@ -33,6 +34,7 @@ add_subdirectory(src/block)
 add_subdirectory(src/alg)
 add_subdirectory(src/zmq)
 add_subdirectory(src/async)
+add_subdirectory(src/pb)
 
 # Executables
 add_subdirectory(src/cli)

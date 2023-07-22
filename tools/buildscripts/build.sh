@@ -66,8 +66,22 @@ if [ ${CLEAN} -gt 0 ]; then
     fi
 fi
 
-# Build
+# Setup build directory
 mkdir -p "${BUILD_DIR}"
+
+# Add dependency patches
+(
+    if [ ! -f "${BUILD_DIR}/protopatched" ]; then
+        cd "${TOP_DIR}/lib/protobuf"
+        for patch in "${TOP_DIR}/cmake/patches/protobuf-"*".diff"; do
+            patch -f -R -p1 -i "${patch}" &> /dev/null || true
+            patch -f -p1 -i "${patch}"
+        done
+        touch "${BUILD_DIR}/protopatched"
+    fi
+)
+
+# Build
 (
     cd "${BUILD_DIR}"
     cmake \

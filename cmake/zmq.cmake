@@ -30,7 +30,7 @@ add_custom_command(
     COMMAND
         mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     COMMAND
-        cp -P ${LIBZMQ_LIB_BASE}* ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+        cp -P ${LIBZMQ_LIB_BASE}* ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
     COMMAND
         touch ${LIBZMQ_EMPTY}
     DEPENDS
