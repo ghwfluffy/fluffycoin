@@ -28,7 +28,7 @@ TEST(Curve25519, EncodeKey)
     EXPECT_NE(pub.get(), nullptr);
 
     SafeData privkey = ossl::Curve25519::toPrivate(*key);
-    EXPECT_GT(privkey.length(), pubkey.length());
+    EXPECT_EQ(privkey.length(), pubkey.length());
     log::traffic("Private key: {}",  Hex::encode(privkey));
 
     ossl::EvpPkeyPtr priv = ossl::Curve25519::fromPrivate(privkey);
@@ -79,7 +79,7 @@ TEST(Curve25519, EncodeDecodeSignVerify)
     EXPECT_NE(pub.get(), nullptr);
 
     SafeData privkey = ossl::Curve25519::toPrivate(*key);
-    EXPECT_GT(privkey.length(), pubkey.length());
+    EXPECT_EQ(privkey.length(), pubkey.length());
 
     ossl::EvpPkeyPtr priv = ossl::Curve25519::fromPrivate(privkey);
     EXPECT_NE(priv.get(), nullptr);

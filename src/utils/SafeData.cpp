@@ -7,6 +7,12 @@ SafeData::SafeData()
 {
 }
 
+SafeData::SafeData(const unsigned char *data, size_t len)
+        : BinData(true)
+{
+    setData(data, len);
+}
+
 SafeData::SafeData(const std::string &data)
         : BinData(true)
 {

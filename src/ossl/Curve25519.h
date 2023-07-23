@@ -15,7 +15,7 @@ namespace ossl
  */
 namespace Curve25519
 {
-    constexpr const size_t PUBLIC_LEN = 32;
+    constexpr const size_t POINT_LEN = 32;
 
     EvpPkeyPtr generate();
 

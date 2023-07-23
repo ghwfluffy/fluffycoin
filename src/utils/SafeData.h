@@ -12,6 +12,7 @@ class SafeData : public BinData
 {
     public:
         SafeData();
+        SafeData(const unsigned char *data, size_t len);
         SafeData(const std::string &data);
         SafeData(SafeData &&);
         SafeData(const SafeData &);

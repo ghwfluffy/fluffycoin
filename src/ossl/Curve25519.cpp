@@ -26,7 +26,18 @@ constexpr const unsigned char pubinfo[] =
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-constexpr const size_t ENCODING_LEN = sizeof(pubinfo) - Curve25519::PUBLIC_LEN;
+constexpr const size_t PUB_ENCODING_LEN = sizeof(pubinfo) - Curve25519::POINT_LEN;
+
+// EVP_PKEY serialized ED25519 private key
+constexpr const unsigned char privinfo[] =
+{
+    0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70,
+    0x04, 0x22, 0x04, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
+
+constexpr const size_t PRIV_ENCODING_LEN = sizeof(privinfo) - Curve25519::POINT_LEN;
 
 }
 
@@ -56,11 +67,11 @@ BinData Curve25519::toPublic(const EVP_PKEY &key)
     BinData x509 = ossl::encode(key, i2d_PUBKEY);
 
     // Verify they really gave us an ED25519 key
-    if (x509.length() != sizeof(pubinfo) || memcmp(pubinfo, x509.data(), ENCODING_LEN) != 0)
+    if (x509.length() != sizeof(pubinfo) || memcmp(pubinfo, x509.data(), PUB_ENCODING_LEN) != 0)
         log::error("Failed to encode ED25519 public key.");
     // Strip the encoding
     else
-        ret.setData(x509.data() + ENCODING_LEN, PUBLIC_LEN);
+        ret.setData(x509.data() + PUB_ENCODING_LEN, POINT_LEN);
 
     return ret;
 }
@@ -69,13 +80,13 @@ EvpPkeyPtr Curve25519::fromPublic(const BinData &publicPoint)
 {
     EvpPkeyPtr retKey;
 
-    if (publicPoint.length() != PUBLIC_LEN)
+    if (publicPoint.length() != POINT_LEN)
         log::error("ED25519 public point invalid length.");
     else
     {
         unsigned char encoded[sizeof(pubinfo)];
         memcpy(encoded, pubinfo, sizeof(pubinfo));
-        memcpy(encoded + ENCODING_LEN, publicPoint.data(), PUBLIC_LEN);
+        memcpy(encoded + PUB_ENCODING_LEN, publicPoint.data(), POINT_LEN);
 
         const unsigned char *pauc = encoded;
         EVP_PKEY *key = nullptr;
@@ -91,15 +102,38 @@ EvpPkeyPtr Curve25519::fromPublic(const BinData &publicPoint)
 
 SafeData Curve25519::toPrivate(const EVP_PKEY &key)
 {
-    return ossl::encode<SafeData>(key, i2d_PrivateKey);
+    SafeData ret = ossl::encode<SafeData>(key, i2d_PrivateKey);
+    if (ret.length() < POINT_LEN)
+    {
+        log::error("Invalid length serialized private key {}.", ret.length());
+        ret.clear();
+    }
+    else
+    {
+        ret.truncateFront(ret.length() - POINT_LEN);
+    }
+
+    return ret;
 }
 
 EvpPkeyPtr Curve25519::fromPrivate(const BinData &priv)
 {
-    return ossl::decode<EvpPkeyPtr>(priv,
-        std::bind(
-            d2i_PrivateKey, EVP_PKEY_ED25519,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    EvpPkeyPtr ret;
+
+    if (priv.length() != POINT_LEN)
+        log::error("Invalid private key point length {}.", priv.length());
+    else
+    {
+        SafeData encodedPriv(privinfo, sizeof(privinfo));
+        memcpy(encodedPriv.data() + PRIV_ENCODING_LEN, priv.data(), priv.length());
+
+        ret = ossl::decode<EvpPkeyPtr>(encodedPriv,
+            std::bind(
+                d2i_PrivateKey, EVP_PKEY_ED25519,
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    }
+
+    return ret;
 }
 
 BinData Curve25519::privateToPublic(const BinData &priv)

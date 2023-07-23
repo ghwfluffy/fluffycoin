@@ -165,6 +165,18 @@ void BinData::setBuffer(unsigned char *data, size_t len)
     }
 }
 
+void BinData::truncateFront(size_t bytes)
+{
+    if (bytes > this->len)
+        bytes = this->len;
+
+    if (bytes > 0)
+    {
+        memmove(this->buffer, this->buffer + bytes, this->len - bytes);
+        this->len -= bytes;
+    }
+}
+
 BinData BinData::sub(size_t pos, size_t len) const
 {
     BinData ret(bSecure);

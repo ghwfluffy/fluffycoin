@@ -25,6 +25,7 @@ class BinData
         void resize(size_t len);
         void setData(const unsigned char *data, size_t len);
         void setBuffer(unsigned char *data, size_t len);
+        void truncateFront(size_t bytes);
 
         BinData sub(size_t pos, size_t len) const;
         void append(const unsigned char *data, size_t len);

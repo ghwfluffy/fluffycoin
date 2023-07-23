@@ -10,7 +10,7 @@ using namespace fluffycoin;
 TEST(Address, Generate)
 {
     // Make public key from static data
-    unsigned char pubkeyData[ossl::Curve25519::PUBLIC_LEN] = {};
+    unsigned char pubkeyData[ossl::Curve25519::POINT_LEN] = {};
     ossl::EvpPkeyPtr key = ossl::Curve25519::fromPublic(BinData(pubkeyData, sizeof(pubkeyData)));
     ASSERT_NE(key, nullptr);
 

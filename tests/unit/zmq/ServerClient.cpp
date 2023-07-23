@@ -2,12 +2,18 @@
 
 #include <fluffycoin/zmq/Server.h>
 #include <fluffycoin/zmq/Client.h>
+#include <fluffycoin/ossl/Curve25519.h>
 
 #include <unistd.h>
 
 using namespace fluffycoin;
 
-TEST(ZmqServerClient, SendMessage)
+namespace
+{
+
+void clientServerTest(
+    const BinData &serverPub,
+    const BinData &serverPriv)
 {
     constexpr const char *LOCALHOST = "127.0.0.1";
     constexpr const uint16_t port = 1337;
@@ -17,12 +23,12 @@ TEST(ZmqServerClient, SendMessage)
     // Bind server port
     zmq::Server tServer(ctx);
     Details details;
-    tServer.bind(LOCALHOST, port, details);
+    tServer.bind(LOCALHOST, port, serverPriv, details);
     ASSERT_TRUE(details.isOk());
 
     // Connect client port
     zmq::Client tClient(ctx);
-    tClient.connect(LOCALHOST, port, details);
+    tClient.connect(LOCALHOST, port, serverPub, details);
     ASSERT_TRUE(details.isOk());
 
     // Send message from client
@@ -68,4 +74,26 @@ TEST(ZmqServerClient, SendMessage)
     ASSERT_TRUE(hasMsg);
     ASSERT_TRUE(details.isOk());
     EXPECT_EQ(msgData, serverMsgData);
+}
+
+}
+
+TEST(ZmqServerClient, SendMessage)
+{
+    clientServerTest(BinData(), BinData());
+}
+
+TEST(ZmqServerClient, CurveMQ)
+{
+    // Generate server keypair
+    ossl::EvpPkeyPtr serverPkey = ossl::Curve25519::generate();
+    ASSERT_NE(serverPkey.get(), nullptr);
+
+    // Serialize to binary
+    BinData serverPubKey = ossl::Curve25519::toPublic(*serverPkey);
+    SafeData serverPrivKey = ossl::Curve25519::toPrivate(*serverPkey);
+    ASSERT_FALSE(serverPubKey.empty());
+    ASSERT_FALSE(serverPrivKey.empty());
+
+    clientServerTest(serverPubKey, serverPrivKey);
 }

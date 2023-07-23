@@ -4,6 +4,7 @@ using namespace fluffycoin;
 
 ErrorStatus::ErrorStatus()
 {
+    this->level = log::Level::Error;
     this->errorCode = ErrorCode::None;
 }
 
@@ -54,12 +55,12 @@ const char *ErrorStatus::c_str() const
 
 void ErrorStatus::set(log::Logger &log, size_t cat, ErrorCode code, const char *field, std::string msg)
 {
+    log.msg(cat, level, msg, static_cast<int>(code), to_string(code).c_str());
+
     this->errorCode = code;
     if (field)
         this->errorField = field;
     else
         this->errorField.clear();
     this->errorStr = std::move(msg);
-
-    log.msg(cat, level, msg, static_cast<int>(code), to_string(code).c_str());
 }
