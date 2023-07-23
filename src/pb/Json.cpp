@@ -6,7 +6,7 @@ using namespace fluffycoin;
 using namespace fluffycoin::pb;
 
 void Json::fromJson(
-    const char *data,
+    const void *data,
     size_t len,
     google::protobuf::Message &msg,
     Details &details)
@@ -17,7 +17,7 @@ void Json::fromJson(
 
     absl::Status status =
         google::protobuf::util::JsonStringToMessage(
-            absl::string_view(data, len),
+            absl::string_view(reinterpret_cast<const char *>(data), len),
             &msg,
             options);
     if (status.code() != absl::StatusCode::kOk)

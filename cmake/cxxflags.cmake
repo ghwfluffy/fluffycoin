@@ -30,7 +30,6 @@ string(APPEND
     " -Wcast-align"
     " -Wcast-qual"
     " -Wconversion"
-    " -Wctor-dtor-privacy"
     " -Wdisabled-optimization"
     " -Wfloat-equal"
     " -Wformat-nonliteral"

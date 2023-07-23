@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package fcpb.comm;
+
+/**
+ * Envelope that wraps every API pub/sub event
+ */
+message EventEnvelope {
+    // The event information
+    google.protobuf.Any body = 1;
+    // The authentication material for the event (if required)
+    optional google.protobuf.Any auth = 2;
+}

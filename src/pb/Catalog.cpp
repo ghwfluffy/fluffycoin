@@ -26,6 +26,11 @@ size_t Catalog::getTypeId(const std::string &type)
     return iter == mapIds.end() ? 0 : iter->second;
 }
 
+size_t Catalog::getTypeId(const google::protobuf::Message &msg)
+{
+    return getTypeId(MsgInfo::getType(msg));
+}
+
 std::unique_ptr<google::protobuf::Message> Catalog::newMsg(const std::string &type)
 {
     auto iter = mapDefaults.find(type);

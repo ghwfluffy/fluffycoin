@@ -13,7 +13,7 @@ namespace fluffycoin::pb
 namespace Json
 {
     void fromJson(
-        const char *data,
+        const void *data,
         size_t len,
         google::protobuf::Message &msg,
         Details &details);

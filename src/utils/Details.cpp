@@ -28,6 +28,11 @@ const ErrorStatus &Details::error() const
     return errorStatus;
 }
 
+log::Logger &Details::log() const
+{
+    return logger;
+}
+
 void Details::setErrorStatus(ErrorStatus errorStatus)
 {
     this->errorStatus = std::move(errorStatus);

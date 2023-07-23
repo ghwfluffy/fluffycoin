@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 
+#include <stdint.h>
+
 namespace fluffycoin
 {
 
@@ -17,9 +19,39 @@ std::string to_string(T &&t)
 template<typename T>
 T from_string(const std::string &str)
 {
-    T ret();
+    T ret{};
     from_string(ret, str);
     return ret;
 }
+
+template<>
+std::string from_string(const std::string &str);
+
+template<>
+int8_t from_string(const std::string &str);
+
+template<>
+uint8_t from_string(const std::string &str);
+
+template<>
+int16_t from_string(const std::string &str);
+
+template<>
+uint16_t from_string(const std::string &str);
+
+template<>
+int32_t from_string(const std::string &str);
+
+template<>
+uint32_t from_string(const std::string &str);
+
+template<>
+int64_t from_string(const std::string &str);
+
+template<>
+uint64_t from_string(const std::string &str);
+
+template<>
+bool from_string(const std::string &str);
 
 }

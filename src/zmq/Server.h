@@ -19,7 +19,7 @@ class Server
 {
     public:
         Server(
-            Context &ctx);
+            const Context &ctx);
         Server(Server &&);
         Server(const Server &) = delete;
         Server &operator=(Server &&);
@@ -35,7 +35,7 @@ class Server
         void bind(
             const std::string &host,
             uint16_t port,
-            const SafeData &serverKey,
+            const BinData &serverKey,
             Details &details);
 
         bool recv(
@@ -55,11 +55,7 @@ class Server
         void close(
             const std::lock_guard<std::mutex> &lock);
 
-        void setupCurve(
-            const SafeData &serverKey,
-            Details &details);
-
-        Context *ctx;
+        const Context *ctx;
         void *socket;
         std::mutex mtx;
 };

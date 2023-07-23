@@ -28,6 +28,7 @@ namespace Catalog
     }
 
     size_t getTypeId(const std::string &type);
+    size_t getTypeId(const google::protobuf::Message &msg);
     std::unique_ptr<google::protobuf::Message> newMsg(const std::string &type);
 
     void cleanup();

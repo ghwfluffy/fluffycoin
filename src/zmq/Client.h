@@ -19,7 +19,7 @@ class Client
 {
     public:
         Client(
-            Context &ctx);
+            const Context &ctx);
         Client(Client &&);
         Client(const Client &) = delete;
         Client &operator=(Client &&);
@@ -53,11 +53,7 @@ class Client
     private:
         void close();
 
-        void setupCurve(
-            const BinData &serverKey,
-            Details &details);
-
-        Context *ctx;
+        const Context *ctx;
         void *socket;
 };
 

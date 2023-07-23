@@ -23,6 +23,7 @@ class Details : public AnyMap
         Details(log::Level level);
         template<typename LogCategory>
         Details(LogCategory cat, log::Level level = log::Level::Error)
+            : Details(level)
         {
             this->logCat = log::Category::catToInt(cat);
         }
@@ -40,7 +41,8 @@ class Details : public AnyMap
             errorStatus.set(logger, logCat, code, field, fmt::format(s, std::forward<Args>(args)...));
         }
 
-        template<typename Category, typename... Args>
+        template<typename Category, typename... Args,
+            typename = std::enable_if_t<std::is_enum<Category>::value>>
         void setError(Category cat, ErrorCode code, const char *field, fmt::format_string<Args...> s, Args&&... args)
         {
             errorStatus.set(logger, cat, code, field, fmt::format(s, std::forward<Args>(args)...));

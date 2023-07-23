@@ -38,6 +38,7 @@ add_subdirectory(src/alg)
 add_subdirectory(src/zmq)
 add_subdirectory(src/async)
 add_subdirectory(src/pb)
+add_subdirectory(src/svc)
 
 # Executables
 add_subdirectory(src/cli)

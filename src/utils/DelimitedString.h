@@ -10,7 +10,7 @@ namespace fluffycoin
  */
 namespace DelimitedString
 {
-    template<typename Container, typename ElementType>
+    template<template <typename...> class Container, typename ElementType>
     Container<ElementType> fromString(const std::string &str, char delimiter = ',')
     {
         Container<ElementType> ret;

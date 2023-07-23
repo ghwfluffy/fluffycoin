@@ -13,6 +13,7 @@ int main(int argc, const char *argv[])
     // Initialize fluffycoin
     log::setConsole(true);
     log::setLevel(log::Level::Traffic);
+    log::Category::init();
     ossl::Initialize::initialize();
 
     // Run tests

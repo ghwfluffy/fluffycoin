@@ -32,39 +32,39 @@ class Logger
 
         void msg(size_t cat, Level level, const std::string &str, int errorCode = 0, const char *errorStr = nullptr);
 
-        template<typename Category, typename... Args>
-        void error(Category cat, fmt::format_string<Args...> s, Args&&... args)
+        template<typename CategoryEnum, typename... Args>
+        void error(CategoryEnum cat, fmt::format_string<Args...> s, Args&&... args)
         {
             if (log::check(Level::Error))
-                msg(catToInt(cat), Level::Error, fmt::format(s, std::forward<Args>(args)...));
+                msg(Category::catToInt(cat), Level::Error, fmt::format(s, std::forward<Args>(args)...));
         }
 
-        template<typename Category, typename... Args>
-        void warn(Category cat, fmt::format_string<Args...> s, Args&&... args)
+        template<typename CategoryEnum, typename... Args>
+        void warn(CategoryEnum cat, fmt::format_string<Args...> s, Args&&... args)
         {
             if (log::check(Level::Warn))
-                msg(catToInt(cat), Level::Warn, fmt::format(s, std::forward<Args>(args)...));
+                msg(Category::catToInt(cat), Level::Warn, fmt::format(s, std::forward<Args>(args)...));
         }
 
-        template<typename Category, typename... Args>
-        void info(Category cat, fmt::format_string<Args...> s, Args&&... args)
+        template<typename CategoryEnum, typename... Args>
+        void info(CategoryEnum cat, fmt::format_string<Args...> s, Args&&... args)
         {
             if (log::check(Level::Info))
-                msg(catToInt(cat), Level::Info, fmt::format(s, std::forward<Args>(args)...));
+                msg(Category::catToInt(cat), Level::Info, fmt::format(s, std::forward<Args>(args)...));
         }
 
-        template<typename Category, typename... Args>
-        void debug(Category cat, fmt::format_string<Args...> s, Args&&... args)
+        template<typename CategoryEnum, typename... Args>
+        void debug(CategoryEnum cat, fmt::format_string<Args...> s, Args&&... args)
         {
             if (log::check(Level::Debug))
-                msg(catToInt(cat), Level::Debug, fmt::format(s, std::forward<Args>(args)...));
+                msg(Category::catToInt(cat), Level::Debug, fmt::format(s, std::forward<Args>(args)...));
         }
 
-        template<typename Category, typename... Args>
-        void traffic(Category cat, fmt::format_string<Args...> s, Args&&... args)
+        template<typename CategoryEnum, typename... Args>
+        void traffic(CategoryEnum cat, fmt::format_string<Args...> s, Args&&... args)
         {
             if (log::check(Level::Traffic))
-                msg(catToInt(cat), Level::Traffic, fmt::format(s, std::forward<Args>(args)...));
+                msg(Category::catToInt(cat), Level::Traffic, fmt::format(s, std::forward<Args>(args)...));
         }
 
     private:

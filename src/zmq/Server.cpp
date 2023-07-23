@@ -1,19 +1,16 @@
 #include <fluffycoin/zmq/Server.h>
-
-#include <fluffycoin/ossl/Curve25519.h>
-#include <fluffycoin/ossl/Error.h>
+#include <fluffycoin/zmq/Utils.h>
 
 #include <fluffycoin/log/Log.h>
 
 #include <zmq.h>
-#include <sodium.h>
 #include <string.h>
 
 using namespace fluffycoin;
 using namespace fluffycoin::zmq;
 
 Server::Server(
-    Context &ctx)
+    const Context &ctx)
         : ctx(&ctx)
 {
     socket = nullptr;
@@ -72,81 +69,10 @@ void Server::bind(
     bind(host, port, SafeData(), details);
 }
 
-void Server::setupCurve(
-    const SafeData &serverKey,
-    Details &details)
-{
-    // Sane validate input
-    if (serverKey.length() != 32)
-    {
-        details.setError(log::Comm, ErrorCode::InternalError, "zmq_curve",
-            "Invalid server key length {}.", serverKey.length());
-    }
-
-    // libSodium wants to have both the private and public components of the ED25519 key
-    SafeData extendedKey;
-    if (details.isOk())
-    {
-        extendedKey.resize(64);
-        memcpy(extendedKey.data(), serverKey.data(), serverKey.length());
-        BinData pubKey = ossl::Curve25519::privateToPublic(serverKey);
-        if (pubKey.length() != 32)
-        {
-            details.setError(log::Comm, ErrorCode::InternalError, "zmq_curve",
-                "Failed to convert ED25519 private key to public key: {}.", ossl::Error::pop());
-        }
-        // Append to private key to get extended key
-        else
-        {
-            memcpy(extendedKey.data() + serverKey.length(), pubKey.data(), pubKey.length());
-        }
-    }
-
-    // Convert ED25519 key to X25519
-    SafeData curveKey;
-    if (details.isOk())
-    {
-        curveKey.resize(32);
-        int i = crypto_sign_ed25519_sk_to_curve25519(curveKey.data(), extendedKey.data());
-        if (i != 0)
-        {
-            details.setError(log::Comm, ErrorCode::InternalError, "zmq_curve",
-                "Failed to convert ED25519 to X25519 with {}.", i);
-        }
-    }
-
-    // Get public component from private component
-    BinData curvePub;
-    if (details.isOk())
-    {
-        curvePub.resize(32);
-        int i = crypto_scalarmult_base(curvePub.data(), curveKey.data());
-        if (i != 0)
-        {
-            details.setError(log::Comm, ErrorCode::InternalError, "zmq_curve",
-                "Failed to convert X25519 private key to public key with {}.", i);
-        }
-    }
-
-    // Setup socket
-    if (details.isOk())
-    {
-        bool bOk = zmq_setsockopt(socket, ZMQ_CURVE_PUBLICKEY, curvePub.data(), curvePub.length()) == 0;
-        bOk &= zmq_setsockopt(socket, ZMQ_CURVE_SECRETKEY, curveKey.data(), curveKey.length()) == 0;
-        constexpr const int server = static_cast<int>(true);
-        bOk &= zmq_setsockopt(socket, ZMQ_CURVE_SERVER, &server, sizeof(server)) == 0;
-        if (!bOk)
-        {
-            details.setError(log::Comm, ErrorCode::InternalError, "zmq_curve",
-                "Failed to set CurveMQ parameters on server socket.");
-        }
-    }
-}
-
 void Server::bind(
     const std::string &host,
     uint16_t port,
-    const SafeData &serverKey, // ED25519 private key
+    const BinData &serverKey, // ED25519 private key
     Details &details)
 {
     std::lock_guard<std::mutex> lock(mtx);
@@ -154,44 +80,10 @@ void Server::bind(
     // Cleanup any previous socket
     close(lock);
 
-    // Check for dependency
-    if (!ctx)
-        details.setError(log::Comm, ErrorCode::InternalError, "zmq_ctx", "No server comm context.");
-
-    // Create new socket
+    // Bind socket
+    socket = Utils::bindSocket(ctx, ZMQ_ROUTER, host, port, serverKey, details);
     if (details.isOk())
-    {
-        socket = zmq_socket(*ctx, ZMQ_ROUTER);
-        if (!socket)
-            details.setError(log::Comm, ErrorCode::SocketError, "zmq_socket", "Failed to create new router socket.");
-    }
-
-    // Setup authentication/encryption
-    if (details.isOk() && serverKey.empty())
-    {
-        log::info("Binding unprotected socket.");
-    }
-    else if (details.isOk())
-    {
-        setupCurve(serverKey, details);
-    }
-
-    // Bind to requested host/port
-    if (details.isOk())
-    {
-        const char *pszHost = host.empty() ? "*" : host.c_str();
-        std::string address = fmt::format("tcp://{}:{}", pszHost, port);
-        int ret = zmq_bind(socket, address.c_str());
-        if (ret != 0)
-        {
-            details.setError(log::Comm, ErrorCode::ConnectError, "zmq_bind",
-                "Failed to bind to '{}': {}.", address, strerror(errno));
-        }
-        else
-        {
-            log::info(log::Comm, "Bound server socket to '{}'.", address);
-        }
-    }
+        details.log().info(log::Comm, "Opened API port.");
 
     // Cleanup on error
     if (!details.isOk())
@@ -356,17 +248,5 @@ void Server::reply(
 int Server::getFd() const
 {
     std::lock_guard<std::mutex> lock(const_cast<std::mutex &>(mtx));
-    int fd = -1;
-    if (socket)
-    {
-        size_t size = sizeof(fd);
-        int ret = zmq_getsockopt(socket, ZMQ_FD, &fd, &size);
-        if (ret != 0)
-        {
-            fd = -1;
-            log::error(log::Comm, "Failed to retrieve ZMQ server socket: ({}) {}.", errno, strerror(errno));
-        }
-    }
-
-    return fd;
+    return Utils::getFd(socket);
 }

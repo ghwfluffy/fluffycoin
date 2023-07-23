@@ -3,7 +3,9 @@
 #include <fluffycoin/zmq/Context.h>
 
 #include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/utils/Details.h>
 
+#include <mutex>
 #include <string>
 
 namespace fluffycoin::zmq
@@ -25,7 +27,6 @@ class Subscriber
         ~Subscriber();
 
         void connect(
-            const BinData &serverKey,
             const std::string &host,
             uint16_t port,
             Details &details);
@@ -33,6 +34,7 @@ class Subscriber
         void connect(
             const std::string &host,
             uint16_t port,
+            const BinData &serverKey,
             Details &details);
 
         void subscribe(
@@ -49,6 +51,11 @@ class Subscriber
         operator bool() const;
 
     private:
+        void close();
+        void close(
+            const std::lock_guard<std::mutex> &lock);
+
+        std::mutex mtx;
         const Context *ctx;
         void *socket;
 };

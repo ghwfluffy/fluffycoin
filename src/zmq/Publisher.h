@@ -3,7 +3,9 @@
 #include <fluffycoin/zmq/Context.h>
 
 #include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/utils/Details.h>
 
+#include <mutex>
 #include <string>
 
 namespace fluffycoin::zmq
@@ -17,7 +19,7 @@ class Publisher
 {
     public:
         Publisher(
-            Context &ctx);
+            const Context &ctx);
         Publisher(Publisher &&);
         Publisher(const Publisher &) = delete;
         Publisher &operator=(Publisher &&);
@@ -29,6 +31,13 @@ class Publisher
             uint16_t port,
             Details &details);
 
+        // CurveZMQ
+        void bind(
+            const std::string &host,
+            uint16_t port,
+            const BinData &serverKey,
+            Details &details);
+
         void publish(
             const std::string &topic,
             const BinData &data,
@@ -37,8 +46,13 @@ class Publisher
         int getFd() const;
 
     private:
-        Context *ctx;
+        void close();
+        void close(
+            const std::lock_guard<std::mutex> &lock);
+
+        const Context *ctx;
         void *socket;
+        std::mutex mtx;
 };
 
 }

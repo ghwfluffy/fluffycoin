@@ -27,6 +27,7 @@ target_link_libraries(
         fluffycoin-ossl
         fluffycoin-block
         fluffycoin-alg
+        fluffycoin-zmq
 )
 
 # Create the fluffytest/ header namespace
@@ -35,3 +36,4 @@ fluffytestlib(alg)
 fluffytestlib(block)
 fluffytestlib(ossl)
 fluffytestlib(utils)
+fluffytestlib(zmq)
