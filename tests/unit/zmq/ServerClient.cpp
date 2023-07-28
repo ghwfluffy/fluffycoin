@@ -38,7 +38,7 @@ void clientServerTest(
 
     // Receive message on server
     BinData serverMsgData;
-    constexpr const unsigned int RETRIES = 3;
+    constexpr const unsigned int RETRIES = 10;
     constexpr const unsigned int RETRY_SLEEP_MS = 1;
     unsigned int tries = 0;
     bool hasMsg = false;
@@ -46,6 +46,7 @@ void clientServerTest(
     while (tries++ < RETRIES && !hasMsg)
     {
         hasMsg = tServer.recv(clientId, serverMsgData, details);
+        EXPECT_TRUE(details.isOk());
         if (!hasMsg && tries <= RETRIES)
             usleep(RETRY_SLEEP_MS * 1000);
     }
@@ -68,6 +69,7 @@ void clientServerTest(
     while (tries++ < RETRIES && !hasMsg)
     {
         hasMsg = tClient.recv(msgData, details);
+        EXPECT_TRUE(details.isOk());
         if (!hasMsg && tries <= RETRIES)
             usleep(RETRY_SLEEP_MS * 1000);
     }

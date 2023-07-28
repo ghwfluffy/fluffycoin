@@ -10,6 +10,7 @@ Subscriber::Subscriber(
     const Context &ctx)
         : ctx(&ctx)
 {
+    socket = nullptr;
 }
 
 Subscriber::Subscriber(Subscriber &&rhs)
