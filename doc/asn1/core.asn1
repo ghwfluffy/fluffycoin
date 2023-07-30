@@ -46,3 +46,82 @@ Genesis                 ::=SEQUENCE {
     -- Personalize blockchain
     seed                OCTET STRING SIZE (0..68719476736)
 }
+
+-- Validators vote if they agree with the round leader
+Validation              ::=SEQUENCE {
+    verified            BOOLEAN,
+    authAddress         Address, -- TODO: Needs to be part of the signature
+    signature           Signature
+}
+
+-- Every so often all of the chains recombine into a single block
+-- This is a bit of a bottleneck that synchronizes all of the sub-chains
+-- It is used to count an arbitrary amount of time in blockchain operations
+ReconciliationContent   ::=SEQUENCE {
+    -- Protocol version can change any time by concensus
+    -- All nodes after a reconciliation protocol change use the new protocol
+    protocol            INTEGER (0),
+    -- Time of reconciliation
+    time                Time,
+    -- Monotomically increments every reconciliation block starting at zero
+    chainId             INTEGER (0..MAX),
+    -- Ordered hashes of the last node of every sub-chain
+    shardHashes         SEQUENCE OF Hash SIZE (1..64),
+    -- The round leader for the reconciliation block
+    leader              Address,
+    leaderKey           PublicKey,
+    newAddress          Address
+}
+Reconciliation          ::=SEQUENCE {
+    content             ReconciliationContent,
+    -- Signature over content
+    signature           Signature,
+    -- Distributed validation of the reconciliation block
+    votes               SET OF Validation SIZE (1..MAX)
+}
+
+-- A normal node in the blockchain where all the transactions happen
+NodeContent             ::=SEQUENCE {
+    chainId             INTEGER (0..MAX),
+    shardId             INTEGER (0..63),
+    index               INTEGER (0..10240),
+    prevHash            Hash,
+    transactions        SEQUENCE SIZE (1..104857600) OF Transaction,
+    nonce               OCTET STRING SIZE (8),
+    leader              Address,
+    newAddress          Address
+}
+Node                    ::=SEQUENCE {
+    content             NodeContent,
+    signature           Signature,
+    votes               SET OF Validation SIZE (1..MAX)
+}
+
+-- Wrapper for a block in the blockchain that identifies what kind of block it is
+Block                   ::=CHOICE {
+    null                [0] NULL,
+    genesis             [1] Genesis,
+    reconciliation      [2] Reconciliation,
+    node                [3] Node
+}
+
+TransactionContent      ::=SEQUENCE {
+    time                Time,
+    action              ::CHOICE {
+        null                [0] NULL,
+        transfer            [1] Transfer,
+        lotto               [2] LotteryTicket,
+        burn                [3] Donation,
+        mine                [3] MineAction,
+        stock               [4] StockAction,
+        vote                [5] VoteAction,
+        loan                [6] LoanAction,
+    },
+    signer              Address,
+    signerKey           PublicKey,
+    newAddress          Address
+}
+Transaction             ::=SEQUENCE {
+    content             TransactionContent,
+    signature           Signature,
+}
