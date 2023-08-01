@@ -4,16 +4,14 @@
 #include <fluffycoin/pb/Json.h>
 #include <fluffycoin/pb/AnyMessage.h>
 
-#include <fcpb/comm/EventEnvelope.pb.h>
+#include <fcpb/comm/Event.pb.h>
 
 using namespace fluffycoin;
 using namespace fluffycoin::svc;
 
 EventPublisher::EventPublisher(
-    boost::asio::io_context &asio,
     const zmq::Context &zmqContext)
-        : asio(asio)
-        , zmqContext(zmqContext)
+        : zmqContext(zmqContext)
 {
 }
 
@@ -44,7 +42,7 @@ void EventPublisher::publish(
     }
 
     // Put in envelope
-    fcpb::comm::EventEnvelope envelope;
+    fcpb::comm::Event envelope;
     pb::AnyMessage::toAny(event, *envelope.mutable_body());
 
     // Convert to JSON

@@ -41,6 +41,9 @@ class Subscriber
             const std::string &topic,
             Details &details);
 
+        void subscribeAll(
+            Details &details);
+
         bool recv(
             std::string &topic,
             BinData &data,
@@ -58,6 +61,7 @@ class Subscriber
         std::mutex mtx;
         const Context *ctx;
         void *socket;
+        bool subscribed;
 };
 
 }

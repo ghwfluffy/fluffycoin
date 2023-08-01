@@ -17,6 +17,9 @@
 
 using namespace fluffycoin;
 
+namespace
+{
+
 struct TestContext
 {
     async::TreasureTrove trove;
@@ -33,6 +36,8 @@ struct TestContext
         scheduler.start();
     }
 };
+
+}
 
 TEST(ApiPort, SimpleStartStop)
 {

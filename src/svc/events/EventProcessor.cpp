@@ -13,16 +13,15 @@ namespace
 {
 
 void queueRead(
-    boost::asio::io_context &asio,
     async::UncontrolledSocket &socket,
     zmq::Subscriber &subscriber,
-    const svc::ServiceScene &svcScene,
+    const svc::ServiceScene &ctx,
     std::function<const EventSubscriptionMap::EventHandler *(const std::string &)> getHandler,
     Details &details)
 {
     socket.read(
         details,
-        [&asio, &socket, &subscriber, &svcScene, getHandler](Details &details) mutable -> void
+        [&socket, &subscriber, &ctx, getHandler](Details &details) mutable -> void
         {
             // Socket closing
             if (!details.isOk())
@@ -52,10 +51,10 @@ void queueRead(
             }
 
             // Deserialize wrapper
-            std::unique_ptr<fcpb::comm::EventEnvelope> envelope;
+            std::unique_ptr<fcpb::comm::Event> envelope;
             if (details.isOk() && !data.empty())
             {
-                envelope = std::make_unique<fcpb::comm::EventEnvelope>();
+                envelope = std::make_unique<fcpb::comm::Event>();
                 pb::Json::fromJson(data.data(), data.length(), *envelope, details);
             }
 
@@ -77,29 +76,27 @@ void queueRead(
             if (details.isOk() && handler)
             {
                 boost::asio::post(
-                    asio,
-                    [handler, &svcScene, envelope = std::move(envelope)]() mutable -> void
+                    ctx.asio,
+                    [handler, &ctx, envelope = std::move(envelope)]() mutable -> void
                     {
-                        (*handler)(svcScene, *envelope);
+                        (*handler)(ctx, *envelope);
                     });
             }
 
             // Requeue the socket read
             Details qDetails;
-            queueRead(asio, socket, subscriber, svcScene, getHandler, qDetails);
+            queueRead(socket, subscriber, ctx, getHandler, qDetails);
         });
 }
 
 }
 
 EventProcessor::EventProcessor(
-    const ServiceScene &svcScene,
+    const ServiceScene &ctx,
     const zmq::Context &zmqCtx,
-    boost::asio::io_context &asio,
     const EventSubscriptionMap &handlers)
-        : svcScene(svcScene)
+        : ctx(ctx)
         , zmqCtx(zmqCtx)
-        , asio(asio)
         , handlers(handlers)
 {
 }
@@ -197,8 +194,8 @@ EventProcessor::SubSocket EventProcessor::startListening(
     async::UncontrolledSocket socket;
     if (details.isOk())
     {
-        socket = async::UncontrolledSocket(asio, subscriber.getFd());
-        queueRead(asio, socket, subscriber, svcScene, getHandler, details);
+        socket = async::UncontrolledSocket(ctx.asio, subscriber.getFd());
+        queueRead(socket, subscriber, ctx, getHandler, details);
     }
 
     return SubSocket(std::move(socket), std::move(subscriber));

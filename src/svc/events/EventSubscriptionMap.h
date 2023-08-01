@@ -11,7 +11,7 @@
 
 #include <fluffycoin/log/Log.h>
 
-#include <fcpb/comm/EventEnvelope.pb.h>
+#include <fcpb/comm/Event.pb.h>
 
 #include <map>
 #include <string>
@@ -31,7 +31,7 @@ class EventSubscriptionMap
     public:
         using EventHandler = std::function<void(
             const ServiceScene &,
-            fcpb::comm::EventEnvelope &)>;
+            fcpb::comm::Event &)>;
 
         EventSubscriptionMap() = default;
         EventSubscriptionMap(EventSubscriptionMap &&) = default;
@@ -60,7 +60,7 @@ class EventSubscriptionMap
                 port,
                 topic,
                 [port, topic, eventHandler]
-                (const ServiceScene &svcScene, fcpb::comm::EventEnvelope &env) -> void
+                (const ServiceScene &svcScene, fcpb::comm::Event &env) -> void
                 {
                     // Pull the message data out of the envelope
                     Details details;
@@ -104,7 +104,7 @@ class EventSubscriptionMap
             addPeerHandler(
                 topic,
                 [topic, eventHandler]
-                (const ServiceScene &svcScene, fcpb::comm::EventEnvelope &env) -> void
+                (const ServiceScene &svcScene, fcpb::comm::Event &env) -> void
                 {
                     // Pull the message data out of the envelope
                     Details details;

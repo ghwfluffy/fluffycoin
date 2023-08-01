@@ -266,7 +266,7 @@ bool Service::startService()
     // Setup event publisher
     if (bOk && params->getEventPort() > 0 && !paused)
     {
-        eventPublisher = std::make_unique<EventPublisher>(scheduler.asio(), zmqCtx);
+        eventPublisher = std::make_unique<EventPublisher>(zmqCtx);
         bOk = eventPublisher->openPort(params->getEventPort(), params->getServerKey());
         // Add it to the scene
         if (bOk)
@@ -286,7 +286,7 @@ bool Service::startService()
     if (bOk && !paused)
     {
         params->addEventSubscriptions(subscriptions);
-        eventProcessor = std::make_unique<EventProcessor>(ctx, zmqCtx, scheduler.asio(), subscriptions);
+        eventProcessor = std::make_unique<EventProcessor>(ctx, zmqCtx, subscriptions);
         bOk = eventProcessor->subscribeLocal();
         if (bOk)
             ctx.set(*eventProcessor);

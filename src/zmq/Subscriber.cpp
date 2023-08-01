@@ -11,12 +11,14 @@ Subscriber::Subscriber(
         : ctx(&ctx)
 {
     socket = nullptr;
+    subscribed = false;
 }
 
 Subscriber::Subscriber(Subscriber &&rhs)
 {
     ctx = nullptr;
     socket = nullptr;
+    subscribed = false;
     operator=(std::move(rhs));
 }
 
@@ -27,6 +29,7 @@ Subscriber &Subscriber::operator=(Subscriber &&rhs)
         close();
         ctx = rhs.ctx;
         socket = rhs.socket;
+        subscribed = rhs.subscribed;
         rhs.socket = nullptr;
     }
 
@@ -56,6 +59,7 @@ void Subscriber::close(
     if (ret != 0)
         log::error(log::Comm, "Failed to close subscription socket ({}): {}.", errno, strerror(errno));
     socket = nullptr;
+    subscribed = false;
 }
 
 void Subscriber::connect(
@@ -109,6 +113,16 @@ void Subscriber::subscribe(
                 "Failed to subscribe to topic '{}': ({}) {}.", topic, errno, strerror(errno));
         }
     }
+
+    // Track subscription state
+    if (details.isOk())
+        subscribed = true;
+}
+
+void Subscriber::subscribeAll(
+    Details &details)
+{
+    subscribe(std::string(), details);
 }
 
 bool Subscriber::recv(
@@ -122,6 +136,10 @@ bool Subscriber::recv(
     // Check connected
     if (!socket)
         details.setError(log::Comm, ErrorCode::NotConnected, "zmq_event", "Not connected.");
+
+    // Prevent programmer error
+    if (!subscribed)
+        details.setError(log::Comm, ErrorCode::InternalError, "zmq_event", "Not subscribed.");
 
     // Read topic
     bool bHasMessage = false;

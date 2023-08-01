@@ -7,7 +7,7 @@ package fcpb.comm;
 /**
  * Envelope that wraps every API pub/sub event
  */
-message EventEnvelope {
+message Event {
     // The event information
     google.protobuf.Any body = 1;
     // The authentication material for the event (if required)

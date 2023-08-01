@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fluffycoin/svc/EventSubscriptionMap.h>
+#include <fluffycoin/svc/ServiceScene.h>
 
 #include <fluffycoin/zmq/Context.h>
 #include <fluffycoin/zmq/Subscriber.h>
@@ -23,9 +24,8 @@ class EventProcessor
 {
     public:
         EventProcessor(
-            const ServiceScene &svcScene,
+            const ServiceScene &ctx,
             const zmq::Context &zmqCtx,
-            boost::asio::io_context &asio,
             const EventSubscriptionMap &handlers);
         EventProcessor(EventProcessor &&) = default;
         EventProcessor(const EventProcessor &) = default;
@@ -62,9 +62,8 @@ class EventProcessor
             std::function<const EventSubscriptionMap::EventHandler *(const std::string &)> getHandler,
             Details &details);
 
-        const ServiceScene &svcScene;
+        const ServiceScene &ctx;
         const zmq::Context &zmqCtx;
-        boost::asio::io_context &asio;
         const EventSubscriptionMap &handlers;
 
         std::list<std::string> peerTopics;

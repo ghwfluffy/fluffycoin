@@ -1,7 +1,5 @@
 #pragma once
 
-#include <fluffycoin/async/boost.h>
-
 #include <fluffycoin/zmq/Context.h>
 #include <fluffycoin/zmq/Publisher.h>
 
@@ -21,7 +19,6 @@ class EventPublisher
 {
     public:
         EventPublisher(
-            boost::asio::io_context &asio,
             const zmq::Context &zmqContext);
         EventPublisher(EventPublisher &&) = default;
         EventPublisher(const EventPublisher &) = default;
@@ -31,14 +28,13 @@ class EventPublisher
 
         bool openPort(
             uint16_t port,
-            const BinData &serverKey);
+            const BinData &serverKey = BinData());
 
         void publish(
             const std::string &topic,
             const google::protobuf::Message &event);
 
     private:
-        boost::asio::io_context &asio;
         const zmq::Context &zmqContext;
 
         std::unique_ptr<zmq::Publisher> socket;

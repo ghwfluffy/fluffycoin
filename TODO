@@ -1,6 +1,10 @@
 Unit Tests
-    [ ] EventPublisher
+    [ ] EventProcessor
     [ ] Service
+
+Misc
+    [ ] PBKDF iters param
+    [ ] protobuf Serialize default enum
 
 Design
     [ ] Async client
@@ -119,3 +123,12 @@ Licensing
         [ ] boost
         [ ] nlohmann
     [ ] Open source promise
+
+Marketing
+    fluffyco.in
+    fluffycoin.dev
+    fluffycoin.us
+    fluffycoin.net
+    fluffycoin.co
+    fluffychain.com
+    fluffycoinblockchain.com
