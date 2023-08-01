@@ -175,7 +175,7 @@ void ApiPort::handleResponse(
     fcpb::comm::Response rsp;
     scene.log().traffic(Log::Api, "Responding to request '{}' with {}.",
         pb::MsgInfo::getType(scene.req<google::protobuf::Message>()),
-        msg ? pb::MsgInfo::getType(*msg) : std::string("Null"));
+        msg ? pb::MsgInfo::getType(*msg) : std::string("null"));
 
     // Serialize message body (if any)
     if (scene.isOk() && msg)

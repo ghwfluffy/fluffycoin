@@ -53,6 +53,7 @@ Scheduler::Scheduler()
 
 Scheduler::~Scheduler()
 {
+    stop();
 }
 
 void Scheduler::setThreads(unsigned int threads)

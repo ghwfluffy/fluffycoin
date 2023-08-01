@@ -1,6 +1,4 @@
 Unit Tests
-    [ ] Add gdb/valgrind to runtests in docker
-    [ ] ApiPort
     [ ] EventPublisher
     [ ] Service
 

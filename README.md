@@ -133,6 +133,7 @@ make release
 You can build and run the unit tests in a docker environment.
 ```
 make debug-docker
+make build-containers
 make runtests-docker
 ```
 

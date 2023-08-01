@@ -170,5 +170,5 @@ void UncontrolledSocket::read(
 
     // Already queued a callback, it will cascade to this one
     impl->pendingDetails = std::move(details);
-    impl->callback = std::move(impl->callback);
+    impl->callback = std::move(callback);
 }

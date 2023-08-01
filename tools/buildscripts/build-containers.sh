@@ -51,3 +51,10 @@ docker build \
     "${TOP_DIR}" \
     -f "${DOCKER_DIR}/cli/Dockerfile" \
     -t "fccli:${FLUFFYCOIN_TAG}"
+
+docker build \
+    ${CACHE} \
+    "${TOP_DIR}" \
+    -f "${DOCKER_DIR}/unit-tests/Dockerfile" \
+    --build-arg="FLUFFYCOIN_TAG=${FLUFFYCOIN_TAG}" \
+    -t "fcunit-tests:${FLUFFYCOIN_TAG}"

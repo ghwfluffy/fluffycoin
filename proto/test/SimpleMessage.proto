@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package fcpb.test;
+
+/**
+ * Simple message to use in unit tests
+ */
+message SimpleMessage {
+    int32 int_value = 1;
+    string string_value = 2;
+}

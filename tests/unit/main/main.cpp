@@ -2,6 +2,7 @@
 
 #include <fluffycoin/ossl/Initialize.h>
 #include <fluffycoin/log/Log.h>
+#include <fluffycoin/svc/Log.h>
 
 using namespace fluffycoin;
 
@@ -15,6 +16,8 @@ int main(int argc, const char *argv[])
     log::setLevel(log::Level::Traffic);
     log::Category::init();
     ossl::Initialize::initialize();
+
+    svc::initLogger();
 
     // Run tests
     int ret = RUN_ALL_TESTS();

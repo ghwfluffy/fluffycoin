@@ -13,13 +13,13 @@ namespace fluffycoin::pb
  */
 namespace Catalog
 {
+    void registerMsg(size_t id, const google::protobuf::Message &msg);
+
     template<typename T>
     void registerMsg()
     {
         registerMsg(typeid(T).hash_code(), T::default_instance());
     }
-
-    void registerMsg(size_t id, const google::protobuf::Message &msg);
 
     template<typename T>
     std::string getType()

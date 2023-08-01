@@ -3,6 +3,8 @@
 #include <fluffycoin/svc/RequestScene.h>
 #include <fluffycoin/svc/ApiResponseCallback.h>
 
+#include <fluffycoin/pb/Catalog.h>
+
 #include <google/protobuf/message.h>
 
 #include <functional>
@@ -27,6 +29,7 @@ class ApiHandlerMap
         template<typename Request>
         void add(std::function<void(svc::RequestScene &, Request &, svc::ApiResponseCallback)> reqHandler)
         {
+            pb::Catalog::registerMsg<Request>();
             add(
                 typeid(Request).hash_code(),
                 [reqHandler]

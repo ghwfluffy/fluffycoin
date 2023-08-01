@@ -48,6 +48,16 @@ class Details : public AnyMap
             errorStatus.set(logger, cat, code, field, fmt::format(s, std::forward<Args>(args)...));
         }
 
+        template<typename Category, typename... Args,
+            typename = std::enable_if_t<std::is_enum<Category>::value>>
+        void setError(log::Level eLevel, Category cat, ErrorCode code, const char *field, fmt::format_string<Args...> s, Args&&... args)
+        {
+            log::Level eOrigLevel = errorStatus.getLogLevel();
+            errorStatus.setLogLevel(eLevel);
+            errorStatus.set(logger, cat, code, field, fmt::format(s, std::forward<Args>(args)...));
+            errorStatus.setLogLevel(eOrigLevel);
+        }
+
         log::Logger &log() const;
 
         ErrorStatus &error();
