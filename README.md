@@ -1,10 +1,10 @@
-# Fluffycoin Decentralized Consensus Protocol
+# <img src="https://raw.githubusercontent.com/ghwfluffy/fluffycoin/master/doc/marketing/fc.png?token=GHSAT0AAAAAACE7ZKDG5YI76SE4JP7EBUG2ZGGLRLA" height="40" /> Fluffycoin Decentralized Consensus Protocol
 
 ## Background
 
 ### What is Fluffycoin?
 
-Fluffycoin is a decentralized blockchain, a peer-to-peer protocol, a mechanism for recording verifiable agreements, but mostly an art project. It's a new layer 1 blockchain with a custom protocol and consensus algorithm. A fluffycoin is the unit of authority on the chain, and is subdivided into 100 million fluffs.
+Fluffycoin is a decentralized indie-blockchain, a peer-to-peer protocol, a mechanism for recording verifiable agreements, but mostly an art project. It's a new layer 1 blockchain with a custom protocol and consensus algorithm. A fluffycoin is the unit of authority on the chain, and is subdivided into 100 million fluffs.
 
 ### Why?
 
@@ -14,7 +14,7 @@ Why build a brand new blockchain? Surely making a layer 2 on top of Etherium, a 
 
 A YouTuber named Biaheza used the name "Fluffy Coin" (with a space) to create an ERC-20 smart contract on the Etherium blockchain for a video to explain how easy it is to setup an alt coin. I've been all talk and no code on this project since 2018, so I can only blame myself for letting the name get minted by someone else in late 2021.
 
-Many other names were considered but nothing else felt right. I'll give Biaheza some coins when the public network goes live and make sure he's cool with it. Check out his content on YouTube, I've been watching him for years.
+Many other names were considered but nothing else felt right. I'll give Biaheza some coins when the public network goes live and let him know I'm using the name. Check out his content on YouTube, I've been watching him for years.
 
 
 ## Protocol Features
@@ -23,7 +23,7 @@ Many other names were considered but nothing else felt right. I'll give Biaheza 
 
 The proof of stake algorithm allows you to take a cut of the transaction fees and requires setting up a validator node. Validator nodes communicate with eachother using a gossip protocol. They negotiate a consensus on the order of who gets to build the next block. The more you stake the more often you will be elected to build the next block.
 
-The validator that builds the block receives the largest portion of the transaction fees. All validators receive a small portion of the transaction fees. And another small percentage of the transaction fees gets burned (not give to anyone).
+The validator that builds the block receives the largest portion of the transaction fees. All validators receive a small portion of the transaction fees. And another small percentage of the transaction fees get burned (not given to anyone).
 
 Validators are penalized for building invalid blocks, affirming invalid blocks, missing their turn to build a block, or not affirming enough blocks built by other validators.
 
@@ -59,7 +59,7 @@ This is the part where you say "that's stupid. who would agree to accept coins t
 
 McBucks is my example scenario to help you imagine a fluffycoin loan. If McDonald's needed to borrow capital, it could take out a fluffycoin loan. They take out a 100 fluffycoin loan that matures in a week, and they receive 100 "IOUs" they call McBucks. They could pay their employees and vendors in McBucks. To McDonald's they get capital up front, and the employees and vendors trust that McDonald's isn't going to default on their loans, so they accept the payment in McBucks knowing in a week it's as good as being paid in fluffycoins. Local businesses that want to entice McDonald's employees and vendors to spend money at their store will offer to accept McBucks, possibly at some small percent markup.
 
-Another example I like to imagine is supporting small businesses. If there is a small business that you believe in, you might accept payment in the "IOU" form as a method of supporting them. You could imagine a small business gaining support from other local businesses by getting them to accept their "IOU" sub-coin, and recruiting employees who believe in the business and understand they will be paid in these digital IOUs that will mature over time or be accepted by the supporting businesses.
+Another example I like to imagine is supporting small businesses. If there is a small business that you believe in, you might accept payment in the "IOU" form as a method of supporting them. You could imagine a small business gaining support from other local businesses by getting them to accept their "IOU" sub-coin, and recruiting employees who believe in the business enough to be paid in these digital IOUs that will mature over time or be spent immediately at supporting businesses.
 
 ### Social Votes
 
@@ -69,7 +69,7 @@ There exists a system on the chain where you can put a topic up for vote. Anyone
 
 Stock tickers can be created on the chain and shares of the stock traded. Stocks can be created as privately owned stocks, where all of the shares belong to the origin wallet and they distribute privately as they see fit. Or stocks can be created as public stocks with an IPO price and an IPO duration.
 
-Public stocks have a built in way of providing dividens. A special quirk makes it so they can never sell below the IPO price. If the IPO price is 1 fluffycoin, the stock can only be traded for more than 1 fluffycoin. If it is resold at the IPO price, the stock immediately resolves into that many fluffycoins for the seller and that many fluffycoins is added to a pool specific to that stock. This pool also grows for every trade of that stock. A percentage of the transaction fee from trading a public stock goes into the pool. During Reconciliation Blocks, public stocks traded during the last period have a chance of minting new shares. This will remove the IPO price from the pool for each minted stock, and assign it to a stock holder.
+Public stocks have a built in way of providing dividens. A special quirk makes it so they can never sell below the IPO price. If the IPO price is 1 fluffycoin, the stock can only be traded for more than 1 fluffycoin. If it is resold at the IPO price, the stock immediately resolves into that many fluffycoins for the seller and that many fluffycoins is added to a pool specific to that stock. This pool also grows for every trade of that stock. A percentage of the transaction fee from trading a public stock goes into the pool. During Reconciliation Blocks, public stocks traded during the last period have a chance of minting new shares. This will remove the IPO price from the pool for each minted stock, and assign it to a random stock holder.
 
 
 #### Covered Calls
@@ -88,6 +88,7 @@ The blockchain consists of several sub-chains called shards. The algorithm defin
 
 * Gives a chance to dynamically change the number of shards based on current network volume
 * Provides a deliniation between transactions that time-based events on the chain can reference
+* Provides a deliniation when a new protocol version becomes adopted and acts as the official validator vote
 * Creates a checkpoint where snapshots can be created to speed up validator onboarding
 * Generates a stronger consensus that all of the shards are coherent with each other
 
@@ -97,7 +98,7 @@ ECDSA signatures on the ED25519 curve are used for all authentication on the cha
 
 ## Building
 
-Everything builds and runs in containers. The bash build scripts use docker. So to build this project you need bash and docker. There are shortcuts to the build scripts in the unix makefile, so the most convenient way to build is with make.
+Everything builds and runs in containers. The bash build scripts use docker. So to build this project you only need bash and docker. There are shortcuts to the build scripts in the unix makefile, so the most convenient way to build is with make.
 
 ```
 $ make help
@@ -113,10 +114,26 @@ runtests-docker                Run unit tests in docker build environment
 ### Build code
 
 Make sure you have the submodules checked out before building.
-
 ```
 git submodule update --init --recursive
-make
+```
+
+You can build the binaries using the docker build environment.
+```
+make release-docker
+```
+
+Or if you want to build the binaries for the host platform.
+```
+make release
+```
+
+### Run unit tests
+
+You can build and run the unit tests in a docker environment.
+```
+make debug-docker
+make runtests-docker
 ```
 
 ### Build validator
@@ -130,16 +147,35 @@ make build-containers
 ### Run validator
 
 Once you have built the runtime containers, the easiest way to run the validator is with docker-compose.
+
+You will need to edit the env file to embed your validator key.
 ```
 cd docker/validator
+cat .env
 docker compose up -d
 ```
 
-### Run unit tests
+### Use Fluffycoin
 
-After the code is built, you can run the unit tests which will run in a docker environment.
+You can use the CLI applications to submit transactions and perform other network actions. For convenience there is a CLI docker that can be run and a Makefile command to start it.
 ```
-make runtests-docker
+make build-containers
+make runcli-docker
+```
+```
+Fluffycoin Command Line Tools
+
+fluffycoin-genesis: Create a new genesis block
+fluffycoin-wallet: Create and manage wallet keys
+fluffycoin-info: Query information from the validators
+fluffycoin-download: Download all or part of the binary blockchain
+fluffycoin-validator: Sign up as a validator, and other validator actions
+fluffycoin-transfer: Submit a transfer transaction
+fluffycoin-trinket: Submit a trinket transaction
+fluffycoin-lottery: Buy a lottery ticket
+fluffycoin-loans: Submit actions related to loans
+fluffycoin-vote: Submit actions related to votes
+fluffycoin-stocks: Submit actions related to stocks
 ```
 
 ## Dependencies
@@ -149,3 +185,23 @@ make runtests-docker
 * libsodium - Required by libzmq for CurveMQ
 * boost ASIO - Asynchronous event handling
 * Google protobuf - Performs de/serialization of IPC and P2P messages
+* nlohmann JSON for Modern C++ - JSON formatter for logs
+* {fmt} - String formatting
+
+### Build Dependencies
+
+* CMake
+* g++
+* Ninja
+* bash
+* patch
+
+#### Build Dependencies of Submodules
+
+* autoconf
+* automake
+* libtool
+
+### Docker Dependencies
+
+* Alpine 3.18

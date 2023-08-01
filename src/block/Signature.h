@@ -17,6 +17,7 @@ class Signature
 {
     public:
         Signature() = default;
+        Signature(BinData sig);
         Signature(Signature &&) = default;
         Signature(const Signature &) = default;
         Signature &operator=(Signature &&) = default;

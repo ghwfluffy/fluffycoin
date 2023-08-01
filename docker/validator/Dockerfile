@@ -13,9 +13,8 @@ RUN set -eux; \
     true
 
 # Binaries
-COPY ./dist/fluffycoin-genesis /usr/bin/
-COPY ./dist/libsodium* /usr/lib/
-COPY ./dist/libzmq* /usr/lib/
+COPY ./dist/bin/fluffycoin-genesis /usr/bin/
+COPY ./dist/lib/* /usr/lib/
 
 # Entrypoint
 ENTRYPOINT /usr/bin/fluffycoin-genesis

@@ -5,7 +5,7 @@
 #include <list>
 #include <string>
 
-namespace fluffycoin::svc
+namespace fluffycoin
 {
 
 class ArgParser;

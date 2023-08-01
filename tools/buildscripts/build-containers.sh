@@ -6,8 +6,7 @@ set -eu -o pipefail
 usage() {
     echo "Usage: $(basename "${0}") <Options>
 
-            -X --no-cache           Don't use docker cache
-            -D --drop-in            Drop into build env" 1>&2
+            -X --no-cache           Don't use docker cache" 1>&2
 }
 
 CACHE=""
@@ -46,3 +45,9 @@ docker build \
     "${TOP_DIR}" \
     -f "${DOCKER_DIR}/validator/Dockerfile" \
     -t "fcvalidator:${FLUFFYCOIN_TAG}"
+
+docker build \
+    ${CACHE} \
+    "${TOP_DIR}" \
+    -f "${DOCKER_DIR}/cli/Dockerfile" \
+    -t "fccli:${FLUFFYCOIN_TAG}"

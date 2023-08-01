@@ -1,7 +1,5 @@
 #pragma once
 
-#include <fluffycoin/svc/ArgParser.h>
-
 #include <fluffycoin/svc/ServiceScene.h>
 
 #include <fluffycoin/svc/ApiHandlerMap.h>
@@ -9,6 +7,7 @@
 #include <fluffycoin/svc/EventSubscriptionMap.h>
 
 #include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/utils/ArgParser.h>
 
 #include <stdint.h>
 

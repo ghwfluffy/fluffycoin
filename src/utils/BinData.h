@@ -39,6 +39,7 @@ class BinData
 
         BinData &operator+=(const BinData &data);
         bool operator==(const BinData &rhs) const;
+        bool operator!=(const BinData &rhs) const;
 
     protected:
         BinData(bool bSecure);

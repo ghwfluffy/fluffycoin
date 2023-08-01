@@ -6,6 +6,11 @@
 using namespace fluffycoin;
 using namespace fluffycoin::block;
 
+PublicKey::PublicKey(BinData point)
+{
+    this->point = std::move(point);
+}
+
 const BinData &PublicKey::get() const
 {
     return point;

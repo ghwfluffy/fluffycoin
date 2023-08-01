@@ -23,6 +23,6 @@ namespace log
 }
 
 std::string to_string(log::Level);
-void from_string(log::Level &, const std::string &);
+void from_string(const std::string &, log::Level &);
 
 }

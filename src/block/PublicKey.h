@@ -17,6 +17,7 @@ class PublicKey
 {
     public:
         PublicKey() = default;
+        PublicKey(BinData point);
         PublicKey(PublicKey &&) = default;
         PublicKey(const PublicKey &) = default;
         PublicKey &operator=(PublicKey &&) = default;

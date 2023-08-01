@@ -3,6 +3,7 @@
 #include <fluffycoin/block/Time.h>
 #include <fluffycoin/block/Address.h>
 #include <fluffycoin/block/Specie.h>
+#include <fluffycoin/block/PublicKey.h>
 
 #include <fluffycoin/utils/BinData.h>
 
@@ -51,6 +52,9 @@ class Genesis
         const Address &getCreator() const;
         void setCreator(Address creator);
 
+        const PublicKey &getCreatorKey() const;
+        void setCreatorKey(PublicKey key);
+
         const Specie &getGreed() const;
         void setGreed(Specie specie);
 
@@ -60,7 +64,7 @@ class Genesis
         void toAsn1(asn1::Genesis &) const;
         void fromAsn1(const asn1::Genesis &);
 
-        BinData toContent() const;
+        BinData encode() const;
 
     private:
         uint32_t protocol;
@@ -68,6 +72,7 @@ class Genesis
         uint32_t version;
         Time creation;
         Address creator;
+        PublicKey creatorKey;
         Specie greed;
         BinData seed;
 };

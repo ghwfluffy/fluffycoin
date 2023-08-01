@@ -2,7 +2,6 @@
 
 #include <fluffycoin/block/Validation.h>
 #include <fluffycoin/block/Hash.h>
-#include <fluffycoin/block/PublicKey.h>
 #include <fluffycoin/block/Address.h>
 #include <fluffycoin/block/Signature.h>
 
@@ -50,12 +49,6 @@ class Reconciliation
         const Address &getLeader() const;
         void setLeader(Address leader);
 
-        const PublicKey &getLeaderKey() const;
-        void setLeaderKey(PublicKey key);
-
-        const Address &getNewAddress() const;
-        void setNewAddress(Address newAddress);
-
         const Signature &getSignature() const;
         void setSignature(Signature signature);
 
@@ -66,14 +59,13 @@ class Reconciliation
         void fromAsn1(const asn1::Reconciliation &);
 
         BinData toContent() const;
+        BinData encode() const;
 
     private:
         uint32_t protocol;
         uint64_t chainId;
         std::list<Hash> shardHashes;
         Address leader;
-        PublicKey leaderKey;
-        Address newAddress;
         Signature signature;
         std::list<Validation> votes;
 };

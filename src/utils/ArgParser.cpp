@@ -1,11 +1,11 @@
-#include <fluffycoin/svc/ArgParser.h>
+#include <fluffycoin/utils/ArgParser.h>
 #include <fluffycoin/utils/DelimitedString.h>
 
 #include <algorithm>
 #include <stdio.h>
 #include <limits.h>
 
-using namespace fluffycoin::svc;
+using namespace fluffycoin;
 
 Args::Args()
 {
@@ -145,7 +145,7 @@ Args ArgParser::parse(int argc, const char **argv)
         {
             char shortcut = tk[1];
             auto iter = shortArgs.find(shortcut);
-            if (iter != shortArgs.end())
+            if (iter == shortArgs.end())
             {
                 fprintf(stderr, "Argument error. Unknown flag '%c'.\n", shortcut);
                 continue;
@@ -211,7 +211,7 @@ void ArgParser::addCategory(
 
 void ArgParser::printHelp()
 {
-    constexpr const int DESCRIPTION_INDENTION = 28;
+    constexpr const int DESCRIPTION_INDENTION = 40;
 
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "\n");
@@ -242,12 +242,13 @@ void ArgParser::printHelp()
 
         // See if there is a short character
         char shortcut = '\0';
-        auto iterShort = shortArgs.begin();
-        while (iterShort != shortArgs.end())
+        for (const auto &shortPair : shortArgs)
         {
-            if (iterShort->second == param)
+            char curShortcut = shortPair.first;
+            const std::string &curParam = shortPair.second;
+            if (curParam == param)
             {
-                shortcut = iterShort->first;
+                shortcut = curShortcut;
                 break;
             }
         }

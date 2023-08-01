@@ -30,9 +30,14 @@ clean: ## Cleanup all previous build artifacts and distributables
 runtests-docker: ## Run unit tests in docker build environment
 	./tools/tests/unit-in-docker.sh $(ARGS)
 
-.PHONY: build-oci-images
+.PHONY: build-containers
 build-containers: ## Build the runtime containers
 	./tools/buildscripts/build-containers.sh
+
+.PHONY: runcli-docker
+runcli-docker: ## Drop into the CLI docker
+	@mkdir -p ~/.fluffycoin
+	docker run -ti -u $(shell id -u):$(shell id -g) -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v $(HOME)/.fluffycoin:$(HOME)/.fluffycoin fccli:0.0.x
 
 # Show help menu
 .PHONY: help

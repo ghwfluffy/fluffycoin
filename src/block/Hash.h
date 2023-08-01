@@ -25,6 +25,7 @@ class Hash
 {
     public:
         Hash() = default;
+        Hash(const BinData &data);
         Hash(Hash &&) = default;
         Hash(const Hash &) = default;
         Hash &operator=(Hash &&) = default;

@@ -18,6 +18,7 @@ typedef struct Genesis_st
     ASN1_INTEGER *version;
     ASN1_INTEGER *creation;
     ASN1_OCTET_STRING *creator;
+    ASN1_OCTET_STRING *creatorKey;
     Specie *greed;
     ASN1_OCTET_STRING *seed;
 } Genesis;
@@ -29,6 +30,7 @@ ASN1_SEQUENCE(Genesis) =
   , ASN1_SIMPLE(Genesis, version, ASN1_INTEGER)
   , ASN1_SIMPLE(Genesis, creation, ASN1_INTEGER)
   , ASN1_SIMPLE(Genesis, creator, ASN1_OCTET_STRING)
+  , ASN1_SIMPLE(Genesis, creatorKey, ASN1_OCTET_STRING)
   , ASN1_SIMPLE(Genesis, greed, Specie)
   , ASN1_SIMPLE(Genesis, seed, ASN1_OCTET_STRING)
 } ASN1_SEQUENCE_END(Genesis)
@@ -98,6 +100,16 @@ void Genesis::setCreator(Address creator)
     this->creator = std::move(creator);
 }
 
+const PublicKey &Genesis::getCreatorKey() const
+{
+    return creatorKey;
+}
+
+void Genesis::setCreatorKey(PublicKey key)
+{
+    this->creatorKey = std::move(key);
+}
+
 const Specie &Genesis::getGreed() const
 {
     return greed;
@@ -125,6 +137,7 @@ void Genesis::toAsn1(asn1::Genesis &t) const
     ossl::fromUInt64(*t.version, version);
     creation.toAsn1(*t.creation);
     creator.toAsn1(*t.creator);
+    creatorKey.toAsn1(*t.creatorKey);
     greed.toAsn1(*t.greed);
     ossl::fromBin(*t.seed, seed);
 }
@@ -136,11 +149,12 @@ void Genesis::fromAsn1(const asn1::Genesis &t)
     version = ossl::toUInt32(*t.version);
     creation.fromAsn1(*t.creation);
     creator.fromAsn1(*t.creator);
+    creatorKey.fromAsn1(*t.creatorKey);
     greed.fromAsn1(*t.greed);
     seed = ossl::toBin(*t.seed);
 }
 
-BinData Genesis::toContent() const
+BinData Genesis::encode() const
 {
     asn1::Genesis *obj = asn1::Genesis_new();
     toAsn1(*obj);

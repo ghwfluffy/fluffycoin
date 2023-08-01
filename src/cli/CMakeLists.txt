@@ -7,5 +7,7 @@ fluffybin(
         fluffycoin-utils
         fluffycoin-ossl
         fluffycoin-block
+        fluffycoin-alg
+        fluffyproto-comm
         OpenSSL::Crypto
 )

@@ -36,7 +36,8 @@ void fromNid(ASN1_OBJECT *&pt, int nid);
     template<typename BlockType> \
     static void to##Type##Stack(asn1::stack_st_##Type &st, const std::list<BlockType> &objs) \
     { \
-        asn1::sk_##Type##_pop_free(&(st), asn1::Type##_free); \
+        while (asn1::sk_##Type##_num(&(st)) > 0) \
+            asn1::Type##_free(sk_##Type##_pop(&st)); \
         for (const BlockType &cur : (objs)) \
         { \
             asn1::Type *pt = asn1::Type##_new(); \
@@ -54,7 +55,7 @@ void fromNid(ASN1_OBJECT *&pt, int nid);
             asn1::Type *pt = asn1::sk_##Type##_value(&(st), i); \
             BlockType cur; \
             cur.fromAsn1(*pt); \
-            objs.emplace_back(std::move(cur)); \
+            objs.push_back(std::move(cur)); \
         } \
     }
 }

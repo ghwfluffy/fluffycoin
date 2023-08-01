@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-void fluffycoin::from_string(log::Level &eLevel, const std::string &str)
+void fluffycoin::from_string(const std::string &str, log::Level &eLevel)
 {
     std::string strUpper(str);
     std::transform(strUpper.begin(), strUpper.end(), strUpper.begin(), ::toupper);

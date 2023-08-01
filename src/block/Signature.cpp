@@ -6,6 +6,11 @@
 using namespace fluffycoin;
 using namespace fluffycoin::block;
 
+Signature::Signature(BinData sig)
+{
+    this->point = std::move(sig);
+}
+
 const BinData &Signature::get() const
 {
     return point;

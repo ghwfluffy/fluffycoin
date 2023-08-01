@@ -124,7 +124,7 @@ void BinData::resize(size_t len)
         }
         else
         {
-            unsigned char *newData = reinterpret_cast<unsigned char *>(malloc(len));
+            unsigned char *newData = reinterpret_cast<unsigned char *>(calloc(1, len));
             size_t minLen = len < this->len ? len : this->len;
             memcpy(newData, buffer, minLen);
             if (len > this->len)
@@ -277,4 +277,9 @@ bool BinData::operator==(const BinData &rhs) const
 {
     return length() == rhs.length() &&
             memcmp(data(), rhs.data(), length()) == 0;
+}
+
+bool BinData::operator!=(const BinData &rhs) const
+{
+    return !((*this) == rhs);
 }

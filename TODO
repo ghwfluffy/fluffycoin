@@ -1,24 +1,12 @@
-Build
-    [ ] Boost
-    [ ] async
-    [ ] svc
-    [ ] pb
-        [ ] protobuf patch
-        [ ] proto compiler
-
-Protobuf
-    [ ] Catalog
-    [ ] MsgInfo
-    [ ] remove google.api url from types
-    [ ] error codes
+Unit Tests
+    [ ] Add gdb/valgrind to runtests in docker
+    [ ] ApiPort
+    [ ] EventPublisher
+    [ ] Service
 
 Design
     [ ] Async client
     [ ] Event auth
-
-zmq
-    [ ] Publisher
-    [ ] Subscriber
 
 P2P service
     [ ] service params
@@ -73,10 +61,28 @@ Design
     Historian: Get information about the blockchain (HTTP REST)
 
 CLI
-    [\] genesis
-    [ ] newprivkey
+    [ ] wallet
+    [ ] info
+    [ ] download
+    [ ] validator
+    [ ] lottery
+    [ ] transfer
+    [ ] trinket
+    [ ] loans
+    [ ] vote
+    [ ] stock
 
 Block
+    Core
+    [ ] ReconciliationContent
+    [ ] BlockDecode
+    [\] Block
+    [ ] Node
+    [ ] Transaction
+    Mining
+    [ ] Register
+    [ ] Unregister
+    [ ] CredentialChange
     Actions
     [ ] Lottery
     [ ] Donation
@@ -95,9 +101,6 @@ Block
     [ ] ForwardLoan
     [ ] PrepayLoan
 
-Utils
-    [ ] Log console colors
-
 Database
     [ ] Chains
     [ ] Miners
@@ -108,13 +111,6 @@ Crypto
     [ ] Address
     [ ] Hash
 
-Marketing
-    Feature blurbs
-    [ ] McBucks
-
-Build
-    [ ] Make distributables
-
 Licensing
     [ ] 3rd party licenses
         [ ] fmt
@@ -122,4 +118,6 @@ Licensing
         [ ] protobuf
         [ ] zmq
         [ ] sodium
+        [ ] boost
+        [ ] nlohmann
     [ ] Open source promise

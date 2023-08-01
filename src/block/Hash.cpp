@@ -1,5 +1,6 @@
 #include <fluffycoin/block/Hash.h>
 #include <fluffycoin/ossl/convert.h>
+#include <fluffycoin/ossl/Hash.h>
 
 #include <openssl/asn1t.h>
 
@@ -30,6 +31,12 @@ IMPLEMENT_ASN1_FUNCTIONS(Hash)
 
 using namespace fluffycoin;
 using namespace fluffycoin::block;
+
+Hash::Hash(const BinData &value)
+{
+    this->sha2 = ossl::Hash::sha2_256(value);
+    this->sha3 = ossl::Hash::sha3_256(value);
+}
 
 const BinData &Hash::getSha2() const
 {

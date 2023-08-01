@@ -38,8 +38,10 @@ Genesis                 ::=SEQUENCE {
     version             INTEGER (0..MAX),
     -- Time when genesis block is instantiated
     creation            Time,
-    -- Address for blockchain creator
+    -- Address for blockchain creator auth+stake key
     creator             Address,
+    -- Public key of creator
+    creatorKey          PublicKey,
     -- Initial coins given to blockchain creator
     -- The proof of stake requires coins to exist for mining to happen
     greed               Specie,
@@ -50,7 +52,7 @@ Genesis                 ::=SEQUENCE {
 -- Validators vote if they agree with the round leader
 Validation              ::=SEQUENCE {
     verified            BOOLEAN,
-    authAddress         Address, -- TODO: Needs to be part of the signature
+    authAddress         Address,
     signature           Signature
 }
 
@@ -69,7 +71,7 @@ ReconciliationContent   ::=SEQUENCE {
     shardHashes         SEQUENCE OF Hash SIZE (1..64),
     -- The round leader for the reconciliation block
     leader              Address,
-    leaderKey           PublicKey,
+    newLeaderKey        PublicKey,
     newAddress          Address
 }
 Reconciliation          ::=SEQUENCE {

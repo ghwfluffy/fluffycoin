@@ -10,7 +10,7 @@ namespace asn1
 
 typedef struct Validation_st
 {
-    ASN1_BOOLEAN *verified;
+    ASN1_BOOLEAN verified;
     ASN1_OCTET_STRING *authAddress;
     ASN1_OCTET_STRING *signature;
 } Validation;
@@ -68,14 +68,14 @@ void Validation::setSignature(Signature signature)
 
 void Validation::toAsn1(asn1::Validation &t) const
 {
-    *t.verified = static_cast<int>(verified);
+    t.verified = static_cast<int>(verified);
     address.toAsn1(*t.authAddress);
     signature.toAsn1(*t.signature);
 }
 
 void Validation::fromAsn1(const asn1::Validation &t)
 {
-    verified = static_cast<bool>(*t.verified);
+    verified = static_cast<bool>(t.verified);
     address.fromAsn1(*t.authAddress);
     signature.fromAsn1(*t.signature);
 }
