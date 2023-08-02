@@ -81,6 +81,24 @@ bool readPassword(
     return true;
 }
 
+// Return codes
+namespace error
+{
+    int iter__ = 0;
+    #define R(x) const int x = iter__++
+    R(Success);
+    R(ArgumentParse);
+    R(ArgumentMissing);
+    R(ReadWallet);
+    R(GetPassword);
+    R(DecryptWallet);
+    R(MakeKey);
+    R(CreateOutputDir);
+    R(WriteBlock);
+    R(SerializeWallet);
+    R(WriteWallet);
+};
+
 }
 
 int main(int argc, const char *argv[])
@@ -100,14 +118,14 @@ int main(int argc, const char *argv[])
     // Parse
     Args args = parser.parse(argc, argv);
     if (args.hasError())
-        return 1;
+        return error::ArgumentParse;
 
     // Check required parameters
     if (!args.hasArg("wallet") || !args.hasArg("greed"))
     {
         fprintf(stderr, "Missing required arguments.\n");
         parser.printHelp();
-        return 2;
+        return error::ArgumentMissing;
     }
 
     // Read in wallet
@@ -117,7 +135,7 @@ int main(int argc, const char *argv[])
         if (!FileTools::read(args.getArg("wallet"), walletContents))
         {
             log::error("Failed to read in wallet data from '{}'.", args.getArg("wallet"));
-            return 3;
+            return error::ReadWallet;
         }
 
         log::info("Read in wallet data from '{}'.", args.getArg("wallet"));
@@ -130,7 +148,7 @@ int main(int argc, const char *argv[])
     else if (!readPassword(password, walletContents.empty()))
     {
         log::error("Failed to read password from command line.");
-        return 4;
+        return error::GetPassword;
     }
 
     // Decrypt wallet
@@ -138,11 +156,15 @@ int main(int argc, const char *argv[])
     if (!walletContents.empty() && !wallet.setString(walletContents, password))
     {
         log::error("Failed to decrypt wallet contents.");
-        return 5;
+        return error::DecryptWallet;
     }
 
     // Make a new key
-    wallet.makeNewKey(args.getArg("wallet-salt"));
+    if (!wallet.makeNewKey(args.getArg("wallet-salt")))
+    {
+        log::error("Failed to create wallet key.");
+        return error::MakeKey;
+    }
 
     // Create genesis block
     block::Genesis gen;
@@ -185,20 +207,20 @@ int main(int argc, const char *argv[])
     if (!FileTools::isDir(outputDir) && !FileTools::createDir(outputDir))
     {
         log::error("Failed to create output directory '{}'.", outputDir);
-        return 6;
+        return error::CreateOutputDir;
     }
 
     // Write out blocks
     if (!FileTools::write(outputDir + "/00.der", genesisData))
     {
         log::error("Failed to write genesis block to filesystem.");
-        return 7;
+        return error::WriteBlock;
     }
 
     if (!FileTools::write(outputDir + "/01.der", recData))
     {
         log::error("Failed to write initial reconciliation block to filesystem.");
-        return 8;
+        return error::WriteBlock;
     }
 
     // Write out wallet
@@ -206,17 +228,17 @@ int main(int argc, const char *argv[])
     if (walletData.empty())
     {
         log::error("Failed to serialize wallet.");
-        return 9;
+        return error::SerializeWallet;
     }
 
     if (!FileTools::write(args.getArg("wallet"), walletData))
     {
         log::error("Failed to write out wallet.");
-        return 10;
+        return error::WriteWallet;
     }
 
     printf("Success.\n");
     fflush(stdout);
 
-    return 0;
+    return error::Success;
 }

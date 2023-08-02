@@ -15,7 +15,7 @@ namespace fluffycoin::alg
 class Wallet
 {
     public:
-        Wallet() = default;
+        Wallet();
         Wallet(Wallet &&) = default;
         Wallet(const Wallet &) = default;
         Wallet &operator=(Wallet &&) = default;
@@ -38,6 +38,8 @@ class Wallet
             std::string privKey;
         };
 
+        void setEncFormat(EncFormat format, unsigned int iters);
+
         ossl::EvpPkeyPtr getLatestKey() const;
         std::string getLatestAddress() const;
         BinData getLatestAddressBin() const;
@@ -53,11 +55,13 @@ class Wallet
         bool setString(const std::string &value, const SafeData &password);
         std::string getString(const SafeData &password = SafeData()) const;
 
-        void addKey(const EVP_PKEY &key, const std::string &address);
+        bool addKey(const EVP_PKEY &key, const std::string &address);
 
     private:
         std::list<Entry> keys;
         SafeData password;
+        EncFormat defaultFormat;
+        unsigned int kdfIters;
 };
 
 }

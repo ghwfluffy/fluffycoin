@@ -16,8 +16,16 @@ namespace ossl
  */
 namespace PbkdfKey
 {
-    BinData wrap(const EVP_PKEY &key, const BinData &pass);
-    EvpPkeyPtr unwrap(const BinData &key, const BinData &pass);
+    constexpr const uint32_t KDF_ITERS_DEFAULT = 1024 * 1024;
+
+    BinData wrap(
+        const EVP_PKEY &key,
+        const BinData &pass,
+        unsigned int KDF_ITERS = KDF_ITERS_DEFAULT);
+
+    EvpPkeyPtr unwrap(
+        const BinData &key,
+        const BinData &pass);
 }
 
 }

@@ -3,7 +3,6 @@ Unit Tests
     [ ] Service
 
 Misc
-    [ ] PBKDF iters param
     [ ] protobuf Serialize default enum
 
 Design

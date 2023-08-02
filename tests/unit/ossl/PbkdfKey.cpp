@@ -12,9 +12,10 @@ TEST(PbkdfKey, EncodeDecode)
     ASSERT_NE(key.get(), nullptr);
 
     constexpr const char *PASSWORD = "ghw";
+    constexpr const unsigned int KDF_ITERS = 1024;
 
     // Encrypt key for storage
-    BinData encoded = ossl::PbkdfKey::wrap(*key, PASSWORD);
+    BinData encoded = ossl::PbkdfKey::wrap(*key, PASSWORD, KDF_ITERS);
     EXPECT_GT(encoded.length(), 0);
 
     // Decrypt and decode key

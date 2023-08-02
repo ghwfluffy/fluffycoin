@@ -15,8 +15,16 @@ namespace ossl
  */
 namespace Pkcs8Key
 {
-    BinData wrap(const EVP_PKEY &key, const BinData &pass);
-    EvpPkeyPtr unwrap(const BinData &key, const BinData &pass);
+    constexpr const unsigned int KDF_ITERS_DEFAULT = 1024 * 1024;
+
+    BinData wrap(
+        const EVP_PKEY &key,
+        const BinData &pass,
+        unsigned int iters = KDF_ITERS_DEFAULT);
+
+    EvpPkeyPtr unwrap(
+        const BinData &key,
+        const BinData &pass);
 }
 
 }

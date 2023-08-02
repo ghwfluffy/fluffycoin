@@ -9,6 +9,7 @@ using namespace fluffycoin;
 TEST(Wallet, Success)
 {
     alg::Wallet wallet;
+    wallet.setEncFormat(alg::Wallet::EncFormat::FcPbkdf, 1024);
 
     // Add new key directly to wallet
     ossl::EvpPkeyPtr key = wallet.makeNewKey("GHW");
@@ -31,6 +32,7 @@ TEST(Wallet, Success)
 
     // Deserialize
     wallet = alg::Wallet();
+    wallet.setEncFormat(alg::Wallet::EncFormat::FcPbkdf, 1024);
     bool bOk = wallet.setString(serialized, pw);
     EXPECT_TRUE(bOk);
 

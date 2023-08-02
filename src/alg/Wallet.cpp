@@ -17,6 +17,8 @@ using namespace fluffycoin::alg;
 namespace
 {
 
+constexpr const unsigned int VERSION = 1;
+
 ossl::EvpPkeyPtr decrypt(
     Wallet::EncFormat format,
     const std::string &keyString,
@@ -77,7 +79,8 @@ void from_string(const std::string &str, Wallet::EncFormat &format)
 
 bool retranslate(
     Wallet::EncFormat format,
-    Wallet::EncFormat &newFormat,
+    Wallet::EncFormat newFormat,
+    unsigned int kdfIters,
     const std::string &original,
     std::string &translated,
     const SafeData &password,
@@ -94,17 +97,13 @@ bool retranslate(
     BinData newEnc;
     if (bRet)
     {
-        if (format == Wallet::EncFormat::Clear)
-            newFormat = Wallet::EncFormat::FcPbkdf;
-        else
-            newFormat = format;
         switch (newFormat)
         {
             case Wallet::EncFormat::FcPbkdf:
-                newEnc = ossl::PbkdfKey::wrap(*key, newPassword);
+                newEnc = ossl::PbkdfKey::wrap(*key, newPassword, kdfIters);
                 break;
             case Wallet::EncFormat::Pkcs8:
-                newEnc = ossl::Pkcs8Key::wrap(*key, newPassword);
+                newEnc = ossl::Pkcs8Key::wrap(*key, newPassword, kdfIters);
                 break;
             default:
             case Wallet::EncFormat::None:
@@ -125,6 +124,18 @@ bool retranslate(
     return bRet;
 }
 
+}
+
+Wallet::Wallet()
+{
+    defaultFormat = EncFormat::FcPbkdf;
+    kdfIters = ossl::PbkdfKey::KDF_ITERS_DEFAULT;
+}
+
+void Wallet::setEncFormat(EncFormat format, unsigned int iters)
+{
+    this->kdfIters = iters;
+    this->defaultFormat = format;
 }
 
 ossl::EvpPkeyPtr Wallet::getLatestKey() const
@@ -187,9 +198,21 @@ bool Wallet::setString(const std::string &value, const SafeData &password)
     bool success = false;
     try {
         nlohmann::ordered_json json = nlohmann::ordered_json::parse(value);
+
+        // Pull out configurations
+        const nlohmann::json &config = json["config"];
+        unsigned int version = config["version"].get<unsigned int>();
+        if (version > VERSION)
+            log::error("Unsupported wallet version {}.", version);
+
+        kdfIters = config["iters"].get<unsigned int>();
+        ::from_string(config["defaultFormat"].get<std::string>(), defaultFormat);
+
+        // Pull out keys
         bool bPwVerify = false;
         unsigned int entryNum = 0;
-        for (auto &key : json) {
+        for (auto &key : json["keys"])
+        {
             std::string address;
             try {
                 address.clear();
@@ -242,7 +265,15 @@ std::string Wallet::getString(const SafeData &password) const
 {
     std::string ret;
     try {
-        // Serialize each entry
+        // Set configurations
+        nlohmann::ordered_json json;
+        nlohmann::ordered_json config;
+        config["version"] = VERSION;
+        config["iters"] = kdfIters;
+        config["defaultFormat"] = ::to_string(defaultFormat);
+        json["config"] = std::move(config);
+
+        // Serialize each key
         std::list<nlohmann::json> entries;
         for (const Entry &entry : keys)
         {
@@ -259,8 +290,7 @@ std::string Wallet::getString(const SafeData &password) const
             {
                 // Retranslate to new password
                 std::string translated;
-                EncFormat newFormat = EncFormat::None;
-                if (!retranslate(entry.format, newFormat, entry.privKey, translated, this->password, password))
+                if (!retranslate(entry.format, defaultFormat, kdfIters, entry.privKey, translated, this->password, password))
                 {
                     throw std::runtime_error(
                         fmt::format("Failed to retranslate key {} under new password.",
@@ -268,14 +298,15 @@ std::string Wallet::getString(const SafeData &password) const
                 }
 
                 json["priv"] = std::move(translated);
-                json["format"] = ::to_string(newFormat);
+                json["format"] = ::to_string(defaultFormat);
             }
 
             entries.push_back(std::move(json));
         }
 
-        nlohmann::ordered_json json;
-        json = entries;
+        // Set keys
+        json["keys"] = std::move(entries);
+        // Serialize
         ret = json.dump();
     } catch (const std::exception &e) {
         log::error("Failed to encode wallet JSON: {}", e.what());
@@ -284,22 +315,51 @@ std::string Wallet::getString(const SafeData &password) const
     return ret;
 }
 
-void Wallet::addKey(const EVP_PKEY &key, const std::string &address)
+bool Wallet::addKey(const EVP_PKEY &key, const std::string &address)
 {
+    bool ok = true;
+
     if (!Address::verify(address, key))
-        log::error("Failed to add key to wallet. Address mismatch.");
-    else
+        ok = log::error("Failed to add key to wallet. Address mismatch.");
+
+    if (ok)
     {
         Entry newEntry;
         newEntry.time = static_cast<uint64_t>(
             std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::system_clock::now().time_since_epoch()).count());
+
         // Assign temporary random password
         if (password.empty())
             password = ossl::Prng::rand(16);
-        newEntry.format = EncFormat::FcPbkdf;
+
         newEntry.address = address;
-        newEntry.privKey = Base64::encode(ossl::PbkdfKey::wrap(key, password));
-        keys.push_front(std::move(newEntry));
+        switch (defaultFormat)
+        {
+            case Wallet::EncFormat::Clear:
+                newEntry.format = EncFormat::Clear;
+                newEntry.privKey = Base64::encode(ossl::Curve25519::toPrivate(key));
+                break;
+            case Wallet::EncFormat::Pkcs8:
+                newEntry.format = EncFormat::Pkcs8;
+                newEntry.privKey = Base64::encode(ossl::Pkcs8Key::wrap(key, password, kdfIters));
+                break;
+            default:
+            case Wallet::EncFormat::None:
+            case Wallet::EncFormat::FcPbkdf:
+                newEntry.format = EncFormat::FcPbkdf;
+                newEntry.privKey = Base64::encode(ossl::PbkdfKey::wrap(key, password, kdfIters));
+                break;
+        }
+
+        // Success?
+        if (newEntry.privKey.empty())
+            ok = log::error("Failed to password encrypt wallet ket.");
+
+        // Add to wallet
+        if (ok)
+            keys.push_front(std::move(newEntry));
     }
+
+    return ok;
 }

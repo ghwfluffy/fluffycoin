@@ -15,18 +15,30 @@ namespace
 {
 
 constexpr const size_t SALT_LEN = 8;
-constexpr const uint32_t KDF_ITERS = 1024 * 1024;
+constexpr const uint32_t KDF_ITERS_MIN = 1024;
+constexpr const uint32_t KDF_ITERS_MAX = 10 * 1024 * 1024;
 
 }
 
-BinData Pkcs8Key::wrap(const EVP_PKEY &key, const BinData &pass)
+BinData Pkcs8Key::wrap(
+    const EVP_PKEY &key,
+    const BinData &pass,
+    unsigned int iters)
 {
     bool ok = true;
 
+    // Validate iterator choice
+    if (iters < KDF_ITERS_MIN || iters > KDF_ITERS_MAX)
+        ok = log::error("PKCS#8 iterations must be between {} and {}.", KDF_ITERS_MIN, KDF_ITERS_MAX);
+
     // Make internal struct
-    PKCS8_PRIV_KEY_INFO *bag = EVP_PKEY2PKCS8(&key);
-    if (!bag)
-        ok = log::error("Failed to convert key to PKCS#8 struct.");
+    PKCS8_PRIV_KEY_INFO *bag = nullptr;
+    if (ok)
+    {
+        bag = EVP_PKEY2PKCS8(&key);
+        if (!bag)
+            ok = log::error("Failed to convert key to PKCS#8 struct.");
+    }
 
     // Encrypt
     X509_SIG *wrapped = nullptr;
@@ -47,7 +59,7 @@ BinData Pkcs8Key::wrap(const EVP_PKEY &key, const BinData &pass)
             static_cast<int>(pass.length()),
             salt,
             sizeof(salt),
-            KDF_ITERS,
+            static_cast<int>(iters),
             bag);
 
         if (!wrapped)
@@ -64,6 +76,7 @@ BinData Pkcs8Key::wrap(const EVP_PKEY &key, const BinData &pass)
     }
 
     // Cleanup
+    X509_SIG_free(wrapped);
     PKCS8_PRIV_KEY_INFO_free(bag);
 
     return encoded;

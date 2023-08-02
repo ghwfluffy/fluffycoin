@@ -21,7 +21,6 @@ namespace
 
 // Hardcoded parameters
 constexpr const size_t SALT_LEN = 8;
-constexpr const uint32_t KDF_ITERS = 1024 * 1024;
 constexpr const int KDF_NID = NID_sha3_512;
 constexpr const int KEY_NID = NID_aes_256_cbc;
 constexpr const size_t IV_LEN = AES_BLOCK_SIZE;
@@ -186,13 +185,18 @@ BinData sign(
 
 }
 
-BinData PbkdfKey::wrap(const EVP_PKEY &key, const BinData &pass)
+BinData PbkdfKey::wrap(
+    const EVP_PKEY &key,
+    const BinData &pass,
+    unsigned int iters)
 {
     bool ok = true;
 
     // Sane validate input
     if (pass.empty())
         ok = log::error("Null password provided to key PBKDF.");
+    else if (iters < KDF_ITERS_MIN || iters > KDF_ITERS_MAX)
+        ok = log::error("PBKDF iterations must be between {} and {}.", KDF_ITERS_MIN, KDF_ITERS_MAX);
 
     // Encode the private key
     SafeData encoded;
@@ -223,7 +227,7 @@ BinData PbkdfKey::wrap(const EVP_PKEY &key, const BinData &pass)
             static_cast<size_t>(EVP_CIPHER_get_key_length(cipher)),
             pass,
             BinData(salt, sizeof(salt)),
-            static_cast<int>(KDF_ITERS),
+            static_cast<int>(iters),
             EVP_get_digestbynid(KDF_NID),
             dek,
             mak);
@@ -254,7 +258,7 @@ BinData PbkdfKey::wrap(const EVP_PKEY &key, const BinData &pass)
         FluffyPbkdfInfo *info = encodedKey->content->info;
         info->iv = ASN1_OCTET_STRING_new();
         ossl::fromUInt32(*info->version, 0);
-        ossl::fromUInt32(*info->iters, KDF_ITERS);
+        ossl::fromUInt32(*info->iters, iters);
         ossl::fromBin(*info->salt, BinData(salt, sizeof(salt)));
         ossl::fromBin(*info->iv, BinData(iv, sizeof(iv)));
         ossl::fromNid(info->kdf, KDF_NID);
@@ -279,7 +283,9 @@ BinData PbkdfKey::wrap(const EVP_PKEY &key, const BinData &pass)
     return ret;
 }
 
-EvpPkeyPtr PbkdfKey::unwrap(const BinData &key, const BinData &pass)
+EvpPkeyPtr PbkdfKey::unwrap(
+    const BinData &key,
+    const BinData &pass)
 {
     bool ok = true;
 
