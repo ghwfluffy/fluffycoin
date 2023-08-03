@@ -157,6 +157,10 @@ void Publisher::publish(
         else if (ret != 0)
             log::notice(log::Comm, "Sent {} byte missing null frame.", ret);
     }
+
+    // Log
+    if (details.isOk())
+        log::traffic(log::Comm, "Published event to topic '{}'.", topic);
 }
 
 int Publisher::getFd() const

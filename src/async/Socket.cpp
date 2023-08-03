@@ -206,7 +206,7 @@ void Socket::read(
 
             if (error == boost::asio::error::operation_aborted)
             {
-                details.setError(log::Level::Info, log::Comm, ErrorCode::SocketTimeout,
+                details.setError(log::Level::Traffic, log::Comm, ErrorCode::SocketTimeout,
                     "socket_read", "Timeout waiting to read.");
             }
             else if (error)

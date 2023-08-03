@@ -29,6 +29,20 @@ namespace DelimitedString
 
         return ret;
     }
+
+    template<typename Container>
+    std::string toString(const Container &elements, char delimiter = ',')
+    {
+        std::string ret;
+        for (const auto &element : elements)
+        {
+            if (!ret.empty())
+                ret += delimiter;
+            ret += to_string(element);
+        }
+
+        return ret;
+    }
 }
 
 }

@@ -56,6 +56,7 @@ class EventSubscriptionMap
             const std::string &topic,
             std::function<void(const ServiceScene &, EventMsg &)> eventHandler)
         {
+            pb::Catalog::registerMsg<EventMsg>();
             addHandler(
                 port,
                 topic,
@@ -101,6 +102,7 @@ class EventSubscriptionMap
             const std::string &topic,
             std::function<void(const ServiceScene &, EventMsg &)> eventHandler)
         {
+            pb::Catalog::registerMsg<EventMsg>();
             addPeerHandler(
                 topic,
                 [topic, eventHandler]

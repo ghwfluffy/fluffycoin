@@ -3,6 +3,8 @@
 
 #include <fluffycoin/pb/Json.h>
 
+#include <fluffycoin/utils/DelimitedString.h>
+
 #include <boost/asio/post.hpp>
 #include <boost/asio/io_context.hpp>
 
@@ -30,29 +32,28 @@ void queueRead(
             // Get data from publisher
             BinData data;
             std::string topic;
-            if (details.isOk())
-                subscriber.recv(topic, data, details);
+            bool hasEvent = subscriber.recv(topic, data, details);
 
             // Sane validate we got something if a message came across
-            if (details.isOk() && !topic.empty() && data.empty())
+            if (details.isOk() && hasEvent && data.empty())
             {
                 details.setError(
                     Log::Event,
                     ErrorCode::ReadError, "pubsub",
                     "Received empty data for topic {} subscription.", topic);
             }
-            else if (details.isOk() && topic.empty() && !data.empty())
+            else if (details.isOk() && hasEvent && topic.empty())
             {
                 details.setError(
                     Log::Event,
                     ErrorCode::ReadError,
                     "pubsub",
-                    "Received data for null topic subscription.");
+                    "Received empty topic for event.");
             }
 
             // Deserialize wrapper
             std::unique_ptr<fcpb::comm::Event> envelope;
-            if (details.isOk() && !data.empty())
+            if (details.isOk() && hasEvent)
             {
                 envelope = std::make_unique<fcpb::comm::Event>();
                 pb::Json::fromJson(data.data(), data.length(), *envelope, details);
@@ -60,7 +61,7 @@ void queueRead(
 
             // Get handler
             const EventSubscriptionMap::EventHandler *handler = nullptr;
-            if (details.isOk() && !data.empty())
+            if (details.isOk() && hasEvent)
             {
                 handler = getHandler(topic);
                 if (!handler)
@@ -73,7 +74,7 @@ void queueRead(
             }
 
             // Queue asynchronous handler
-            if (details.isOk() && handler)
+            if (details.isOk() && hasEvent)
             {
                 boost::asio::post(
                     ctx.asio,
@@ -91,6 +92,13 @@ void queueRead(
 
 }
 
+EventProcessor::SubSocket::SubSocket(
+    std::unique_ptr<async::UncontrolledSocket> psocket,
+    std::unique_ptr<zmq::Subscriber> psubscriber)
+        : psocket(std::move(psocket))
+        , psubscriber(std::move(psubscriber))
+{}
+
 EventProcessor::EventProcessor(
     const ServiceScene &ctx,
     const zmq::Context &zmqCtx,
@@ -101,12 +109,21 @@ EventProcessor::EventProcessor(
 {
 }
 
-void EventProcessor::addPeer(
+bool EventProcessor::addPeer(
     const BinData &serverKey,
     const std::string &host,
     uint16_t port)
 {
     std::lock_guard<std::mutex> lock(mtx);
+    if (peerTopics.empty())
+        peerTopics = handlers.getPeerSubscriptions();
+
+    // Nothing to subscribe to
+    if (peerTopics.empty())
+    {
+        log::debug("No peer events to subscribe.");
+        return true;
+    }
 
     std::string peer = fmt::format("{}:{}", host, port);
 
@@ -115,7 +132,7 @@ void EventProcessor::addPeer(
     if (iter != peerSockets.end())
     {
         log::error(Log::Event, "Already subscribed to peer {}.", peer);
-        return;
+        return false;
     }
 
     // Connect to peer
@@ -140,6 +157,14 @@ void EventProcessor::addPeer(
     // Log error
     if (!details.isOk())
         details.setError(Log::Event, ErrorCode::ConnectError, "subscribe", "Failed to subscribe to peer {}.", peer);
+    // Log success
+    else
+    {
+        details.log().info(log::Comm, "Subscribed to peer '{}' topics '{}'.",
+            peer, DelimitedString::toString(peerTopics), port);
+    }
+
+    return details.isOk();
 }
 
 void EventProcessor::removePeer(
@@ -153,7 +178,11 @@ void EventProcessor::removePeer(
 bool EventProcessor::subscribeLocal()
 {
     std::map<uint16_t, std::list<std::string>> subs = handlers.getServiceSubscriptions();
-    this->peerTopics = handlers.getPeerSubscriptions();
+    if (subs.empty())
+    {
+        log::debug("No local events to subscribe.");
+        return true;
+    }
 
     Details details;
     for (const auto &pair : subs)
@@ -180,6 +209,8 @@ bool EventProcessor::subscribeLocal()
             break;
 
         localSockets.push_back(std::move(sub));
+        details.log().info(log::Comm, "Subscribed to local topics '{}' on port {}.",
+            DelimitedString::toString(topics), port);
     }
 
     return details.isOk();
@@ -191,12 +222,19 @@ EventProcessor::SubSocket EventProcessor::startListening(
     Details &details)
 {
     // Hand off to ASIO
-    async::UncontrolledSocket socket;
+    SubSocket ret;
     if (details.isOk())
     {
-        socket = async::UncontrolledSocket(ctx.asio, subscriber.getFd());
-        queueRead(socket, subscriber, ctx, getHandler, details);
+        std::unique_ptr<zmq::Subscriber> psubscriber;
+        psubscriber = std::make_unique<zmq::Subscriber>(std::move(subscriber));
+
+        std::unique_ptr<async::UncontrolledSocket> psocket;
+        psocket = std::make_unique<async::UncontrolledSocket>(ctx.asio, psubscriber->getFd());
+
+        queueRead(*psocket, *psubscriber, ctx, getHandler, details);
+        if (details.isOk())
+            ret = SubSocket(std::move(psocket), std::move(psubscriber));
     }
 
-    return SubSocket(std::move(socket), std::move(subscriber));
+    return ret;
 }

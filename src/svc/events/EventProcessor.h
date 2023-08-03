@@ -33,7 +33,7 @@ class EventProcessor
         EventProcessor &operator=(const EventProcessor &) = delete;
         ~EventProcessor() = default;
 
-        void addPeer(
+        bool addPeer(
             const BinData &serverKey,
             const std::string &host,
             uint16_t port);
@@ -48,13 +48,13 @@ class EventProcessor
     private:
         struct SubSocket
         {
-            async::UncontrolledSocket socket;
-            zmq::Subscriber subscriber;
+            std::unique_ptr<async::UncontrolledSocket> psocket;
+            std::unique_ptr<zmq::Subscriber> psubscriber;
 
             SubSocket() = default;
             SubSocket(
-                async::UncontrolledSocket socket,
-                zmq::Subscriber subscriber);
+                std::unique_ptr<async::UncontrolledSocket> psocket,
+                std::unique_ptr<zmq::Subscriber> psubscriber);
         };
 
         SubSocket startListening(
