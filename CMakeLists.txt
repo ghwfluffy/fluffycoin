@@ -21,6 +21,8 @@ include(cmake/cxxflags.cmake)
 include(cmake/dist.cmake)
 include(cmake/fluffybin.cmake)
 include(cmake/fluffylib.cmake)
+include(cmake/fluffyproto.cmake)
+include(cmake/fluffyservice.cmake)
 
 # Dependencies
 find_package(fmt REQUIRED)
@@ -42,6 +44,7 @@ add_subdirectory(src/svc)
 
 # Executables
 add_subdirectory(src/cli)
+add_subdirectory(src/services)
 
 # Unit tests
 add_subdirectory(tests/unit)

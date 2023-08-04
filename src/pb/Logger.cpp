@@ -52,6 +52,7 @@ void Logger::init()
 {
     if (!bInit)
     {
+        bInit = true;
         log::Category::add(Protobuf, "PROTOBUF");
         absl::AddLogSink(&logger);
     }

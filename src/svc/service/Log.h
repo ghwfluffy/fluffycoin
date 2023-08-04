@@ -7,6 +7,7 @@ namespace fluffycoin::svc
 
 enum class Log
 {
+    Service,
     Api,
     Event,
 };

@@ -32,7 +32,7 @@ class Service
         static ServiceStatusCode run(int argc, const char **argv, bool paused = false)
         {
             static_assert(
-                std::is_base_of_v<Params, IServiceParams>,
+                std::is_base_of_v<IServiceParams, Params>,
                 "Service requires IServiceParams to run.");
 
             Service svc;

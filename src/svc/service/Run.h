@@ -1,7 +1,9 @@
 #pragma once
 
-#include <fluffycoin/Log/log.h>
+#include <fluffycoin/log/Log.h>
 
+#include <fluffycoin/svc/Log.h>
+#include <fluffycoin/svc/Service.h>
 #include <fluffycoin/svc/ServiceStatusCode.h>
 
 namespace fluffycoin::svc
@@ -18,14 +20,17 @@ namespace fluffycoin::svc
 template<typename ServiceParams>
 int run(int argc, const char **argv)
 {
-    log::info("Service execution starting.");
+    svc::initLogger();
+    log::Category::init();
+
+    log::info(Log::Service, "Service execution starting.");
 
     // Run until told to shut down
     ServiceStatusCode code = ServiceStatusCode::Running;
     while (code == ServiceStatusCode::Running || code == ServiceStatusCode::Paused)
     {
         code = Service::run<ServiceParams>(argc, argv, code == ServiceStatusCode::Paused);
-        log::info("Service execution loop status set to '{}'.", to_string(code));
+        log::info(Log::Service, "Service execution loop status set to '{}'.", to_string(code));
 
         if (code == ServiceStatusCode::Restart)
             code = ServiceStatusCode::Running;
@@ -38,7 +43,7 @@ int run(int argc, const char **argv)
     if (code != ServiceStatusCode::Shutdown)
         ret = static_cast<int>(code);
 
-    log::info("Service execution ending with {}.", ret);
+    log::info(Log::Service, "Service execution ending with {}.", ret);
 
     return ret;
 }

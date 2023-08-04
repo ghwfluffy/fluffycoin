@@ -8,13 +8,16 @@ ENV LANGUAGE="en_US:en"
 # Fluffycoin dependencies
 RUN set -eux; \
     apk add --no-cache \
+        fmt \
+        libgcc \
+        libstdc++ \
         openssl \
         ; \
     true
 
 # Binaries
-COPY ./dist/bin/fluffycoin-genesis /usr/bin/
+COPY ./dist/bin/fluffycoin-validator /usr/bin/
 COPY ./dist/lib/* /usr/lib/
 
 # Entrypoint
-ENTRYPOINT /usr/bin/fluffycoin-genesis
+ENTRYPOINT ["/usr/bin/fluffycoin-validator"]

@@ -8,6 +8,7 @@ using namespace fluffycoin::svc;
 
 void svc::initLogger()
 {
+    log::Category::add(Log::Service, "SERVICE");
     log::Category::add(Log::Api, "API");
     log::Category::add(Log::Event, "EVENT");
     pb::Logger::init();

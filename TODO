@@ -9,8 +9,21 @@ Design
     [ ] Event auth
 
 P2P service
+    [x] setup service CMake
+    [x] docker
     [ ] service params
-    [ ] docker
+    API
+    [\] Handshake
+    [ ] GetBlock
+    [ ] VoteValidator
+    [ ] VoteProtocolChange
+    [ ] GetPeers
+    [ ] RelayMessage
+    [ ] SubmitTransaction
+    Events:
+    [ ] NewBlock
+    [ ] ValidateBlock
+    [ ] NewTransaction
 
 consistency
     [ ] namespace ::

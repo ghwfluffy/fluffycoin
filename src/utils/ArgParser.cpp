@@ -124,6 +124,7 @@ void ArgParser::addSwitch(
 
     order.push_back(flag);
     descriptions[flag] = description;
+    switches.insert(flag);
 }
 
 Args ArgParser::parse(int argc, const char **argv)
@@ -180,7 +181,6 @@ Args ArgParser::parse(int argc, const char **argv)
         if (bSwitch)
         {
             args.addArg(tk, "1");
-            args.setError();
             continue;
         }
 
