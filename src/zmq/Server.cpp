@@ -1,6 +1,8 @@
 #include <fluffycoin/zmq/Server.h>
 #include <fluffycoin/zmq/Utils.h>
 
+#include <fluffycoin/utils/Errno.h>
+
 #include <fluffycoin/log/Log.h>
 
 #include <zmq.h>
@@ -57,7 +59,7 @@ void Server::close(
 
     int ret = zmq_close(socket);
     if (ret != 0)
-        log::error(log::Comm, "Failed to close server socket ({}): {}.", errno, strerror(errno));
+        log::error(log::Comm, "Failed to close server socket: {}.", Errno::error());
     socket = nullptr;
 }
 
@@ -113,7 +115,8 @@ bool Server::recv(
         // Error
         else if (ret == -1)
         {
-            details.setError(log::Comm, ErrorCode::SocketError, "zmq_server", "Failed to read client ID: {}.", strerror(errno));
+            details.setError(log::Comm, ErrorCode::SocketError, "zmq_server",
+                "Failed to read client ID: {}.", Errno::error());
         }
         // First message is client ID
         else
@@ -131,7 +134,8 @@ bool Server::recv(
         // Error
         if (ret == -1)
         {
-            details.setError(log::Comm, ErrorCode::SocketError, "zmq_server", "Failed to read delimiter frame: {}.", strerror(errno));
+            details.setError(log::Comm, ErrorCode::SocketError, "zmq_server",
+                "Failed to read delimiter frame: {}.", Errno::error());
         }
         else if (ret != 0)
         {
@@ -141,7 +145,7 @@ bool Server::recv(
             if (ret >= 0)
                 log::debug(log::Comm, "Read {} bytes after invalid zmq second router frame.", ret);
             else
-                log::debug(log::Comm, "Received {} ({}) when trying to pop third router frame.", errno, strerror(errno));
+                log::debug(log::Comm, "Failed to pop third router frame: {}.", Errno::error());
         }
     }
 
@@ -152,7 +156,8 @@ bool Server::recv(
         // Error
         if (ret == -1)
         {
-            details.setError(log::Comm, ErrorCode::SocketError, "zmq_server", "Failed to read data frame: {}.", strerror(errno));
+            details.setError(log::Comm, ErrorCode::SocketError, "zmq_server",
+                "Failed to read data frame: {}.", Errno::error());
         }
         // Read in message
         else
@@ -192,7 +197,8 @@ void Server::reply(
         sent += ret >= 0;
         if (ret == -1)
         {
-            details.setError(log::Comm, ErrorCode::WriteError, "zmq_reply", "Failed to send reply client ID: {}.", strerror(errno));
+            details.setError(log::Comm, ErrorCode::WriteError, "zmq_reply",
+                "Failed to send reply client ID: {}.", Errno::error());
         }
         else if (static_cast<size_t>(ret) != client.size())
         {
@@ -209,7 +215,8 @@ void Server::reply(
         // Error
         if (ret == -1)
         {
-            details.setError(log::Comm, ErrorCode::WriteError, "zmq_reply", "Failed to send delimiter frame: {}.", strerror(errno));
+            details.setError(log::Comm, ErrorCode::WriteError, "zmq_reply",
+                "Failed to send delimiter frame: {}.", Errno::error());
         }
         // That's odd
         else if (ret > 0)
@@ -225,7 +232,8 @@ void Server::reply(
         sent += ret >= 0;
         if (ret == -1)
         {
-            details.setError(log::Comm, ErrorCode::WriteError, "zmq_reply", "Failed to send reply: {}.", strerror(errno));
+            details.setError(log::Comm, ErrorCode::WriteError, "zmq_reply",
+                "Failed to send reply: {}.", Errno::error());
         }
         else if (static_cast<size_t>(ret) != data.length())
         {
@@ -239,7 +247,7 @@ void Server::reply(
     {
         int ret = zmq_send(socket, nullptr, 0, ++sent != 3 ? ZMQ_SNDMORE : 0);
         if (ret == -1)
-            log::error(log::Comm, "Received {} ({}) when sending failed reply frames.", errno, strerror(errno));
+            log::error(log::Comm, "Failed when sending failed reply frames: {}.", Errno::error());
         else if (ret != 0)
             log::notice(log::Comm, "Sent {} byte missing null frame.", ret);
     }

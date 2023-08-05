@@ -8,19 +8,20 @@ package fcpb.p2p.v1.auth;
  * Request to authenticate as an active validator
  */
 message AuthenticateSession {
+    // The maximum understood protocol version of the client
+    int32 version = 1;
     // A random 8 byte identifier chosen by the client
-    bytes client_session_id = 1;
+    bytes client_session_id = 2;
     // Validator authentication stake public key address
-    string auth_address = 2;
+    string auth_address = 3;
 }
 
 /**
  * Response that establishes an authenticated session
  */
 message AuthenticateSessionResponse {
+    // The maximum understood protocol version of the server
+    int32 version = 1;
     // A random 8 byte identifier chosen by the server
-    string server_session_id = 1;
-    // Validator authentication public key
-    // TODO: Client already has this to make CurveMQ work
-    bytes auth_key = 2;
+    bytes server_session_id = 2;
 }

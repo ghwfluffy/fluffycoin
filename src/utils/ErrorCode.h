@@ -27,6 +27,7 @@ enum class ErrorCode
     NotLoggedIn = 201,
     NotAuthorized = 202,
     NoPermission = 203,
+    Blocked = 204,
 
     // Communication errors
     NotConnected = 300,

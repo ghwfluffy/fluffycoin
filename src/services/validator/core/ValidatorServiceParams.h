@@ -2,6 +2,9 @@
 
 #include <fluffycoin/svc/AbstractServiceParams.h>
 
+#include <fluffycoin/validator/BruteForce.h>
+#include <fluffycoin/validator/StakeKey.h>
+
 namespace fluffycoin
 {
 
@@ -21,31 +24,45 @@ class ValidatorServiceParams : public svc::AbstractServiceParams
         ValidatorServiceParams &operator=(const ValidatorServiceParams &) = delete;
         ~ValidatorServiceParams() final = default;
 
+        static constexpr const uint16_t API_PORT = 0x4643;
+        static constexpr const uint16_t EVENT_PORT = 0x4663;
+        static constexpr const char *WALLET_PW_ENV = "FLUFFYCOIN_WALLET_PASSWORD";
+
         std::string getLogFile() const final;
 
-#if 0
+        void setupScene(svc::ServiceScene &ctx) final;
+
         void initCmdLineParams(ArgParser &args) const final;
         void setCmdLineArgs(const Args &args) final;
-
-        unsigned int getNumEventThreads() const final;
 
         uint16_t getApiPort() const final;
         uint16_t getEventPort() const final;
 
         const BinData &getServerKey() const final;
 
-        void setupScene(ServiceScene &ctx) final;
-        void addApiHandlers(ApiHandlerMap &handlers, bool paused) const final;
-        void addEventSubscriptions(EventSubscriptionMap &handlers) const final;
+        void addApiHandlers(svc::ApiHandlerMap &handlers, bool paused) const final;
+#if 0
+        void addEventSubscriptions(svc::EventSubscriptionMap &handlers) const final;
+#endif
 
-        IAuthenticator *getAuthenticator() final;
+        svc::IAuthenticator *getAuthenticator() final;
 
         bool preInit() final;
+#if 0
         bool init() final;
 
         void cleanup() final;
         void postCleanup() final;
 #endif
+
+    private:
+        StakeKey stakeKey;
+        BruteForce bruteForce;
+
+        // Configuration
+        std::string walletFile;
+        SafeData walletPassword;
+        std::string stakeAddress;
 };
 
 }

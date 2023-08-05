@@ -123,7 +123,10 @@ int main(int argc, const char *argv[])
     // Check required parameters
     if (!args.hasArg("wallet") || !args.hasArg("greed"))
     {
-        fprintf(stderr, "Missing required arguments.\n");
+        if (!args.hasArg("wallet"))
+            fprintf(stderr, "Missing required argument 'wallet'.\n");
+        else
+            fprintf(stderr, "Missing required argument 'greed'.\n");
         parser.printHelp();
         return error::ArgumentMissing;
     }

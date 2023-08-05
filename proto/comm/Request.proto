@@ -8,10 +8,8 @@ package fcpb.comm;
  * Envelope that wraps every API request
  */
 message Request {
-    // The maximum understood protocol version of the client
-    int32 version = 1;
     // The request message body
-    google.protobuf.Any body = 2;
+    google.protobuf.Any body = 1;
     // The authentication material for the message (if required)
-    optional google.protobuf.Any auth = 3;
+    optional google.protobuf.Any auth = 2;
 }

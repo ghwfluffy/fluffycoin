@@ -1,4 +1,5 @@
 #include <fluffycoin/utils/FileTools.h>
+#include <fluffycoin/utils/Errno.h>
 #include <fluffycoin/log/Log.h>
 
 #include <filesystem>
@@ -44,7 +45,7 @@ bool FileTools::read(
     FILE *fp = fopen(expandTilde(path).c_str(), "rb");
     if (!fp)
     {
-        log::error("Failed to open file '{}' for reading: ({}) {}.", path, errno, strerror(errno));
+        log::error("Failed to open file '{}' for reading: {}.", path, Errno::error());
         return false;
     }
 
@@ -53,7 +54,7 @@ bool FileTools::read(
     if (size < 0)
     {
         fclose(fp);
-        log::error("Failed to get siez of file '{}': ({}) {}.", path, errno, strerror(errno));
+        log::error("Failed to get size of file '{}': {}.", path, Errno::error());
         return false;
     }
     fseek(fp, 0, SEEK_SET);
@@ -90,8 +91,7 @@ bool FileTools::write(
     FILE *fp = fopen(expandTilde(path).c_str(), "wb");
     if (!fp)
     {
-        log::error("Failed to open file '{}' for writing: ({}) {}.",
-            path, errno, strerror(errno));
+        log::error("Failed to open file '{}' for writing: {}.", path, Errno::error());
         return false;
     }
 
@@ -100,8 +100,8 @@ bool FileTools::write(
     if (write != len)
     {
         ret = false;
-        log::error("Failed to write to file '{}' ({}/{} written): ({}) {}.",
-            path, write, len, errno, strerror(errno));
+        log::error("Failed to write to file '{}' ({}/{} written): {}.",
+            path, write, len, Errno::error());
     }
 
     fclose(fp);

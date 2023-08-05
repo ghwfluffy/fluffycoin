@@ -283,3 +283,10 @@ bool BinData::operator!=(const BinData &rhs) const
 {
     return !((*this) == rhs);
 }
+
+BinData operator+(const BinData &lhs, const BinData &rhs)
+{
+    BinData ret(lhs);
+    ret += rhs;
+    return ret;
+}

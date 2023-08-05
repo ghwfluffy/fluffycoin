@@ -1,4 +1,5 @@
 #include <fluffycoin/zmq/Context.h>
+#include <fluffycoin/utils/Errno.h>
 #include <fluffycoin/log/Log.h>
 
 #include <zmq.h>
@@ -12,7 +13,7 @@ Context::Context()
 {
     ctx = zmq_ctx_new();
     if (!ctx)
-        log::error(log::Comm, "Failed to create ZMQ context: ({}) {}.", errno, strerror(errno));
+        log::error(log::Comm, "Failed to create ZMQ context: {}.", Errno::error());
 }
 
 Context::Context(Context &&rhs)
@@ -43,11 +44,11 @@ void Context::cleanup()
     {
         int ret = zmq_ctx_shutdown(ctx);
         if (ret != 0)
-            log::error(log::Comm, "Failed to shutdown ZMQ context: ({}) {}.", errno, strerror(errno));
+            log::error(log::Comm, "Failed to shutdown ZMQ context: {}.", Errno::error());
 
         zmq_ctx_destroy(ctx);
         if (ret != 0)
-            log::error(log::Comm, "Failed to destroy ZMQ context: ({}) {}.", errno, strerror(errno));
+            log::error(log::Comm, "Failed to destroy ZMQ context: {}.", Errno::error());
 
         ctx = nullptr;
     }

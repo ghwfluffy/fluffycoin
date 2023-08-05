@@ -1,6 +1,10 @@
 #include <fluffycoin/zmq/Subscriber.h>
 #include <fluffycoin/zmq/Utils.h>
 
+#include <fluffycoin/utils/Errno.h>
+
+#include <fluffycoin/log/Log.h>
+
 #include <zmq.h>
 
 using namespace fluffycoin;
@@ -57,7 +61,7 @@ void Subscriber::close(
 
     int ret = zmq_close(socket);
     if (ret != 0)
-        log::error(log::Comm, "Failed to close subscription socket ({}): {}.", errno, strerror(errno));
+        log::error(log::Comm, "Failed to close subscription socket: {}.", Errno::error());
     socket = nullptr;
     subscribed = false;
 }
@@ -110,7 +114,7 @@ void Subscriber::subscribe(
             details.setError(
                 log::Comm,
                 ErrorCode::WriteError, "zmq_subscribe",
-                "Failed to subscribe to topic '{}': ({}) {}.", topic, errno, strerror(errno));
+                "Failed to subscribe to topic '{}': {}.", topic, Errno::error());
         }
     }
 
@@ -155,7 +159,7 @@ bool Subscriber::recv(
         else if (ret == -1)
         {
             details.setError(log::Comm, ErrorCode::ReadError, "zmq_event",
-                "Error while reading subscription topic from server: {}.", strerror(errno));
+                "Error while reading subscription topic from server: {}.", Errno::error());
         }
         // Received topic
         else
@@ -176,7 +180,7 @@ bool Subscriber::recv(
         if (ret == -1)
         {
             details.setError(log::Comm, ErrorCode::ReadError, "zmq_event",
-                "Error while reading subscription from server: {}.", strerror(errno));
+                "Error while reading subscription from server: {}.", Errno::error());
         }
         // Received topic
         else

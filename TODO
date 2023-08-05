@@ -1,3 +1,28 @@
+P2P service
+    [x] Fix cmake include namespaces
+    API
+    [\] Handshake
+        [x] Define nonce length constant
+        [x] BruteForce
+        [x] PeerAuth::createMessageAuthKey
+        [x] StakeKey
+        [x] PeerSessions
+        [\] ValidatorLookup
+            [ ] ValidatorInfo
+        [ ] Authenticator
+        [x] Protocol Versioning
+        [ ] Client Handshake
+    [ ] GetBlock
+    [ ] VoteValidator
+    [ ] VoteProtocolChange
+    [ ] GetPeers
+    [ ] RelayMessage
+    [ ] SubmitTransaction
+    Events
+    [ ] NewBlock
+    [ ] ValidateBlock
+    [ ] NewTransaction
+
 Unit Tests
     [ ] Service
 
@@ -7,23 +32,6 @@ Misc
 Design
     [ ] Async client
     [ ] Event auth
-
-P2P service
-    [x] setup service CMake
-    [x] docker
-    [ ] service params
-    API
-    [\] Handshake
-    [ ] GetBlock
-    [ ] VoteValidator
-    [ ] VoteProtocolChange
-    [ ] GetPeers
-    [ ] RelayMessage
-    [ ] SubmitTransaction
-    Events:
-    [ ] NewBlock
-    [ ] ValidateBlock
-    [ ] NewTransaction
 
 consistency
     [ ] namespace ::

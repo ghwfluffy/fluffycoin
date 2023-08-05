@@ -1,6 +1,16 @@
-#include <fluffycoin/services/validator/api/server/Handshake.h>
+#include <fluffycoin/validator/api/server/Handshake.h>
 
-#include <fluffycoin/utils/BinData.h>
+#include <fluffycoin/validator/StakeKey.h>
+#include <fluffycoin/validator/BruteForce.h>
+#include <fluffycoin/validator/PeerSessions.h>
+#include <fluffycoin/validator/ValidatorLookup.h>
+
+#include <fluffycoin/svc/Log.h>
+
+#include <fluffycoin/alg/PeerAuth.h>
+#include <fluffycoin/alg/P2pProtocol.h>
+
+#include <fluffycoin/ossl/Prng.h>
 
 using namespace fluffycoin;
 using namespace fluffycoin::validator;
@@ -12,36 +22,91 @@ void Handshake::process(
         fcpb::p2p::v1::auth::AuthenticateSession &handshake,
         svc::ApiResponseCallback callback)
 {
-    (void)scene;
     (void)callback;
 
-    BinData clientNonce = handshake.client_session_id();
+    // Check address against brute force map
     std::string clientAddress = handshake.auth_address();
+    BruteForce &bforce = scene.utils().get<BruteForce>();
+    if (!bforce.checkAddress(clientAddress))
+    {
+        scene.setError(log::Auth, ErrorCode::Blocked, "brute_force",
+            "Refusing address '{}' due to brute force check.",
+            clientAddress);
+        return;
+    }
 
-    // TODO
-    // Check against a brute force list if we trust this address
-    // Get the peer address/port from the socket
-    // Check against a brute force list if we trust this address/port
-    // Lookup the information stub about the peer from their address
+    // Sane validate supported protocol version
+    int version = handshake.version();
+    if (version <= 0)
+    {
+        scene.setError(svc::Log::Api, ErrorCode::ArgumentInvalid, "version",
+            "Invalid protocol version {}.", version);
+        bforce.addOffense(clientAddress);
+        return;
+    }
+    // Log if peers are using a newer protocol version
+    else if (static_cast<unsigned int>(version) > alg::P2pProtocol::VERSION)
+    {
+        scene.log().traffic(svc::Log::Api, "Peer supports newer protocol version {}.", version);
+    }
+
+    // Sane validate nonce length
+    BinData clientNonce = handshake.client_session_id();
+    if (clientNonce.length() != alg::PeerAuth::AUTH_NONCE_LENGTH)
+    {
+        scene.setError(log::Auth, ErrorCode::ArgumentInvalid, "client_session_id",
+            "Invalid client session ID length.");
+        bforce.addOffense(clientAddress);
+        return;
+    }
+
+    // Lookup validator info of client
+    ValidatorInfo info = scene.utils().get<ValidatorLookup>().getValidator(clientAddress, scene.details());
+    if (!scene.details().isOk())
+        return;
+
+    // This validator has coins staked?
+    if (!info.isActive())
+    {
+        scene.setError(log::Auth, ErrorCode::NotAuthorized, "auth_address",
+            "Validator '{}' is not currently active.", clientAddress);
+        bforce.addOffense(clientAddress);
+        return;
+    }
+
     // Generate a server nonce
-    // Perform ECDH to create the secret HMAC key
-    // Save to our auth map with expiration
-    // Send back the server nonce and our public key
+    BinData serverNonce = ossl::Prng::rand(alg::PeerAuth::AUTH_NONCE_LENGTH);
+    // Combine nonces to create HMAC key
+    SafeData hmacKey = alg::PeerAuth::createMessageAuthKey(
+        *scene.utils().get<StakeKey>().getKey(),
+        info.getPubKey(),
+        clientNonce,
+        serverNonce);
+    if (hmacKey.empty())
+    {
+        scene.setError(log::Auth, ErrorCode::InternalError, "derive",
+            "Failed to derive message authentication key.");
+        return;
+    }
 
-    // TODO: Remove server auth from responses, server auth is all based on CurveMQ
-#if 0
-    // TODO: Should server auth all be based on CurveZMQ
-    // TODO: If so, then don't send back server key, and don't set auth on server responses
-    // TODO: Also do we really need the client to auth every message then, or just the handshake
-    // TODO: You should be able to get a TCP disconnect and resume on the same handshake/clientid?
+    // Combine nonces to make session identifier
+    std::string sessionId = alg::PeerAuth::createSessionId(clientNonce, serverNonce);
 
-    // Option A:
-    // Validators: peer p2p all uses curveMQ
-    // client signs all their messages to verify who they are against their handshaked session
-    // client already knows server's key, they got it from peers or they got it from the registry
+    // Log
+    scene.log().traffic(log::Auth, "Started authentication session '{}' with validator '{}'.",
+        sessionId, clientAddress);
 
-    // Kiosks: These accept clear messages. Same as registry?
+    // Save the session info to verify later requests
+    scene.utils().get<PeerSessions>().addSession(
+        static_cast<unsigned int>(version),
+        std::move(clientAddress),
+        std::move(sessionId),
+        std::move(hmacKey));
 
-    // Registry: This is just an HTTP/S server who exposes known peer information
-#endif
+    // Send back the server nonce
+    // They already have our public key
+    auto rsp = std::make_unique<fcpb::p2p::v1::auth::AuthenticateSessionResponse>();
+    rsp->set_version(static_cast<int>(alg::P2pProtocol::VERSION));
+    rsp->set_server_session_id(serverNonce.data(), serverNonce.length());
+    callback(std::move(rsp));
 }

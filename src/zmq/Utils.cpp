@@ -3,6 +3,8 @@
 #include <fluffycoin/ossl/Curve25519.h>
 #include <fluffycoin/ossl/Error.h>
 
+#include <fluffycoin/utils/Errno.h>
+
 #include <fluffycoin/log/Log.h>
 
 #include <zmq.h>
@@ -22,7 +24,8 @@ int Utils::getFd(void *socket)
         if (ret != 0)
         {
             fd = -1;
-            log::error(log::Comm, "Failed to retrieve ZMQ socket: ({}) {}.", errno, strerror(errno));
+            log::error(log::Comm, "Failed to retrieve ZMQ socket: {}.",
+                Errno::error());
         }
     }
 
@@ -146,7 +149,7 @@ void *Utils::bindSocket(
         if (ret != 0)
         {
             details.setError(log::Comm, ErrorCode::ConnectError, "zmq_bind",
-                "Failed to bind to '{}': {}.", address, strerror(errno));
+                "Failed to bind to '{}': {}.", address, Errno::error());
         }
         else
         {
@@ -202,7 +205,7 @@ void setupClientCurve(
         if (i != 0)
         {
             details.setError(log::Comm, ErrorCode::InternalError, "zmq_curve",
-                "Failed to generate ephemeral X25519 keypair: {}.", strerror(errno));
+                "Failed to generate ephemeral X25519 keypair: {}.", Errno::error());
         }
     }
 
@@ -261,7 +264,7 @@ void *Utils::connectSocket(
         if (ret != 0)
         {
             details.setError(log::Comm, ErrorCode::ConnectError, "zmq_socket",
-                "Failed to connect to '{}': {}.", address, strerror(errno));
+                "Failed to connect to '{}': {}.", address, Errno::error());
         }
         else
         {

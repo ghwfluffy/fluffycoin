@@ -55,3 +55,5 @@ class BinData
 };
 
 }
+
+fluffycoin::BinData operator+(const fluffycoin::BinData &lhs, const fluffycoin::BinData &rhs);

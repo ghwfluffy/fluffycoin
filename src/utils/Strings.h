@@ -54,4 +54,8 @@ uint64_t from_string(const std::string &str);
 template<>
 bool from_string(const std::string &str);
 
+constexpr size_t constStrlen(const char* str) {
+    return *str ? 1 + constStrlen(str + 1) : 0;
+}
+
 }

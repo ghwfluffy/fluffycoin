@@ -18,6 +18,7 @@ std::string fluffycoin::to_string(ErrorCode code)
         case ErrorCode::NotLoggedIn: return "Not Logged In";
         case ErrorCode::NotAuthorized: return "Not Authorized";
         case ErrorCode::NoPermission: return "No Permission";
+        case ErrorCode::Blocked: return "Blocked";
         case ErrorCode::NotConnected: return "Not Connected";
         case ErrorCode::ResolveError: return "Resolve Error";
         case ErrorCode::ConnectError: return "Connect Error";

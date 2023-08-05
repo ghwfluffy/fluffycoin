@@ -15,6 +15,10 @@ RUN set -eux; \
         ; \
     true
 
+# Runtime environment
+RUN set -eux; \
+    mkdir -p /var/log/fluffycoin
+
 # Binaries
 COPY ./dist/bin/fluffycoin-validator /usr/bin/
 COPY ./dist/lib/* /usr/lib/

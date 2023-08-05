@@ -1,4 +1,4 @@
-#include <fluffycoin/services/validator/core/ValidatorServiceParams.h>
+#include <fluffycoin/validator/ValidatorServiceParams.h>
 
 #include <fluffycoin/svc/Run.h>
 

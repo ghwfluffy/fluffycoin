@@ -2,6 +2,8 @@
 #include <fluffycoin/ossl/Error.h>
 #include <fluffycoin/ossl/Prng.h>
 
+#include <fluffycoin/utils/Errno.h>
+
 #include <fluffycoin/log/Log.h>
 
 #include <openssl/evp.h>
@@ -22,7 +24,7 @@ size_t osEntropy(
     size_t len = 0;
     FILE *fp = fopen("/dev/urandom", "rb");
     if (!fp)
-        log::error("Failed to open urandom ({}): {}.", errno, strerror(errno));
+        log::error("Failed to open urandom: {}.", Errno::error());
     else
     {
         len = fread(buffer, 1, dataLen, fp);
@@ -98,7 +100,7 @@ void sysInfoSeed()
     struct sysinfo info = {};
     int ret = sysinfo(&info);
     if (ret != 0)
-        log::error("Failed to get system info seed ({}): {}.", errno, strerror(errno));
+        log::error("Failed to get system info seed: {}.", Errno::error());
     else
         ossl::Prng::seed(&info, sizeof(info));
 }
@@ -108,7 +110,7 @@ void timeSeed()
     struct timeval tv = {};
     int ret = gettimeofday(&tv, nullptr);
     if (ret != 0)
-        log::error("Failed to get system time seed ({}): {}.", errno, strerror(errno));
+        log::error("Failed to get system time seed: {}.", Errno::error());
     else
         ossl::Prng::seed(&tv, sizeof(tv));
 }

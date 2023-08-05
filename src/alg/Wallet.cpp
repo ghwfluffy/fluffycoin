@@ -169,6 +169,22 @@ BinData Wallet::getLatestPublicKey() const
     return key ? ossl::Curve25519::toPublic(*key) : BinData();
 }
 
+ossl::EvpPkeyPtr Wallet::getKey(const std::string &address)
+{
+    for (const Entry &entry : keys)
+    {
+        if (entry.address == address)
+        {
+            ossl::EvpPkeyPtr key = decrypt(entry.format, entry.privKey, password);
+            if (!key)
+                log::error("Failed to decrypt wallet key.");
+            return key;
+        }
+    }
+
+    return ossl::EvpPkeyPtr();
+}
+
 ossl::EvpPkeyPtr Wallet::makeNewKey(const std::string &addressSalt)
 {
     ossl::EvpPkeyPtr key = ossl::Curve25519::generate();

@@ -1,11 +1,17 @@
-#include <fluffycoin/services/validator/core/ValidatorServiceParams.h>
+#include <fluffycoin/validator/ValidatorServiceParams.h>
+
+#include <fluffycoin/validator/api/server/Handshake.h>
+
+#include <fluffycoin/alg/Wallet.h>
+
+#include <fluffycoin/utils/FileTools.h>
 
 using namespace fluffycoin;
 using namespace fluffycoin::validator;
 
 ValidatorServiceParams::ValidatorServiceParams()
 {
-    // TODO
+    walletFile = "~/.fluffycoin/wallet.fc";
 }
 
 std::string ValidatorServiceParams::getLogFile() const
@@ -13,57 +19,76 @@ std::string ValidatorServiceParams::getLogFile() const
     return "/var/log/fluffycoin/validator.log";
 }
 
-#if 0
+void ValidatorServiceParams::setupScene(svc::ServiceScene &ctx)
+{
+    ctx.set(stakeKey);
+    ctx.set(bruteForce);
+}
+
 void ValidatorServiceParams::initCmdLineParams(ArgParser &args) const
 {
-    // TODO
+    args.addParam('w', "wallet", "Wallet containing stake key");
+    args.addParam('p', "wallet-password", "Wallet password\n"
+                                          "Default: Use FLUFFYCOIN_WALLET_PASSWORD env var");
+    args.addParam('a', "stake-address", "Address from wallet matching stake key\n"
+                                        "Default: Newest key in wallet");
 }
 
 void ValidatorServiceParams::setCmdLineArgs(const Args &args)
 {
-    // TODO
-}
+    if (args.hasArg("wallet"))
+        walletFile = args.getArg("wallet");
 
-unsigned int ValidatorServiceParams::getNumEventThreads() const
-{
-    // TODO
-    return 1;
+    if (args.hasArg("stake-address"))
+        stakeAddress = args.getArg("stake-address");
+
+    if (args.hasArg("wallet-password"))
+    {
+        walletPassword = SafeData(args.getArg("wallet-password"));
+        const_cast<Args &>(args).maskArg("wallet-address");
+    }
+    else
+    {
+        const char *pw = getenv(WALLET_PW_ENV);
+        if (pw)
+        {
+            walletPassword.setData(reinterpret_cast<const unsigned char *>(pw), strlen(pw));
+            setenv(WALLET_PW_ENV, "", true);
+        }
+    }   
 }
 
 uint16_t ValidatorServiceParams::getApiPort() const
 {
-    // TODO
-    return 0;
+    return API_PORT;
 }
 
 uint16_t ValidatorServiceParams::getEventPort() const
 {
-    // TODO
-    return 0;
+    return EVENT_PORT;
 }
 
 const BinData &ValidatorServiceParams::getServerKey() const
 {
-    // TODO
-    return BinData();
+    return stakeKey.getPriv();
 }
 
-void ValidatorServiceParams::setupScene(ServiceScene &ctx)
+void ValidatorServiceParams::addApiHandlers(svc::ApiHandlerMap &handlers, bool paused) const
+{
+    if (paused)
+        return;
+
+    handlers.add<fcpb::p2p::v1::auth::AuthenticateSession>(api::server::Handshake::process);
+}
+
+#if 0
+void ValidatorServiceParams::addEventSubscriptions(svc::EventSubscriptionMap &handlers) const
 {
     // TODO
 }
+#endif
 
-void ValidatorServiceParams::addApiHandlers(ApiHandlerMap &handlers, bool paused) const
-{
-    // TODO
-}
-
-void ValidatorServiceParams::addEventSubscriptions(EventSubscriptionMap &handlers) const
-{
-    // TODO
-}
-
-IAuthenticator *ValidatorServiceParams::getAuthenticator()
+svc::IAuthenticator *ValidatorServiceParams::getAuthenticator()
 {
     // TODO
     return nullptr;
@@ -71,10 +96,44 @@ IAuthenticator *ValidatorServiceParams::getAuthenticator()
 
 bool ValidatorServiceParams::preInit()
 {
-    // TODO
-    return false;
+    // Read in wallet data
+    std::string walletContents;
+    if (!FileTools::read(walletFile, walletContents))
+    {
+        log::error("Failed to read in wallet data from '{}'.", walletFile);
+        return false;
+    }
+
+    // Parse wallet
+    alg::Wallet stakeWallet;
+    if (!stakeWallet.setString(walletContents, walletPassword))
+    {
+        log::error("Failed to open wallet file.");
+        return false;
+    }
+
+    // Find stake key
+    ossl::EvpPkeyPtr key;
+    if (!stakeAddress.empty())
+        key = stakeWallet.getKey(stakeAddress);
+    else
+    {
+        key = stakeWallet.getLatestKey();
+        stakeAddress = stakeWallet.getLatestAddress();
+    }
+
+    if (stakeAddress.empty() || !key)
+    {
+        log::error("Failed to find stake key '{}'.", stakeAddress);
+        return false;
+    }
+
+    stakeKey.setKey(std::move(stakeAddress), std::move(key));
+
+    return true;
 }
 
+#if 0
 bool ValidatorServiceParams::init()
 {
     // TODO

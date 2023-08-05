@@ -1,6 +1,8 @@
 #include <fluffycoin/zmq/Client.h>
 #include <fluffycoin/zmq/Utils.h>
 
+#include <fluffycoin/utils/Errno.h>
+
 #include <fluffycoin/log/Log.h>
 
 #include <zmq.h>
@@ -48,7 +50,7 @@ void Client::close()
 
     int ret = zmq_close(socket);
     if (ret != 0)
-        log::error(log::Comm, "Failed to close client socket ({}): {}.", errno, strerror(errno));
+        log::error(log::Comm, "Failed to close client socket: {}.", Errno::error());
     socket = nullptr;
 }
 
@@ -92,7 +94,7 @@ void Client::send(
         if (ret == -1)
         {
             details.setError(log::Comm, ErrorCode::WriteError, "zmq_send",
-                "Failed to request to server: {}.", strerror(errno));
+                "Failed to request to server: {}.", Errno::error());
         }
         else if (static_cast<size_t>(ret) != data.length())
         {
@@ -126,7 +128,7 @@ bool Client::recv(
         else if (ret == -1)
         {
             details.setError(log::Comm, ErrorCode::ReadError, "zmq_recv",
-                "Error while reading response from server: {}.", strerror(errno));
+                "Error while reading response from server: {}.", Errno::error());
         }
         // Received message
         else

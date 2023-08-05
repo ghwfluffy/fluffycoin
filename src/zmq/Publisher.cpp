@@ -1,6 +1,8 @@
 #include <fluffycoin/zmq/Publisher.h>
 #include <fluffycoin/zmq/Utils.h>
 
+#include <fluffycoin/utils/Errno.h>
+
 #include <zmq.h>
 #include <string.h>
 
@@ -55,7 +57,7 @@ void Publisher::close(
 
     int ret = zmq_close(socket);
     if (ret != 0)
-        log::error(log::Comm, "Failed to close publisher socket ({}): {}.", errno, strerror(errno));
+        log::error(log::Comm, "Failed to close publisher socket: {}.", Errno::error());
     socket = nullptr;
 }
 
@@ -116,7 +118,7 @@ void Publisher::publish(
             details.setError(
                 log::Comm,
                 ErrorCode::WriteError, "zmq_publish",
-                "Failed to publish topic '{}': {}.", topic, strerror(errno));
+                "Failed to publish topic '{}': {}.", topic, Errno::error());
         }
         else if (static_cast<size_t>(ret) != topic.size())
         {
@@ -137,7 +139,7 @@ void Publisher::publish(
             details.setError(
                 log::Comm,
                 ErrorCode::WriteError, "zmq_publish",
-                "Failed to send event '{}': {}.", topic, strerror(errno));
+                "Failed to send event '{}': {}.", topic, Errno::error());
         }
         else if (static_cast<size_t>(ret) != data.length())
         {
@@ -153,7 +155,7 @@ void Publisher::publish(
     {
         int ret = zmq_send(socket, nullptr, 0, 0);
         if (ret == -1)
-            log::error(log::Comm, "Received {} ({}) when sending failed event frame.", errno, strerror(errno));
+            log::error(log::Comm, "Failed sending missing event frame: {}.", Errno::error());
         else if (ret != 0)
             log::notice(log::Comm, "Sent {} byte missing null frame.", ret);
     }

@@ -79,6 +79,22 @@ void Args::addArg(const std::string &arg, std::string value)
     args[arg].push_back(std::move(value));
 }
 
+void Args::addArg(const std::string &arg, const char *value)
+{
+    args[arg].push_back(value);
+    originals[arg].push_back(value);
+}
+
+void Args::maskArg(const char *arg)
+{
+    auto iter = originals.find(arg);
+    if (iter != originals.end())
+    {
+        for (const char *p : iter->second)
+            const_cast<char &>(*p) = '\0';
+    }
+}
+
 void ArgParser::addParam(
     char shortcut,
     const char *param,

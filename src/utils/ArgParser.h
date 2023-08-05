@@ -36,14 +36,18 @@ class Args
 
         bool hasError() const;
 
+        void maskArg(const char *arg);
+
     private:
         friend class ArgParser;
 
         void addArg(const std::string &arg, std::string value);
+        void addArg(const std::string &arg, const char *value);
         void setError();
 
         bool bError;
         std::map<std::string, std::list<std::string>> args;
+        std::map<std::string, std::list<const char *>> originals;
 };
 
 /**
