@@ -18,7 +18,8 @@ typedef struct Genesis_st
     ASN1_INTEGER *version;
     ASN1_INTEGER *creation;
     ASN1_OCTET_STRING *creator;
-    ASN1_OCTET_STRING *creatorKey;
+    ASN1_OCTET_STRING *validatorKey;
+    ASN1_OCTET_STRING *stakeAddress;
     Specie *greed;
     ASN1_OCTET_STRING *seed;
 } Genesis;
@@ -30,7 +31,8 @@ ASN1_SEQUENCE(Genesis) =
   , ASN1_SIMPLE(Genesis, version, ASN1_INTEGER)
   , ASN1_SIMPLE(Genesis, creation, ASN1_INTEGER)
   , ASN1_SIMPLE(Genesis, creator, ASN1_OCTET_STRING)
-  , ASN1_SIMPLE(Genesis, creatorKey, ASN1_OCTET_STRING)
+  , ASN1_SIMPLE(Genesis, validatorKey, ASN1_OCTET_STRING)
+  , ASN1_SIMPLE(Genesis, stakeAddress, ASN1_OCTET_STRING)
   , ASN1_SIMPLE(Genesis, greed, Specie)
   , ASN1_SIMPLE(Genesis, seed, ASN1_OCTET_STRING)
 } ASN1_SEQUENCE_END(Genesis)
@@ -100,14 +102,24 @@ void Genesis::setCreator(Address creator)
     this->creator = std::move(creator);
 }
 
-const PublicKey &Genesis::getCreatorKey() const
+const PublicKey &Genesis::getValidatorKey() const
 {
-    return creatorKey;
+    return validatorKey;
 }
 
-void Genesis::setCreatorKey(PublicKey key)
+void Genesis::setValidatorKey(PublicKey key)
 {
-    this->creatorKey = std::move(key);
+    this->validatorKey = std::move(key);
+}
+
+const Address &Genesis::getStakeAddress() const
+{
+    return stakeAddress;
+}
+
+void Genesis::setStakeAddress(Address address)
+{
+    this->stakeAddress = std::move(address);
 }
 
 const Specie &Genesis::getGreed() const
@@ -137,7 +149,8 @@ void Genesis::toAsn1(asn1::Genesis &t) const
     ossl::fromUInt64(*t.version, version);
     creation.toAsn1(*t.creation);
     creator.toAsn1(*t.creator);
-    creatorKey.toAsn1(*t.creatorKey);
+    validatorKey.toAsn1(*t.validatorKey);
+    stakeAddress.toAsn1(*t.stakeAddress);
     greed.toAsn1(*t.greed);
     ossl::fromBin(*t.seed, seed);
 }
@@ -149,7 +162,8 @@ void Genesis::fromAsn1(const asn1::Genesis &t)
     version = ossl::toUInt32(*t.version);
     creation.fromAsn1(*t.creation);
     creator.fromAsn1(*t.creator);
-    creatorKey.fromAsn1(*t.creatorKey);
+    validatorKey.fromAsn1(*t.validatorKey);
+    stakeAddress.fromAsn1(*t.stakeAddress);
     greed.fromAsn1(*t.greed);
     seed = ossl::toBin(*t.seed);
 }

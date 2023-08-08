@@ -38,10 +38,12 @@ Genesis                 ::=SEQUENCE {
     version             INTEGER (0..MAX),
     -- Time when genesis block is instantiated
     creation            Time,
-    -- Address for blockchain creator auth+stake key
+    -- Address for blockchain creator wallet
     creator             Address,
-    -- Public key of creator
-    creatorKey          PublicKey,
+    -- Initial validator key
+    validatorKey        PublicKey,
+    -- Address for validator key
+    stakeAddress        Address,
     -- Initial coins given to blockchain creator
     -- The proof of stake requires coins to exist for mining to happen
     greed               Specie,

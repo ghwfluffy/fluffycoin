@@ -12,15 +12,16 @@ TEST(Wallet, Success)
     wallet.setEncFormat(alg::Wallet::EncFormat::FcPbkdf, 1024);
 
     // Add new key directly to wallet
-    ossl::EvpPkeyPtr key = wallet.makeNewKey("GHW");
+    alg::Wallet::KeyUsage usage = alg::Wallet::KeyUsage::Specie;
+    ossl::EvpPkeyPtr key = wallet.makeNewKey(usage, "GHW");
     ASSERT_NE(key, nullptr);
-    EXPECT_EQ(wallet.getLatestAddress().substr(0, 3), "GHW");
+    EXPECT_EQ(wallet.getLatestAddress(usage).substr(0, 3), "GHW");
 
     // Make random private key
     key = ossl::Curve25519::generate();
     ASSERT_NE(key, nullptr);
     std::string newAddress = alg::Address::printable(alg::Address::generate(*key));
-    wallet.addKey(*key, newAddress);
+    wallet.addKey(usage, *key, newAddress);
 
     // Expect two keys
     EXPECT_EQ(wallet.getKeys().size(), 2);
@@ -40,6 +41,6 @@ TEST(Wallet, Success)
     EXPECT_EQ(wallet.getKeys().size(), 2);
 
     // Expect latest key to exist
-    EXPECT_NE(wallet.getLatestKey().get(), nullptr);
-    EXPECT_EQ(wallet.getLatestAddress(), newAddress);
+    EXPECT_NE(wallet.getLatestKey(usage).get(), nullptr);
+    EXPECT_EQ(wallet.getLatestAddress(usage), newAddress);
 }

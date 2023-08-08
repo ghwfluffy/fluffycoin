@@ -77,6 +77,31 @@ void from_string(const std::string &str, Wallet::EncFormat &format)
         format = Wallet::EncFormat::FcPbkdf;
 }
 
+std::string to_string(Wallet::KeyUsage usage)
+{
+    switch (usage)
+    {
+        case Wallet::KeyUsage::Specie:
+            return "specie";
+        case Wallet::KeyUsage::Validator:
+            return "validator";
+        default:
+        case Wallet::KeyUsage::None:
+            break;
+    }
+
+    return "none";
+}
+
+void from_string(const std::string &str, Wallet::KeyUsage &usage)
+{
+    usage = Wallet::KeyUsage::None;
+    if (str == "specie")
+        usage = Wallet::KeyUsage::Specie;
+    else if (str == "validator")
+        usage = Wallet::KeyUsage::Validator;
+}
+
 bool retranslate(
     Wallet::EncFormat format,
     Wallet::EncFormat newFormat,
@@ -124,6 +149,22 @@ bool retranslate(
     return bRet;
 }
 
+std::list<Wallet::Entry>::const_iterator getTopKey(
+    const std::list<Wallet::Entry> &keys,
+    Wallet::KeyUsage usage)
+{
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        const Wallet::Entry &entry = (*iter);
+        if (entry.usage == usage)
+            break;
+        ++iter;
+    }
+
+    return iter;
+}
+
 }
 
 Wallet::Wallet()
@@ -138,34 +179,40 @@ void Wallet::setEncFormat(EncFormat format, unsigned int iters)
     this->defaultFormat = format;
 }
 
-ossl::EvpPkeyPtr Wallet::getLatestKey() const
+ossl::EvpPkeyPtr Wallet::getLatestKey(KeyUsage usage) const
 {
     ossl::EvpPkeyPtr key;
-    if (!keys.empty())
+    auto iter = getTopKey(keys, usage);
+    if (iter != keys.end())
     {
-        const Entry &entry = keys.front();
+        const Entry &entry = (*iter);
         key = decrypt(entry.format, entry.privKey, this->password);
     }
 
     return key;
 }
 
-std::string Wallet::getLatestAddress() const
+std::string Wallet::getLatestAddress(KeyUsage usage) const
 {
     std::string ret;
-    if (!keys.empty())
-        ret = keys.front().address;
+    auto iter = getTopKey(keys, usage);
+    if (iter != keys.end())
+    {
+        const Entry &entry = (*iter);
+        ret = entry.address;
+    }
+
     return ret;
 }
 
-BinData Wallet::getLatestAddressBin() const
+BinData Wallet::getLatestAddressBin(KeyUsage usage) const
 {
-    return Address::unprintable(getLatestAddress());
+    return Address::unprintable(getLatestAddress(usage));
 }
 
-BinData Wallet::getLatestPublicKey() const
+BinData Wallet::getLatestPublicKey(KeyUsage usage) const
 {
-    ossl::EvpPkeyPtr key = getLatestKey();
+    ossl::EvpPkeyPtr key = getLatestKey(usage);
     return key ? ossl::Curve25519::toPublic(*key) : BinData();
 }
 
@@ -185,7 +232,7 @@ ossl::EvpPkeyPtr Wallet::getKey(const std::string &address)
     return ossl::EvpPkeyPtr();
 }
 
-ossl::EvpPkeyPtr Wallet::makeNewKey(const std::string &addressSalt)
+ossl::EvpPkeyPtr Wallet::makeNewKey(KeyUsage usage, const std::string &addressSalt)
 {
     ossl::EvpPkeyPtr key = ossl::Curve25519::generate();
     if (key)
@@ -195,7 +242,7 @@ ossl::EvpPkeyPtr Wallet::makeNewKey(const std::string &addressSalt)
             address = Address::printable(Address::generate(*key));
         else
             address = Address::printable(Address::generate(*key, addressSalt));
-        addKey(*key, address);
+        addKey(usage, *key, address);
     }
 
     return key;
@@ -240,6 +287,8 @@ bool Wallet::setString(const std::string &value, const SafeData &password)
                 std::string privKey = jsonEntry["priv"].get<std::string>();
                 EncFormat format = EncFormat::None;
                 ::from_string(jsonEntry["format"].get<std::string>(), format);
+                KeyUsage usage = KeyUsage::None;
+                ::from_string(jsonEntry["usage"].get<std::string>(), usage);
                 uint64_t time = jsonEntry["time"].get<uint64_t>();
                 if (format == EncFormat::None)
                     throw std::runtime_error("Invalid encryption format");
@@ -256,6 +305,7 @@ bool Wallet::setString(const std::string &value, const SafeData &password)
                 // Save entry
                 Entry entry;
                 entry.time = time;
+                entry.usage = usage;
                 entry.format = format;
                 entry.address = std::move(address);
                 entry.privKey = std::move(privKey);
@@ -296,6 +346,7 @@ std::string Wallet::getString(const SafeData &password) const
             nlohmann::json json;
             json["address"] = entry.address;
             json["time"] = entry.time;
+            json["usage"] = ::to_string(entry.usage);
             // Export in same format
             if (password.empty() || password == this->password)
             {
@@ -331,7 +382,7 @@ std::string Wallet::getString(const SafeData &password) const
     return ret;
 }
 
-bool Wallet::addKey(const EVP_PKEY &key, const std::string &address)
+bool Wallet::addKey(KeyUsage usage, const EVP_PKEY &key, const std::string &address)
 {
     bool ok = true;
 
@@ -341,6 +392,7 @@ bool Wallet::addKey(const EVP_PKEY &key, const std::string &address)
     if (ok)
     {
         Entry newEntry;
+        newEntry.usage = usage;
         newEntry.time = static_cast<uint64_t>(
             std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::system_clock::now().time_since_epoch()).count());

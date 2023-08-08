@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/format.h>
+
 #include <map>
 #include <set>
 #include <list>
@@ -64,6 +66,16 @@ class ArgParser
         ~ArgParser() = default;
 
         // Setup parser
+        template<typename... Args>
+        void addParam(
+            char shortcut,
+            const char *param,
+            fmt::format_string<Args...> s,
+            Args&&... args)
+        {
+            addParam(shortcut, param, fmt::format(s, std::forward<Args>(args)...).c_str());
+        }
+
         void addParam(
             char shortcut,
             const char *param,

@@ -88,6 +88,7 @@ namespace error
     #define R(x) const int x = iter__++
     R(Success);
     R(ArgumentParse);
+    R(ArgumentInvalid);
     R(ArgumentMissing);
     R(ReadWallet);
     R(GetPassword);
@@ -105,43 +106,50 @@ int main(int argc, const char *argv[])
 {
     log::setConsole(true);
 
+    // Defaults
+    uint64_t greed = 1000;
+    std::string outputDir = "~/.fluffycoin/blocks";
+    std::string walletFile = "~/.fluffycoin/wallet.json";
+
     // Setup argument parser
     ArgParser parser;
     parser.addCategory("Wallet");
-    parser.addParam('w', "wallet", "File to read and save wallet");
-    parser.addParam('W', "wallet-salt", "Salt for new wallet address");
+    parser.addParam('w', "wallet", "File to read and save wallet (Default: {})", walletFile);
+    parser.addParam('W', "wallet-salt", "Salt for new wallet address (Default: Random)");
     parser.addParam('p', "wallet-password", "Password for wallet (Default: Prompt)");
-    parser.addParam('g', "greed", "How many coins to mint");
+    parser.addParam('g', "greed", "How many coins to mint (Default: {})", greed);
     parser.addParam('s', "seed", "Seed value (Optional)");
-    parser.addParam('o', "output", "Output directory (Default ~/.fluffycoin/blocks)");
+    parser.addParam('o', "output", "Output directory (Default {})", outputDir);
 
     // Parse
     Args args = parser.parse(argc, argv);
     if (args.hasError())
         return error::ArgumentParse;
 
-    // Check required parameters
-    if (!args.hasArg("wallet") || !args.hasArg("greed"))
+    // Validate greed value
+    if (args.hasArg("greed"))
+        greed = static_cast<uint64_t>(args.getSizeT("greed"));
+
+    if (!greed)
     {
-        if (!args.hasArg("wallet"))
-            fprintf(stderr, "Missing required argument 'wallet'.\n");
-        else
-            fprintf(stderr, "Missing required argument 'greed'.\n");
+        fprintf(stderr, "Invalid greed.\n");
         parser.printHelp();
-        return error::ArgumentMissing;
+        return error::ArgumentInvalid;
     }
 
     // Read in wallet
+    if (args.hasArg("wallet"))
+        walletFile = args.getArg("wallet");
     std::string walletContents;
-    if (FileTools::exists(args.getArg("wallet")))
+    if (FileTools::exists(walletFile))
     {
-        if (!FileTools::read(args.getArg("wallet"), walletContents))
+        if (!FileTools::read(walletFile, walletContents))
         {
-            log::error("Failed to read in wallet data from '{}'.", args.getArg("wallet"));
+            log::error("Failed to read in wallet data from '{}'.", walletFile);
             return error::ReadWallet;
         }
 
-        log::info("Read in wallet data from '{}'.", args.getArg("wallet"));
+        log::info("Read in wallet data from '{}'.", walletFile);
     }
 
     // Get wallet password
@@ -163,9 +171,14 @@ int main(int argc, const char *argv[])
     }
 
     // Make a new key
-    if (!wallet.makeNewKey(args.getArg("wallet-salt")))
+    if (!wallet.makeNewKey(alg::Wallet::KeyUsage::Validator, args.getArg("wallet-salt")))
     {
-        log::error("Failed to create wallet key.");
+        log::error("Failed to create validator wallet key.");
+        return error::MakeKey;
+    }
+    else if (!wallet.makeNewKey(alg::Wallet::KeyUsage::Specie, args.getArg("wallet-salt")))
+    {
+        log::error("Failed to create creator wallet key.");
         return error::MakeKey;
     }
 
@@ -175,13 +188,14 @@ int main(int argc, const char *argv[])
     gen.setName(alg::BLOCKCHAIN_NAME);
     gen.setVersion(alg::BLOCKCHAIN_VERSION);
     gen.setCreation(block::Time::now());
-    gen.setCreator(wallet.getLatestAddressBin());
-    gen.setCreatorKey(wallet.getLatestPublicKey());
+    gen.setCreator(wallet.getLatestAddressBin(alg::Wallet::KeyUsage::Specie));
+    gen.setValidatorKey(wallet.getLatestPublicKey(alg::Wallet::KeyUsage::Validator));
+    gen.setStakeAddress(wallet.getLatestAddressBin(alg::Wallet::KeyUsage::Validator));
     gen.setSeed(args.getArg("seed"));
 
-    block::Specie greed;
-    greed.setCoins(static_cast<uint64_t>(args.getSizeT("greed")));
-    gen.setGreed(greed);
+    block::Specie greedSpec;
+    greedSpec.setCoins(greed);
+    gen.setGreed(greedSpec);
 
     // Serialize genesis block
     BinData genesisData = gen.encode();
@@ -191,22 +205,21 @@ int main(int argc, const char *argv[])
     rec.setProtocol(alg::PROTOCOL_VERSION);
     rec.setChainId(0);
     rec.setShardHashes({block::Hash(genesisData)});
-    rec.setLeader(wallet.getLatestAddressBin());
-    rec.setSignature(ossl::Curve25519::sign(*wallet.getLatestKey(), rec.toContent()));
+    rec.setLeader(wallet.getLatestAddressBin(alg::Wallet::KeyUsage::Validator));
+    rec.setSignature(ossl::Curve25519::sign(*wallet.getLatestKey(alg::Wallet::KeyUsage::Validator), rec.toContent()));
 
     // Vote for ourselves
     block::Validation validation;
     validation.setVerified(true);
-    validation.setAddress(wallet.getLatestAddressBin());
+    validation.setAddress(wallet.getLatestAddressBin(alg::Wallet::KeyUsage::Validator));
     validation.setSignature(rec.getSignature());
     rec.setVotes({validation});
 
     BinData recData = rec.encode();
 
     // Get output directory
-    std::string outputDir = args.getArg("output");
-    if (outputDir.empty())
-        outputDir = "~/.fluffycoin/blocks";
+    if (args.hasArg("output"))
+        outputDir = args.getArg("output");
     if (!FileTools::isDir(outputDir) && !FileTools::createDir(outputDir))
     {
         log::error("Failed to create output directory '{}'.", outputDir);
@@ -234,7 +247,7 @@ int main(int argc, const char *argv[])
         return error::SerializeWallet;
     }
 
-    if (!FileTools::write(args.getArg("wallet"), walletData))
+    if (!FileTools::write(walletFile, walletData))
     {
         log::error("Failed to write out wallet.");
         return error::WriteWallet;

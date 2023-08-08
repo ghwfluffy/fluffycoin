@@ -52,8 +52,11 @@ class Genesis
         const Address &getCreator() const;
         void setCreator(Address creator);
 
-        const PublicKey &getCreatorKey() const;
-        void setCreatorKey(PublicKey key);
+        const PublicKey &getValidatorKey() const;
+        void setValidatorKey(PublicKey key);
+
+        const Address &getStakeAddress() const;
+        void setStakeAddress(Address address);
 
         const Specie &getGreed() const;
         void setGreed(Specie specie);
@@ -72,7 +75,8 @@ class Genesis
         uint32_t version;
         Time creation;
         Address creator;
-        PublicKey creatorKey;
+        PublicKey validatorKey;
+        Address stakeAddress;
         Specie greed;
         BinData seed;
 };

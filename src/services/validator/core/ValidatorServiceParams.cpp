@@ -11,7 +11,7 @@ using namespace fluffycoin::validator;
 
 ValidatorServiceParams::ValidatorServiceParams()
 {
-    walletFile = "~/.fluffycoin/wallet.fc";
+    walletFile = "~/.fluffycoin/wallet.json";
 }
 
 std::string ValidatorServiceParams::getLogFile() const
@@ -118,8 +118,8 @@ bool ValidatorServiceParams::preInit()
         key = stakeWallet.getKey(stakeAddress);
     else
     {
-        key = stakeWallet.getLatestKey();
-        stakeAddress = stakeWallet.getLatestAddress();
+        key = stakeWallet.getLatestKey(alg::Wallet::KeyUsage::Validator);
+        stakeAddress = stakeWallet.getLatestAddress(alg::Wallet::KeyUsage::Validator);
     }
 
     if (stakeAddress.empty() || !key)
