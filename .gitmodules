@@ -13,3 +13,6 @@
 [submodule "lib/boost"]
 	path = lib/boost
 	url = https://github.com/boostorg/boost.git
+[submodule "lib/ozo"]
+	path = lib/ozo
+	url = https://github.com/yandex/ozo.git
