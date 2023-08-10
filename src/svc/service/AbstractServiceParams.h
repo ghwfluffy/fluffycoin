@@ -32,8 +32,8 @@ class AbstractServiceParams : public IServiceParams
 
         IAuthenticator *getAuthenticator() override;
 
-        bool preInit() override;
-        bool init() override;
+        bool preInit(bool paused) override;
+        bool init(bool paused) override;
 
         void cleanup() override;
         void postCleanup() override;

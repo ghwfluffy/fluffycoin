@@ -1,0 +1,60 @@
+P2P discovery:
+- Contact the public registry (https://fluffyco.in/peers) and get a list of IP/Port and addresses
+    - TODO: How does registry get updated.
+        - Need some way to specify a custom registry or peer list file
+        - Need some way for other people to host their own registries to remove centralized power
+- Contact each IP/Port and address to become their peer
+- Measure how long it takes to handshake and that helps determine who your favorite peers are
+- Query our peers for information about the peers they know how to reach
+- Future: Broadcast ipv4/ipv6 to discover peers on local network
+    - Some concept of local peers versus foreign peers, so they work together instead of just all do the same thing
+
+Polling Requests:
+- We need some sort of directory of all validators and how we reach them
+- If we have a message for a peer, and we can't reach them, we can put it in a queue
+    - If we know our peer is a healthy listener, then we just send it normally
+    - If we know our peer is unable to receive connections, then we send it as an attachment to responses
+    - Each response puts a pending message from the queue into an extension
+    - When the client replies, it replies with a "response request"
+        - a client request that contains a response to a previous response extension request
+
+Passthrough Peers:
+- Future: Could be possible for one peer to reach another peer. If A can talk to B, and B can talk to C, but A can't talk to C, then A can hand a message through B to C
+    - Bottlnecks power though
+
+Block Service:
+- Specialized microservice who's job is just to listen for new blocks and create the next block
+- When it's our turn to create a block, we query the current block this service has built
+    - This query should return pending if the previous block on our chain isnt validated yet
+
+Peer Pub/Sub:
+- NewBlock
+    - When a peer hears about a new block, they pass it on
+    - If I haven't heard of this block before, I validate it and pass it on
+- NewTransaction
+    - When a peer learns someone has placed a new transaction, they pass it on
+    - I pass it to my block building microservice and also pass it on
+- ValidateBlock
+    - Same. Clear pattern here
+- NewPeer
+
+TODO Design:
+
+- Need to keep track of every design decision in a unified format/location
+
+Validator Rewards
+- Issue: Validators hoard transactions so they can maximize MEV
+- Solution: Validator rewards aren't based on the block we create
+    - They're psuedo randomly based on a previous block
+    - If it's sufficiently random, you would want the distribution of all blocks to be even
+    - Issue: See Stupid Validator
+
+Stupid Validator Protection
+- Issue: Someone sets up a validator node who all they do is vote yes on everything and make blocks with no transactions
+    - If their MEV isn't based on their block, and most validators aren't malicious,
+      this is the least effort for most reward for them
+- Solution A: Aggregate knowledge
+    - Some way to put stuff into the blocks and only verify it during reconciliation, huge penalty if you get it wrong, only way to get it right is to actually have been doing all the math the whole time
+    - Could be ZK but I think its simple enough to encrypt something, put it on the chain, then at reconciliation you provide the peer key and everyone can decrypt what your already solidified vote was
+- Solution B: Statistical checks
+    - If you have too many transactions or too few transactions compated to other blocks, it's a penalty

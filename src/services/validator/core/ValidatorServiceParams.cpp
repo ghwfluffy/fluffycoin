@@ -94,8 +94,11 @@ svc::IAuthenticator *ValidatorServiceParams::getAuthenticator()
     return nullptr;
 }
 
-bool ValidatorServiceParams::preInit()
+bool ValidatorServiceParams::preInit(bool paused)
 {
+    if (paused)
+        return true;
+
     // Read in wallet data
     std::string walletContents;
     if (!FileTools::read(walletFile, walletContents))
@@ -134,7 +137,7 @@ bool ValidatorServiceParams::preInit()
 }
 
 #if 0
-bool ValidatorServiceParams::init()
+bool ValidatorServiceParams::init(bool paused)
 {
     // TODO
     return false;

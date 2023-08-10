@@ -119,11 +119,11 @@ bool Service::init()
         // Setup service dependencies
         (bSceneSetup || (bSceneSetup = setupScene())) &&
         // Service-specific pre-initialization
-        (bPreInit || (bPreInit = params->preInit())) &&
+        (bPreInit || (bPreInit = params->preInit(paused))) &&
         // Setup ports and threads
         (bInit || (bInit = startService())) &&
         // Service-specific post-initialization
-        (bPostInit || (bPostInit = params->init()));
+        (bPostInit || (bPostInit = params->init(paused)));
 }
 
 void Service::cleanup()

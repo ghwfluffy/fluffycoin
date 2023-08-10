@@ -1,18 +1,76 @@
+Known Quantities
+    Curator
+    [ ] LoadFromFs
+    Database
+    [ ] ozo dependency
+    [ ] Database
+    [ ] Work Sessions
+
+Curator Rabbit Holes
+    Algorithms
+    [ ] Serialize snapshots
+    [ ] Rewind blocks
+    Subscriptions
+    [ ] Validator::NewBlock
+    API
+    [ ] GetNextBlock
+    Events
+    [ ] ValidatorLeaving
+    [ ] ValidatorLeft
+
+
+Questions:
+    - How does validator know when its initialized (has all the blocks)
+    - How do microservices request the p2p service to request stuff from the peers
+        - Internal API port
+        - OR The p2p service should have this logic (pull threads), to keep all other services simple
+
+High level tasks:
+    - Find and connect to peers
+    - Validate a transaction/block
+        - Summize how much coins is associated with an address
+    - Vote on who the next validator is
+
+
+
+
+fluffycoin-whois
+    API
+    [ ] LookupAddress: Get latest info related to an address
+    [ ] GetNextPeer: 
+    [ ] PeerUpdate
+    Events
+    [ ] NewBlock
+
+fluffycoin-builder
+    API
+    [ ] GetNextBlock
+    Events
+    [ ] NewTransaction
+    [ ] NewBlock
+
+fluffycoin-sync
+    API
+    [ ] TODO
+
+database module
+    [ ] Finalize Schema
+    [ ] Database creation
+    [ ] Work sessions
+    [ ] Async query wrapper
+
 P2P service
-    [x] Fix cmake include namespaces
+    Event Loops
+    [ ] Find Peers
+    [ ] Collect Missing Blocks
     API
     [\] Handshake
-        [x] Define nonce length constant
-        [x] BruteForce
-        [x] PeerAuth::createMessageAuthKey
-        [x] StakeKey
-        [x] PeerSessions
         [\] ValidatorLookup
             [ ] ValidatorInfo
         [ ] Authenticator
-        [x] Protocol Versioning
         [ ] Client Handshake
     [ ] GetBlock
+    [ ] Get info on latest block
     [ ] VoteValidator
     [ ] VoteProtocolChange
     [ ] GetPeers

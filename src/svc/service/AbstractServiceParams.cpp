@@ -60,13 +60,15 @@ IAuthenticator *AbstractServiceParams::getAuthenticator()
     return nullptr;
 }
 
-bool AbstractServiceParams::preInit()
+bool AbstractServiceParams::preInit(bool paused)
 {
+    (void)paused;
     return true;
 }
 
-bool AbstractServiceParams::init()
+bool AbstractServiceParams::init(bool paused)
 {
+    (void)paused;
     return true;
 }
 

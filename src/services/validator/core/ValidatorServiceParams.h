@@ -47,9 +47,9 @@ class ValidatorServiceParams : public svc::AbstractServiceParams
 
         svc::IAuthenticator *getAuthenticator() final;
 
-        bool preInit() final;
+        bool preInit(bool paused) final;
 #if 0
-        bool init() final;
+        bool init(bool paused) final;
 
         void cleanup() final;
         void postCleanup() final;

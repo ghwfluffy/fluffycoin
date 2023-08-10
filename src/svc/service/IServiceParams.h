@@ -40,8 +40,8 @@ class IServiceParams
 
         virtual IAuthenticator *getAuthenticator() = 0;
 
-        virtual bool preInit() = 0;
-        virtual bool init() = 0;
+        virtual bool preInit(bool paused) = 0;
+        virtual bool init(bool paused) = 0;
 
         virtual void cleanup() = 0;
         virtual void postCleanup() = 0;
