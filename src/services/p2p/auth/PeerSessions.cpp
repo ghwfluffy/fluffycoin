@@ -1,7 +1,7 @@
-#include <fluffycoin/validator/PeerSessions.h>
+#include <fluffycoin/p2p/PeerSessions.h>
 
 using namespace fluffycoin;
-using namespace fluffycoin::validator;
+using namespace fluffycoin::p2p;
 
 namespace
 {

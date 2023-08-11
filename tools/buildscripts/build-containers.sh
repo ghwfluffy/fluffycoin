@@ -40,21 +40,26 @@ source "${TOP_DIR}/.env"
 export DOCKER_BUILDKIT=1
 export WORKDIR="${TOP_DIR}"
 
-docker build \
-    ${CACHE} \
-    "${TOP_DIR}" \
-    -f "${DOCKER_DIR}/validator/Dockerfile" \
-    -t "fcvalidator:${FLUFFYCOIN_TAG}"
+# Validator node containers
+for container in p2p curator; do
+    docker build \
+        ${CACHE} \
+        "${TOP_DIR}" \
+        -f "${DOCKER_DIR}/validator/${container}/Dockerfile" \
+        -t "fluffyco.in/${container}:${FLUFFYCOIN_TAG}"
+done
 
+# CLI runtime
 docker build \
     ${CACHE} \
     "${TOP_DIR}" \
     -f "${DOCKER_DIR}/cli/Dockerfile" \
-    -t "fccli:${FLUFFYCOIN_TAG}"
+    -t "fluffyco.in/cli:${FLUFFYCOIN_TAG}"
 
+# Unit tests
 docker build \
     ${CACHE} \
     "${TOP_DIR}" \
     -f "${DOCKER_DIR}/unit-tests/Dockerfile" \
     --build-arg="FLUFFYCOIN_TAG=${FLUFFYCOIN_TAG}" \
-    -t "fcunit-tests:${FLUFFYCOIN_TAG}"
+    -t "fluffyco.in/unit-tests:${FLUFFYCOIN_TAG}"

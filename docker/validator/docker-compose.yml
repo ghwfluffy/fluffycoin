@@ -1,0 +1,51 @@
+version: '3.8'
+
+x-env: &environment
+  environment:
+    - FLUFFYCOIN_TAG=${FLUFFYCOIN_TAG}
+    - FLUFFYCOIN_RESOURCE_DIR=${FLUFFYCOIN_RESOURCE_DIR}
+    - PGUSER=fluffy
+    - POSTGRES_PASSWORD=fluffy
+    - PGPORT=5432
+    - PGDATA=${FLUFFYCOIN_RESOURCE_DIR}/db
+
+x-mounted-fs: &mounted-fs
+  volumes:
+    - ${FLUFFYCOIN_RESOURCE_DIR}:${FLUFFYCOIN_RESOURCE_DIR}:rw
+    - /etc/passwd:/etc/passwd:ro
+    - /etc/group:/etc/group:ro
+
+x-network: &network
+  networks:
+    - fluffynet
+
+networks:
+  fluffynet:
+    driver: bridge
+
+services:
+  fluffycoin:
+    image: k8s.gcr.io/pause:3.2
+    <<: [*network]
+    command: "/pause"
+
+  postgres:
+    image: postgres:15-alpine3.18
+    <<: [*network, *environment]
+    volumes:
+      - ${FLUFFYCOIN_RESOURCE_DIR}/db:${FLUFFYCOIN_RESOURCE_DIR}/db:rw
+    expose:
+      - "1337" # API Port
+
+  p2p:
+    image: fluffyco.in/p2p:${FLUFFYCOIN_TAG}
+    <<: [*network, *environment, *mounted-fs]
+    ports:
+      - "4643:4643" # API Port
+      - "4663:4663" # Event Port
+
+  curator:
+    image: fluffyco.in/curator:${FLUFFYCOIN_TAG}
+    <<: [*network, *environment, *mounted-fs]
+    expose:
+      - "1337" # API Port

@@ -1,7 +1,7 @@
-project(fluffycoin-validator)
+project(fluffycoin-p2p)
 
 fluffyservice(
-    validator
+    p2p
     PRIVATE
         fluffycoin-log
         fluffycoin-utils

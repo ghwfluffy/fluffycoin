@@ -1,31 +1,31 @@
-#include <fluffycoin/validator/ValidatorServiceParams.h>
+#include <fluffycoin/p2p/P2pServiceParams.h>
 
-#include <fluffycoin/validator/api/server/Handshake.h>
+#include <fluffycoin/p2p/api/server/Handshake.h>
 
 #include <fluffycoin/alg/Wallet.h>
 
 #include <fluffycoin/utils/FileTools.h>
 
 using namespace fluffycoin;
-using namespace fluffycoin::validator;
+using namespace fluffycoin::p2p;
 
-ValidatorServiceParams::ValidatorServiceParams()
+P2pServiceParams::P2pServiceParams()
 {
     walletFile = "~/.fluffycoin/wallet.json";
 }
 
-std::string ValidatorServiceParams::getLogFile() const
+std::string P2pServiceParams::getLogFile() const
 {
-    return "/var/log/fluffycoin/validator.log";
+    return "/var/log/fluffycoin/p2p.log";
 }
 
-void ValidatorServiceParams::setupScene(svc::ServiceScene &ctx)
+void P2pServiceParams::setupScene(svc::ServiceScene &ctx)
 {
     ctx.set(stakeKey);
     ctx.set(bruteForce);
 }
 
-void ValidatorServiceParams::initCmdLineParams(ArgParser &args) const
+void P2pServiceParams::initCmdLineParams(ArgParser &args) const
 {
     args.addParam('w', "wallet", "Wallet containing stake key");
     args.addParam('p', "wallet-password", "Wallet password\n"
@@ -34,7 +34,7 @@ void ValidatorServiceParams::initCmdLineParams(ArgParser &args) const
                                         "Default: Newest key in wallet");
 }
 
-void ValidatorServiceParams::setCmdLineArgs(const Args &args)
+void P2pServiceParams::setCmdLineArgs(const Args &args)
 {
     if (args.hasArg("wallet"))
         walletFile = args.getArg("wallet");
@@ -58,22 +58,22 @@ void ValidatorServiceParams::setCmdLineArgs(const Args &args)
     }   
 }
 
-uint16_t ValidatorServiceParams::getApiPort() const
+uint16_t P2pServiceParams::getApiPort() const
 {
     return API_PORT;
 }
 
-uint16_t ValidatorServiceParams::getEventPort() const
+uint16_t P2pServiceParams::getEventPort() const
 {
     return EVENT_PORT;
 }
 
-const BinData &ValidatorServiceParams::getServerKey() const
+const BinData &P2pServiceParams::getServerKey() const
 {
     return stakeKey.getPriv();
 }
 
-void ValidatorServiceParams::addApiHandlers(svc::ApiHandlerMap &handlers, bool paused) const
+void P2pServiceParams::addApiHandlers(svc::ApiHandlerMap &handlers, bool paused) const
 {
     if (paused)
         return;
@@ -82,19 +82,19 @@ void ValidatorServiceParams::addApiHandlers(svc::ApiHandlerMap &handlers, bool p
 }
 
 #if 0
-void ValidatorServiceParams::addEventSubscriptions(svc::EventSubscriptionMap &handlers) const
+void P2pServiceParams::addEventSubscriptions(svc::EventSubscriptionMap &handlers) const
 {
     // TODO
 }
 #endif
 
-svc::IAuthenticator *ValidatorServiceParams::getAuthenticator()
+svc::IAuthenticator *P2pServiceParams::getAuthenticator()
 {
     // TODO
     return nullptr;
 }
 
-bool ValidatorServiceParams::preInit(bool paused)
+bool P2pServiceParams::preInit(bool paused)
 {
     if (paused)
         return true;
@@ -137,18 +137,18 @@ bool ValidatorServiceParams::preInit(bool paused)
 }
 
 #if 0
-bool ValidatorServiceParams::init(bool paused)
+bool P2pServiceParams::init(bool paused)
 {
     // TODO
     return false;
 }
 
-void ValidatorServiceParams::cleanup()
+void P2pServiceParams::cleanup()
 {
     // TODO
 }
 
-void ValidatorServiceParams::postCleanup()
+void P2pServiceParams::postCleanup()
 {
     // TODO
 }

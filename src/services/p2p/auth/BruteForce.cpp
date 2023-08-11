@@ -1,7 +1,7 @@
-#include <fluffycoin/validator/BruteForce.h>
+#include <fluffycoin/p2p/BruteForce.h>
 
 using namespace fluffycoin;
-using namespace fluffycoin::validator;
+using namespace fluffycoin::p2p;
 
 namespace
 {

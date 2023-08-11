@@ -60,6 +60,6 @@ docker run \
     -v /proc/cpuinfo:/proc/cpuinfo:ro \
     -u $(id -u):$(id -g) \
     --entrypoint "${ENTRYPOINT}" \
-    "fcunit-tests:${FLUFFYCOIN_TAG}" \
+    "fluffyco.in/unit-tests:${FLUFFYCOIN_TAG}" \
     "${ARGS[@]}" \
     ${FILTER}

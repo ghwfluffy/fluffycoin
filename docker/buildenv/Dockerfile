@@ -35,5 +35,6 @@ RUN set -eux; \
         fmt-dev \
         nlohmann-json \
         openssl-dev \
+        postgresql15-dev \
         ; \
     true

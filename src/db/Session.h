@@ -23,17 +23,17 @@ class Session
         Session(const Session &) = default;
         Session &operator=(Session &&) = default;
         Session &operator=(const Session &) = default;
-        ~Session();
+        ~Session() = default;
 
         void query(
             std::string query,
             Details &details,
-            async::func<void(Result result, Details &details)> callback);
+            async::func<void(Result, Details &)> callback);
 
         void select(
             std::string query,
             Details &details,
-            async::func<void(DataResult result, Details &details)> callback);
+            async::func<void(DataResult, Details &)> callback);
 };
 
 }

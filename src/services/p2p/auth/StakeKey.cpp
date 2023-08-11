@@ -1,9 +1,9 @@
-#include <fluffycoin/validator/StakeKey.h>
+#include <fluffycoin/p2p/StakeKey.h>
 
 #include <fluffycoin/ossl/Curve25519.h>
 
 using namespace fluffycoin;
-using namespace fluffycoin::validator;
+using namespace fluffycoin::p2p;
 
 const BinData &StakeKey::getPub() const
 {

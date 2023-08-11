@@ -7,7 +7,7 @@
 #include <string>
 #include <chrono>
 
-namespace fluffycoin::validator
+namespace fluffycoin::p2p
 {
 
 /**

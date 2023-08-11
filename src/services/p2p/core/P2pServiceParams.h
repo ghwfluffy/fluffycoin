@@ -2,27 +2,27 @@
 
 #include <fluffycoin/svc/AbstractServiceParams.h>
 
-#include <fluffycoin/validator/BruteForce.h>
-#include <fluffycoin/validator/StakeKey.h>
+#include <fluffycoin/p2p/BruteForce.h>
+#include <fluffycoin/p2p/StakeKey.h>
 
 namespace fluffycoin
 {
 
-namespace validator
+namespace p2p
 {
 
 /**
- * Setup the validator service
+ * Setup the p2p service
  */
-class ValidatorServiceParams : public svc::AbstractServiceParams
+class P2pServiceParams : public svc::AbstractServiceParams
 {
     public:
-        ValidatorServiceParams();
-        ValidatorServiceParams(ValidatorServiceParams &&) = delete;
-        ValidatorServiceParams(const ValidatorServiceParams &) = delete;
-        ValidatorServiceParams &operator=(ValidatorServiceParams &&) = delete;
-        ValidatorServiceParams &operator=(const ValidatorServiceParams &) = delete;
-        ~ValidatorServiceParams() final = default;
+        P2pServiceParams();
+        P2pServiceParams(P2pServiceParams &&) = delete;
+        P2pServiceParams(const P2pServiceParams &) = delete;
+        P2pServiceParams &operator=(P2pServiceParams &&) = delete;
+        P2pServiceParams &operator=(const P2pServiceParams &) = delete;
+        ~P2pServiceParams() final = default;
 
         static constexpr const uint16_t API_PORT = 0x4643;
         static constexpr const uint16_t EVENT_PORT = 0x4663;

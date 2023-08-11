@@ -5,7 +5,7 @@
 
 #include <fcpb/p2p/v1/auth/AuthenticateSession.pb.h>
 
-namespace fluffycoin::validator::api::server
+namespace fluffycoin::p2p::api::server
 {
 
 /**

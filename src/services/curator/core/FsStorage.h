@@ -21,7 +21,7 @@ class FsStorage
         ~FsStorage() = default;
 
         void setDirectory(
-            const std::string &dir);
+            const std::string &dir) {this->dir = dir;} // TODO
 
         BinData readBlock(
             uint64_t reconciliation,

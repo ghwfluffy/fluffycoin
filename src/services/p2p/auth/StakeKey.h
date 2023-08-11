@@ -4,11 +4,11 @@
 
 #include <fluffycoin/utils/SafeData.h>
 
-namespace fluffycoin::validator
+namespace fluffycoin::p2p
 {
 
 /**
- * The key associated with the stake address of this validator node
+ * The key associated with the stake address of this p2p node
  */
 class StakeKey
 {

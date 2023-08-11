@@ -6,4 +6,6 @@ fluffylib(
         fluffycoin-log
         fluffycoin-utils
         fluffycoin-async
+        pq
+        ozo
 )

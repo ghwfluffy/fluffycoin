@@ -53,7 +53,7 @@ source "${TOP_DIR}/.env"
     docker build \
         ${CACHE} \
         "${DOCKER_DIR}" \
-        -t "fcbuildenv:${FLUFFYCOIN_TAG}"
+        -t "fluffyco.in/buildenv:${FLUFFYCOIN_TAG}"
 )
 
 # Run docker
@@ -64,5 +64,5 @@ docker run \
     -v /proc/cpuinfo:/proc/cpuinfo:ro \
     -u $(id -u):$(id -g) \
     --entrypoint "${ENTRYPOINT}" \
-    "fcbuildenv:${FLUFFYCOIN_TAG}" \
+    "fluffyco.in/buildenv:${FLUFFYCOIN_TAG}" \
     "${@}"

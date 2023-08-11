@@ -37,7 +37,7 @@ build-containers: ## Build the runtime containers
 .PHONY: runcli-docker
 runcli-docker: ## Drop into the CLI docker
 	@mkdir -p ~/.fluffycoin
-	docker run -ti -u $(shell id -u):$(shell id -g) -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v $(HOME)/.fluffycoin:$(HOME)/.fluffycoin fccli:0.0.x
+	docker run -ti -u $(shell id -u):$(shell id -g) -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v $(HOME)/.fluffycoin:$(HOME)/.fluffycoin fluffyco.in/cli:0.0.x
 
 # Show help menu
 .PHONY: help

@@ -1,4 +1,4 @@
 project(fluffycoin-services)
 
-add_subdirectory(validator)
+add_subdirectory(p2p)
 add_subdirectory(curator)

@@ -1,7 +1,7 @@
-#include <fluffycoin/validator/ValidatorLookup.h>
+#include <fluffycoin/p2p/ValidatorLookup.h>
 
 using namespace fluffycoin;
-using namespace fluffycoin::validator;
+using namespace fluffycoin::p2p;
 
 const BinData &ValidatorInfo::getPubKey() const
 {
@@ -22,6 +22,6 @@ ValidatorInfo ValidatorLookup::getValidator(
 {
     // TODO
     (void)address;
-    details.setError(log::Auth, ErrorCode::InternalError, "validator_lookup", "Not implemented");
+    details.setError(log::Auth, ErrorCode::InternalError, "p2p_lookup", "Not implemented");
     return ValidatorInfo();
 }

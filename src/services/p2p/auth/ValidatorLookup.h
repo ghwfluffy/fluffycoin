@@ -3,7 +3,7 @@
 #include <fluffycoin/utils/BinData.h>
 #include <fluffycoin/utils/Details.h>
 
-namespace fluffycoin::validator
+namespace fluffycoin::p2p
 {
 
 // TODO: This comes from the peer info microservice

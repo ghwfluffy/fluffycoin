@@ -1,9 +1,9 @@
-#include <fluffycoin/validator/api/server/Handshake.h>
+#include <fluffycoin/p2p/api/server/Handshake.h>
 
-#include <fluffycoin/validator/StakeKey.h>
-#include <fluffycoin/validator/BruteForce.h>
-#include <fluffycoin/validator/PeerSessions.h>
-#include <fluffycoin/validator/ValidatorLookup.h>
+#include <fluffycoin/p2p/StakeKey.h>
+#include <fluffycoin/p2p/BruteForce.h>
+#include <fluffycoin/p2p/PeerSessions.h>
+#include <fluffycoin/p2p/ValidatorLookup.h>
 
 #include <fluffycoin/svc/Log.h>
 
@@ -13,9 +13,9 @@
 #include <fluffycoin/ossl/Prng.h>
 
 using namespace fluffycoin;
-using namespace fluffycoin::validator;
-using namespace fluffycoin::validator::api;
-using namespace fluffycoin::validator::api::server;
+using namespace fluffycoin::p2p;
+using namespace fluffycoin::p2p::api;
+using namespace fluffycoin::p2p::api::server;
 
 void Handshake::process(
         svc::RequestScene &scene,
@@ -60,12 +60,12 @@ void Handshake::process(
         return;
     }
 
-    // Lookup validator info of client
+    // Lookup p2p info of client
     ValidatorInfo info = scene.utils().get<ValidatorLookup>().getValidator(clientAddress, scene.details());
     if (!scene.details().isOk())
         return;
 
-    // This validator has coins staked?
+    // This p2p has coins staked?
     if (!info.isActive())
     {
         scene.setError(log::Auth, ErrorCode::NotAuthorized, "auth_address",
@@ -93,7 +93,7 @@ void Handshake::process(
     std::string sessionId = alg::PeerAuth::createSessionId(clientNonce, serverNonce);
 
     // Log
-    scene.log().traffic(log::Auth, "Started authentication session '{}' with validator '{}'.",
+    scene.log().traffic(log::Auth, "Started authentication session '{}' with peer '{}'.",
         sessionId, clientAddress);
 
     // Save the session info to verify later requests

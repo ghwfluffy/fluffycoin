@@ -7,7 +7,7 @@
 #include <chrono>
 #include <string>
 
-namespace fluffycoin::validator
+namespace fluffycoin::p2p
 {
 
 struct PeerSession
