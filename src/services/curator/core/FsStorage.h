@@ -3,6 +3,7 @@
 #include <fluffycoin/utils/BinData.h>
 
 #include <string>
+#include <stdint.h>
 
 namespace fluffycoin::curator
 {

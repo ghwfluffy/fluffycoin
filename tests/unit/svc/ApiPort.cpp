@@ -60,7 +60,7 @@ TEST(ApiPort, HandleApiCall)
     auto myHandler = [&handled, &mtx, &cond](
         svc::RequestScene &scene,
         fcpb::test::SimpleMessage &msg,
-        svc::ApiResponseCallback callback) mutable -> void
+        svc::ApiResponseCallback callback) mutable -> boost::asio::awaitable<void>
     {
         EXPECT_EQ(msg.int_value(), 123);
         EXPECT_EQ(msg.string_value(), "Ghw");
@@ -71,6 +71,7 @@ TEST(ApiPort, HandleApiCall)
 
         std::lock_guard<std::mutex> lock(mtx);
         cond.notify_one();
+        co_return;
     };
     ctx.apiMap.add<fcpb::test::SimpleMessage>(myHandler);
 

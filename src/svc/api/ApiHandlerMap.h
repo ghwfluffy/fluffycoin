@@ -5,6 +5,8 @@
 
 #include <fluffycoin/pb/Catalog.h>
 
+#include <boost/asio/awaitable.hpp>
+
 #include <google/protobuf/message.h>
 
 #include <functional>
@@ -20,22 +22,23 @@ namespace fluffycoin::svc
 class ApiHandlerMap
 {
     public:
-        using Handler = std::function<void(
+        using Handler = std::function<boost::asio::awaitable<void>(
             svc::RequestScene &,
             svc::ApiResponseCallback)>;
 
         const Handler *get(size_t reqType) const;
 
         template<typename Request>
-        void add(std::function<void(svc::RequestScene &, Request &, svc::ApiResponseCallback)> reqHandler)
+        void add(std::function<boost::asio::awaitable<void>
+                 (svc::RequestScene &, Request &, svc::ApiResponseCallback)> reqHandler)
         {
             pb::Catalog::registerMsg<Request>();
             add(
                 typeid(Request).hash_code(),
                 [reqHandler]
-                (svc::RequestScene &scene, svc::ApiResponseCallback apiCallback) -> void
+                (svc::RequestScene &scene, svc::ApiResponseCallback apiCallback) -> boost::asio::awaitable<void>
                 {
-                    reqHandler(scene, scene.req<Request>(), std::move(apiCallback));
+                    co_await reqHandler(scene, scene.req<Request>(), std::move(apiCallback));
                 });
         }
 

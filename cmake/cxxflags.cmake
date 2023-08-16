@@ -60,7 +60,8 @@ string(APPEND
     " -Wstrict-aliasing=2"
     " -Wstrict-null-sentinel"
     " -Wstrict-overflow=5"
-    " -Wswitch-default"
+    # https://gcc.gnu.org/bugzilla//show_bug.cgi?id=109867
+    #" -Wswitch-default"
     " -Wswitch-enum"
     " -Wundef"
     " -Wunreachable-code"

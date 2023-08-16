@@ -5,6 +5,8 @@
 
 #include <fcpb/p2p/v1/auth/AuthenticateSession.pb.h>
 
+#include <boost/asio/awaitable.hpp>
+
 namespace fluffycoin::p2p::api::server
 {
 
@@ -13,7 +15,7 @@ namespace fluffycoin::p2p::api::server
  */
 namespace Handshake
 {
-    void process(
+    boost::asio::awaitable<void> process(
         svc::RequestScene &scene,
         fcpb::p2p::v1::auth::AuthenticateSession &handshake,
         svc::ApiResponseCallback callback);

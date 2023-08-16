@@ -17,7 +17,7 @@ using namespace fluffycoin::p2p;
 using namespace fluffycoin::p2p::api;
 using namespace fluffycoin::p2p::api::server;
 
-void Handshake::process(
+boost::asio::awaitable<void> Handshake::process(
         svc::RequestScene &scene,
         fcpb::p2p::v1::auth::AuthenticateSession &handshake,
         svc::ApiResponseCallback callback)
@@ -32,7 +32,7 @@ void Handshake::process(
         scene.setError(log::Auth, ErrorCode::Blocked, "brute_force",
             "Refusing address '{}' due to brute force check.",
             clientAddress);
-        return;
+        co_return;
     }
 
     // Sane validate supported protocol version
@@ -42,7 +42,7 @@ void Handshake::process(
         scene.setError(svc::Log::Api, ErrorCode::ArgumentInvalid, "version",
             "Invalid protocol version {}.", version);
         bforce.addOffense(clientAddress);
-        return;
+        co_return;
     }
     // Log if peers are using a newer protocol version
     else if (static_cast<unsigned int>(version) > alg::P2pProtocol::VERSION)
@@ -57,13 +57,13 @@ void Handshake::process(
         scene.setError(log::Auth, ErrorCode::ArgumentInvalid, "client_session_id",
             "Invalid client session ID length.");
         bforce.addOffense(clientAddress);
-        return;
+        co_return;
     }
 
     // Lookup p2p info of client
     ValidatorInfo info = scene.utils().get<ValidatorLookup>().getValidator(clientAddress, scene.details());
     if (!scene.details().isOk())
-        return;
+        co_return;
 
     // This p2p has coins staked?
     if (!info.isActive())
@@ -71,7 +71,7 @@ void Handshake::process(
         scene.setError(log::Auth, ErrorCode::NotAuthorized, "auth_address",
             "Validator '{}' is not currently active.", clientAddress);
         bforce.addOffense(clientAddress);
-        return;
+        co_return;
     }
 
     // Generate a server nonce
@@ -86,7 +86,7 @@ void Handshake::process(
     {
         scene.setError(log::Auth, ErrorCode::InternalError, "derive",
             "Failed to derive message authentication key.");
-        return;
+        co_return;
     }
 
     // Combine nonces to make session identifier
@@ -109,4 +109,6 @@ void Handshake::process(
     rsp->set_version(static_cast<int>(alg::P2pProtocol::VERSION));
     rsp->set_server_session_id(serverNonce.data(), serverNonce.length());
     callback(std::move(rsp));
+
+    co_return;
 }

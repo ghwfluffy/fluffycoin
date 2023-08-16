@@ -14,6 +14,10 @@ add_custom_command(
     COMMAND
         ./b2 headers
     COMMAND
+        ./b2 --with-coroutine
+    COMMAND
+        cp -P ${BOOST_DIR}/stage/lib/libboost*.so* ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    COMMAND
         touch ${BOOST_EMPTY}
     COMMENT
         "Building boost ${BOOST_VERSION}"

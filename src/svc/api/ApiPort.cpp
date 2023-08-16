@@ -9,6 +9,10 @@
 #include <fcpb/comm/Request.pb.h>
 #include <fcpb/comm/Response.pb.h>
 
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/io_context.hpp>
+
 using namespace fluffycoin;
 using namespace fluffycoin::svc;
 
@@ -147,24 +151,28 @@ void ApiPort::handleRequest(
     // Save memory
     ctx.trove.add(std::move(pscene));
 
-    // Handle request
-    (*handler)(scene, ApiResponseCallback(
-        // Programmer will call this when processing is complete
-        [this, client, &scene](std::unique_ptr<google::protobuf::Message> msg) -> void
-        {
-            handleResponse(scene, client, std::move(msg));
-        },
-        // If this gets triggered, programmer fked up and some code path leads to a dead end
-        [this, client, &scene]() -> void
-        {
-            if (!scene.isOk())
+    // Handle request as coroutine
+    boost::asio::co_spawn(
+        ctx.asio,
+        (*handler)(scene, ApiResponseCallback(
+            // Programmer will call this when processing is complete
+            [this, client, &scene](std::unique_ptr<google::protobuf::Message> msg) -> void
             {
-                scene.setError(
-                    ErrorCode::InternalError, "no_response",
-                    "Request handling ended prematurely.");
-            }
-            handleResponse(scene, client, std::unique_ptr<google::protobuf::Message>());
-        }));
+                handleResponse(scene, client, std::move(msg));
+            },
+            // If this gets triggered, programmer fked up and some code path leads to a dead end
+            [this, client, &scene]() -> void
+            {
+                if (!scene.isOk())
+                {
+                    scene.setError(
+                        ErrorCode::InternalError, "no_response",
+                        "Request handling ended prematurely.");
+                }
+                handleResponse(scene, client, std::unique_ptr<google::protobuf::Message>());
+            })
+        ),
+        boost::asio::detached);
 }
 
 void ApiPort::handleResponse(

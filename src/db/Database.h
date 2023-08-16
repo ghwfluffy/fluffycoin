@@ -7,6 +7,9 @@
 namespace fluffycoin::db
 {
 
+/**
+ * Create connections to the database to run queries
+ */
 class Database
 {
     public:
@@ -18,6 +21,10 @@ class Database
         ~Database() = default;
 
         void newReadOnlySession(
+            Details &details,
+            async::func<void(Session, Details &)> callback);
+
+        void newSession(
             Details &details,
             async::func<void(Session, Details &)> callback);
 };
