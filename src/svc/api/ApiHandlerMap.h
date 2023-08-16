@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fluffycoin/svc/RequestScene.h>
-#include <fluffycoin/svc/ApiResponseCallback.h>
 
 #include <fluffycoin/pb/Catalog.h>
 
@@ -22,23 +21,24 @@ namespace fluffycoin::svc
 class ApiHandlerMap
 {
     public:
-        using Handler = std::function<boost::asio::awaitable<void>(
-            svc::RequestScene &,
-            svc::ApiResponseCallback)>;
+        using AwaitResponse = boost::asio::awaitable<
+            std::unique_ptr<google::protobuf::Message>>;
+
+        using Handler = std::function<AwaitResponse(svc::RequestScene &)>;
 
         const Handler *get(size_t reqType) const;
 
         template<typename Request>
-        void add(std::function<boost::asio::awaitable<void>
-                 (svc::RequestScene &, Request &, svc::ApiResponseCallback)> reqHandler)
+        void add(std::function<AwaitResponse(svc::RequestScene &, Request &)> reqHandler)
         {
             pb::Catalog::registerMsg<Request>();
             add(
                 typeid(Request).hash_code(),
                 [reqHandler]
-                (svc::RequestScene &scene, svc::ApiResponseCallback apiCallback) -> boost::asio::awaitable<void>
+                (svc::RequestScene &scene) -> AwaitResponse
                 {
-                    co_await reqHandler(scene, scene.req<Request>(), std::move(apiCallback));
+                    auto rsp = co_await reqHandler(scene, scene.req<Request>());
+                    co_return rsp;
                 });
         }
 

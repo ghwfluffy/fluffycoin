@@ -7,6 +7,8 @@
 #include <fluffycoin/async/UncontrolledSocket.h>
 #include <fluffycoin/zmq/Server.h>
 
+#include <boost/asio/awaitable.hpp>
+
 #include <atomic>
 
 #include <stdint.h>
@@ -41,9 +43,9 @@ class ApiPort
         void read(
             Details &details);
 
-        void handleRequest(
-            const zmq::ClientId &client,
-            const BinData &msgData);
+        boost::asio::awaitable<void> handleRequest(
+            zmq::ClientId client,
+            BinData msgData);
 
         void handleResponse(
             RequestScene &scene,

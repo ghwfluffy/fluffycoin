@@ -59,19 +59,18 @@ TEST(ApiPort, HandleApiCall)
     std::atomic<bool> handled = false;
     auto myHandler = [&handled, &mtx, &cond](
         svc::RequestScene &scene,
-        fcpb::test::SimpleMessage &msg,
-        svc::ApiResponseCallback callback) mutable -> boost::asio::awaitable<void>
+        fcpb::test::SimpleMessage &msg) mutable ->
+            boost::asio::awaitable<std::unique_ptr<google::protobuf::Message>>
     {
         EXPECT_EQ(msg.int_value(), 123);
         EXPECT_EQ(msg.string_value(), "Ghw");
         EXPECT_TRUE(scene.isOk());
 
-        callback(std::unique_ptr<google::protobuf::Message>());
         handled = true;
 
         std::lock_guard<std::mutex> lock(mtx);
         cond.notify_one();
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
     };
     ctx.apiMap.add<fcpb::test::SimpleMessage>(myHandler);
 

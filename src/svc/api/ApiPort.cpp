@@ -78,15 +78,22 @@ void ApiPort::read(
 
     // Have a message, process it
     if (bHasMessage)
-        handleRequest(clientId, message);
+    {
+        boost::asio::co_spawn(
+            ctx.asio,
+            handleRequest(
+                std::move(clientId),
+                std::move(message)),
+            boost::asio::detached);
+    }
 
     // Queue next read
     socket.read(details, std::bind(&ApiPort::read, this, std::placeholders::_1));
 }
 
-void ApiPort::handleRequest(
-    const zmq::ClientId &client,
-    const BinData &msgData)
+boost::asio::awaitable<void> ApiPort::handleRequest(
+    zmq::ClientId clientId,
+    BinData msgData)
 {
     // Setup the request scene
     std::unique_ptr<RequestScene> pscene = std::make_unique<RequestScene>(ctx);
@@ -144,35 +151,18 @@ void ApiPort::handleRequest(
     // Do not process, respond error
     if (!scene.isOk())
     {
-        handleResponse(scene, client, std::unique_ptr<google::protobuf::Message>());
-        return;
+        handleResponse(scene, clientId, std::unique_ptr<google::protobuf::Message>());
+        co_return;
     }
 
     // Save memory
     ctx.trove.add(std::move(pscene));
 
-    // Handle request as coroutine
-    boost::asio::co_spawn(
-        ctx.asio,
-        (*handler)(scene, ApiResponseCallback(
-            // Programmer will call this when processing is complete
-            [this, client, &scene](std::unique_ptr<google::protobuf::Message> msg) -> void
-            {
-                handleResponse(scene, client, std::move(msg));
-            },
-            // If this gets triggered, programmer fked up and some code path leads to a dead end
-            [this, client, &scene]() -> void
-            {
-                if (!scene.isOk())
-                {
-                    scene.setError(
-                        ErrorCode::InternalError, "no_response",
-                        "Request handling ended prematurely.");
-                }
-                handleResponse(scene, client, std::unique_ptr<google::protobuf::Message>());
-            })
-        ),
-        boost::asio::detached);
+    // Handle request
+    std::unique_ptr<google::protobuf::Message> msg = co_await (*handler)(scene);
+
+    // Respond
+    handleResponse(scene, clientId, std::move(msg));
 }
 
 void ApiPort::handleResponse(

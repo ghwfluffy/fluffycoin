@@ -17,13 +17,10 @@ using namespace fluffycoin::p2p;
 using namespace fluffycoin::p2p::api;
 using namespace fluffycoin::p2p::api::server;
 
-boost::asio::awaitable<void> Handshake::process(
+boost::asio::awaitable<std::unique_ptr<google::protobuf::Message>> Handshake::process(
         svc::RequestScene &scene,
-        fcpb::p2p::v1::auth::AuthenticateSession &handshake,
-        svc::ApiResponseCallback callback)
+        fcpb::p2p::v1::auth::AuthenticateSession &handshake)
 {
-    (void)callback;
-
     // Check address against brute force map
     std::string clientAddress = handshake.auth_address();
     BruteForce &bforce = scene.utils().get<BruteForce>();
@@ -32,7 +29,7 @@ boost::asio::awaitable<void> Handshake::process(
         scene.setError(log::Auth, ErrorCode::Blocked, "brute_force",
             "Refusing address '{}' due to brute force check.",
             clientAddress);
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
     }
 
     // Sane validate supported protocol version
@@ -42,7 +39,7 @@ boost::asio::awaitable<void> Handshake::process(
         scene.setError(svc::Log::Api, ErrorCode::ArgumentInvalid, "version",
             "Invalid protocol version {}.", version);
         bforce.addOffense(clientAddress);
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
     }
     // Log if peers are using a newer protocol version
     else if (static_cast<unsigned int>(version) > alg::P2pProtocol::VERSION)
@@ -57,13 +54,13 @@ boost::asio::awaitable<void> Handshake::process(
         scene.setError(log::Auth, ErrorCode::ArgumentInvalid, "client_session_id",
             "Invalid client session ID length.");
         bforce.addOffense(clientAddress);
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
     }
 
     // Lookup p2p info of client
     ValidatorInfo info = scene.utils().get<ValidatorLookup>().getValidator(clientAddress, scene.details());
     if (!scene.details().isOk())
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
 
     // This p2p has coins staked?
     if (!info.isActive())
@@ -71,7 +68,7 @@ boost::asio::awaitable<void> Handshake::process(
         scene.setError(log::Auth, ErrorCode::NotAuthorized, "auth_address",
             "Validator '{}' is not currently active.", clientAddress);
         bforce.addOffense(clientAddress);
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
     }
 
     // Generate a server nonce
@@ -86,7 +83,7 @@ boost::asio::awaitable<void> Handshake::process(
     {
         scene.setError(log::Auth, ErrorCode::InternalError, "derive",
             "Failed to derive message authentication key.");
-        co_return;
+        co_return std::unique_ptr<google::protobuf::Message>();
     }
 
     // Combine nonces to make session identifier
@@ -108,7 +105,6 @@ boost::asio::awaitable<void> Handshake::process(
     auto rsp = std::make_unique<fcpb::p2p::v1::auth::AuthenticateSessionResponse>();
     rsp->set_version(static_cast<int>(alg::P2pProtocol::VERSION));
     rsp->set_server_session_id(serverNonce.data(), serverNonce.length());
-    callback(std::move(rsp));
 
-    co_return;
+    co_return rsp;
 }

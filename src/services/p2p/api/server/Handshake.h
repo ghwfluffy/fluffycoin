@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fluffycoin/svc/RequestScene.h>
-#include <fluffycoin/svc/ApiResponseCallback.h>
 
 #include <fcpb/p2p/v1/auth/AuthenticateSession.pb.h>
 
@@ -15,10 +14,9 @@ namespace fluffycoin::p2p::api::server
  */
 namespace Handshake
 {
-    boost::asio::awaitable<void> process(
+    boost::asio::awaitable<std::unique_ptr<google::protobuf::Message>> process(
         svc::RequestScene &scene,
-        fcpb::p2p::v1::auth::AuthenticateSession &handshake,
-        svc::ApiResponseCallback callback);
+        fcpb::p2p::v1::auth::AuthenticateSession &handshake);
 }
 
 }
