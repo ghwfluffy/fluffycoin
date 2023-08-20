@@ -47,6 +47,12 @@ target_include_directories(
         ${BOOST_DIR}
 )
 
+target_compile_options(
+    boost
+    PUBLIC
+        -DBOOST_HANA_CONFIG_ENABLE_STRING_UDL
+)
+
 add_dependencies(
     boost
     boost-build

@@ -17,7 +17,7 @@ using namespace fluffycoin::p2p;
 using namespace fluffycoin::p2p::api;
 using namespace fluffycoin::p2p::api::server;
 
-boost::asio::awaitable<std::unique_ptr<google::protobuf::Message>> Handshake::process(
+async::RetPtr<google::protobuf::Message> Handshake::process(
         svc::RequestScene &scene,
         fcpb::p2p::v1::auth::AuthenticateSession &handshake)
 {

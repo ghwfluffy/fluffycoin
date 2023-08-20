@@ -2,9 +2,9 @@
 
 #include <fluffycoin/svc/RequestScene.h>
 
-#include <fcpb/p2p/v1/auth/AuthenticateSession.pb.h>
+#include <fluffycoin/async/Ret.h>
 
-#include <boost/asio/awaitable.hpp>
+#include <fcpb/p2p/v1/auth/AuthenticateSession.pb.h>
 
 namespace fluffycoin::p2p::api::server
 {
@@ -14,7 +14,7 @@ namespace fluffycoin::p2p::api::server
  */
 namespace Handshake
 {
-    boost::asio::awaitable<std::unique_ptr<google::protobuf::Message>> process(
+   async::RetPtr<google::protobuf::Message> process(
         svc::RequestScene &scene,
         fcpb::p2p::v1::auth::AuthenticateSession &handshake);
 }

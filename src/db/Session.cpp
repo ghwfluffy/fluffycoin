@@ -1,26 +1,49 @@
 #include <fluffycoin/db/Session.h>
+#include <fluffycoin/db/priv/SessionImpl.h>
 
 using namespace fluffycoin;
 using namespace fluffycoin::db;
 
-void Session::query(
-    std::string query,
-    Details &details,
-    async::func<void(Result, Details &)> callback)
+Session::Session()
 {
-    (void)query;
-    (void)details;
-    (void)callback;
-    // TODO
 }
 
-void Session::select(
+Session::Session(std::unique_ptr<priv::SessionImpl> impl)
+        : impl(std::move(impl))
+{
+}
+
+Session::Session(Session &&rhs)
+        : impl(std::move(rhs.impl))
+{
+}
+
+Session &Session::operator=(Session &&rhs)
+{
+    if (this != &rhs)
+        impl = std::move(rhs.impl);
+
+    return (*this);
+}
+
+Session::~Session()
+{
+}
+
+async::Ret<Result> Session::query(
     std::string query,
-    Details &details,
-    async::func<void(DataResult, Details &)> callback)
+    Details &details)
 {
     (void)query;
     (void)details;
-    (void)callback;
-    // TODO
+    co_return Result();
+}
+
+async::Ret<DataResult> Session::select(
+    std::string query,
+    Details &details)
+{
+    (void)query;
+    (void)details;
+    co_return DataResult();
 }

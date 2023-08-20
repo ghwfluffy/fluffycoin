@@ -3,14 +3,19 @@
 #include <fluffycoin/db/Result.h>
 #include <fluffycoin/db/DataResult.h>
 
-#include <fluffycoin/async/func.h>
+#include <fluffycoin/async/Ret.h>
 
 #include <fluffycoin/utils/Details.h>
 
 #include <string>
+#include <memory>
 
 namespace fluffycoin::db
 {
+
+namespace priv {
+struct SessionImpl;
+}
 
 /**
  * Database connection potentially tied to a transaction
@@ -18,22 +23,24 @@ namespace fluffycoin::db
 class Session
 {
     public:
-        Session() = default;
-        Session(Session &&) = default;
-        Session(const Session &) = default;
-        Session &operator=(Session &&) = default;
-        Session &operator=(const Session &) = default;
-        ~Session() = default;
+        Session();
+        Session(std::unique_ptr<priv::SessionImpl> impl);
+        Session(Session &&);
+        Session(const Session &) = delete;
+        Session &operator=(Session &&);
+        Session &operator=(const Session &) = delete;
+        ~Session();
 
-        void query(
+        async::Ret<Result> query(
             std::string query,
-            Details &details,
-            async::func<void(Result, Details &)> callback);
+            Details &details);
 
-        void select(
+        async::Ret<DataResult> select(
             std::string query,
-            Details &details,
-            async::func<void(DataResult, Details &)> callback);
+            Details &details);
+
+    private:
+        std::unique_ptr<priv::SessionImpl> impl;
 };
 
 }

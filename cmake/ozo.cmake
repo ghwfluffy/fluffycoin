@@ -3,6 +3,7 @@ set(OZO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/ozo)
 set(OZO_EMPTY ${CMAKE_CURRENT_BINARY_DIR}/blank-ozo.c)
 set(OZO_INC ${OZO_DIR}/include)
 set(YAMAIL_INC ${OZO_DIR}/contrib/resource_pool/include)
+set(POSTGRES_INC /usr/include/postgresql)
 
 add_custom_command(
     OUTPUT
@@ -36,6 +37,14 @@ target_include_directories(
     PUBLIC
         ${OZO_INC}
         ${YAMAIL_INC}
+        ${POSTGRES_INC}
+)
+
+target_link_libraries(
+    ozo
+    PUBLIC
+        boost
+        pq
 )
 
 add_dependencies(

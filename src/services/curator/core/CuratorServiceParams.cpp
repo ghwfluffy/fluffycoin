@@ -3,6 +3,10 @@
 
 #include <fluffycoin/utils/FileTools.h>
 
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/io_context.hpp>
+
 using namespace fluffycoin;
 using namespace fluffycoin::curator;
 
@@ -81,7 +85,7 @@ bool CuratorServiceParams::init(bool paused)
 
     fs.setDirectory(fsStorageDir);
 
-    LoadFromFs::init(*pctx, reloadFrom);
+    boost::asio::co_spawn(pctx->asio, LoadFromFs::init(*pctx, reloadFrom), boost::asio::detached);
     return true;
 }
 

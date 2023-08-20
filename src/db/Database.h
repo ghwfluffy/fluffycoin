@@ -2,10 +2,14 @@
 
 #include <fluffycoin/db/Session.h>
 
-#include <fluffycoin/async/func.h>
+#include <fluffycoin/async/Ret.h>
+
+#include <memory>
 
 namespace fluffycoin::db
 {
+
+struct DatabaseImpl;
 
 /**
  * Create connections to the database to run queries
@@ -13,20 +17,22 @@ namespace fluffycoin::db
 class Database
 {
     public:
-        Database() = default;
-        Database(Database &&) = default;
-        Database(const Database &) = default;
-        Database &operator=(Database &&) = default;
-        Database &operator=(const Database &) = default;
-        ~Database() = default;
+        Database();
+        Database(Database &&);
+        Database(const Database &) = delete;
+        Database &operator=(Database &&);
+        Database &operator=(const Database &) = delete;
+        ~Database();
 
-        void newReadOnlySession(
-            Details &details,
-            async::func<void(Session, Details &)> callback);
+        void connect(
+            const std::string &params,
+            Details &details);
 
-        void newSession(
-            Details &details,
-            async::func<void(Session, Details &)> callback);
+        async::Ret<Session> newSession(Details &details);
+        async::Ret<Session> newReadOnlySession(Details &details);
+
+    private:
+        std::unique_ptr<DatabaseImpl> impl;
 };
 
 }

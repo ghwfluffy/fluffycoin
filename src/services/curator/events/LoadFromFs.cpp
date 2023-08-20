@@ -12,6 +12,7 @@
 using namespace fluffycoin;
 using namespace fluffycoin::curator;
 
+#if 0
 namespace
 {
 
@@ -124,14 +125,21 @@ void delayedRetry(LoadState state)
 
 }
 
-void LoadFromFs::init(
+#endif
+
+async::Ret<void> LoadFromFs::init(
     const svc::ServiceScene &ctx,
     uint64_t reloadFrom)
 {
+#if 0
     // Setup async state
     LoadState state(ctx.trove, ctx);
     state().reloadFrom = reloadFrom;
 
     // Connect to DB
     startDbSession(std::move(state));
+#endif
+    (void)reloadFrom;
+    Details details;
+    db::Session session = co_await ctx.get<db::Database>().newReadOnlySession(details);
 }

@@ -22,10 +22,17 @@ macro(fluffylib)
     # Find all header files
     file(
         GLOB_RECURSE
-        HEADER_FILES
+        ALL_HEADER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}
         REGEX *.h
     )
+
+    # Split between private and not private
+    set(HEADER_FILES ${ALL_HEADER_FILES})
+    list(FILTER HEADER_FILES EXCLUDE REGEX "priv")
+
+    set(PRIV_HEADER_FILES ${ALL_HEADER_FILES})
+    list(FILTER PRIV_HEADER_FILES INCLUDE REGEX "priv")
 
     # Stage header files with fluffycoin/lib/ prefix
     set(HEADER_BASEDIR ${CMAKE_CURRENT_BINARY_DIR}/dist/include/)
@@ -47,6 +54,30 @@ macro(fluffylib)
         COMMENT
             "Setting up fluffycoin-${FLUFFYLIB_NAME} headers"
     )
+
+    # Stage private headers too
+    if (PRIV_HEADER_FILES)
+        set(PRIV_HEADER_DIR ${HEADER_DIR}/priv)
+        set(PRIV_HEADER_TIMESTAMP ${CMAKE_CURRENT_BINARY_DIR}/.${FLUFFYLIB_NAME}.priv.headers.timestamp)
+        add_custom_command(
+            OUTPUT
+                ${PRIV_HEADER_TIMESTAMP}
+            COMMAND
+                rm -rf ${PRIV_HEADER_DIR}
+            COMMAND
+                mkdir -p ${PRIV_HEADER_DIR}
+            COMMAND
+                ln -s ${PRIV_HEADER_FILES} ${PRIV_HEADER_DIR}/
+            COMMAND
+                touch ${PRIV_HEADER_TIMESTAMP}
+            DEPENDS
+                ${PRIV_HEADER_FILES}
+            COMMENT
+                "Setting up fluffycoin-${FLUFFYLIB_NAME} private headers"
+        )
+        set(HEADER_TIMESTAMP ${HEADER_TIMESTAMP} ${PRIV_HEADER_TIMESTAMP})
+    endif()
+
     set_source_files_properties(
         ${HEADER_TIMESTAMP}
         PROPERTIES GENERATED TRUE)

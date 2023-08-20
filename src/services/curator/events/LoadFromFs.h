@@ -2,6 +2,8 @@
 
 #include <fluffycoin/svc/ServiceScene.h>
 
+#include <fluffycoin/async/Ret.h>
+
 #include <stdint.h>
 
 namespace fluffycoin::curator
@@ -12,7 +14,7 @@ namespace fluffycoin::curator
  */
 namespace LoadFromFs
 {
-    void init(
+    async::Ret<void> init(
         const svc::ServiceScene &ctx,
         uint64_t reloadFrom);
 }
