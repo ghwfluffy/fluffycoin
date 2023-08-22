@@ -34,7 +34,7 @@ namespace Ozo
         boost::hana::basic_tuple<> > >;
 
     template<typename Conn>
-    std::string error(ozo::error_code ec, Conn conn)
+    std::string error(ozo::error_code ec, const Conn &conn)
     {
         std::stringstream ss;
         ss << ec.message();

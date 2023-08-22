@@ -8,7 +8,7 @@ namespace fluffycoin::db
 class IResultRow
 {
     public:
-        ~IResultRow() = default;
+        virtual ~IResultRow() = default;
 
         virtual operator bool() const = 0;
 

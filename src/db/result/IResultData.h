@@ -16,7 +16,7 @@ class IResultData
         virtual size_t getNumResults() const = 0;
 
         virtual const IResultRow &cur() const = 0;
-        virtual const IResultRow &next() const = 0;
+        virtual const IResultRow &next() = 0;
 
     protected:
         IResultData() = default;
@@ -25,7 +25,6 @@ class IResultData
         IResultData &operator=(IResultData &&) = default;
         IResultData &operator=(const IResultData &) = default;
 };
-
 
 }
 

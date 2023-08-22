@@ -16,6 +16,8 @@ struct SessionImpl
     Mode mode = Mode::None;
     Ozo::Connection connection;
     Ozo::Transaction transaction;
+
+    bool isTransaction() const { return mode == Mode::Transaction; }
 };
 
 }

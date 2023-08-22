@@ -83,7 +83,8 @@ async::Ret<Session> Database::newSession(
         conn,
         boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 
-    if (ec) {
+    if (ec)
+    {
         details.setError(log::Db, ErrorCode::ConnectError, "new_session",
             "Failed to start database transaction: {}.",
             db::priv::Ozo::error(ec, trans));
@@ -112,8 +113,15 @@ async::Ret<Session> Database::newReadOnlySession(
     boost::system::error_code ec;
     db::priv::Ozo::Connection conn = co_await ozo::get_connection(
         std::move(provider),
-        std::chrono::seconds(2),
+        std::chrono::seconds(20),
         boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+    if (ec)
+    {
+        details.setError(log::Db, ErrorCode::ConnectError, "new_session",
+            "Failed to connect to database: {}",
+            db::priv::Ozo::error(ec, conn));
+        co_return Session();
+    }
 
     std::unique_ptr<db::priv::SessionImpl> sess = std::make_unique<db::priv::SessionImpl>();
     sess->connection = std::move(conn);
