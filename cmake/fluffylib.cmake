@@ -72,6 +72,7 @@ macro(fluffylib)
                 touch ${PRIV_HEADER_TIMESTAMP}
             DEPENDS
                 ${PRIV_HEADER_FILES}
+                ${HEADER_TIMESTAMP}
             COMMENT
                 "Setting up fluffycoin-${FLUFFYLIB_NAME} private headers"
         )

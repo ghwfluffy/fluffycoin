@@ -3,6 +3,7 @@
 #include <fluffycoin/db/Session.h>
 
 #include <fluffycoin/async/Ret.h>
+#include <fluffycoin/async/boost.h>
 
 #include <memory>
 
@@ -17,7 +18,7 @@ struct DatabaseImpl;
 class Database
 {
     public:
-        Database();
+        Database(boost::asio::io_context &io);
         Database(Database &&);
         Database(const Database &) = delete;
         Database &operator=(Database &&);
@@ -28,10 +29,14 @@ class Database
             const std::string &params,
             Details &details);
 
-        async::Ret<Session> newSession(Details &details);
-        async::Ret<Session> newReadOnlySession(Details &details);
+        async::Ret<Session> newSession(
+            Details &details);
+
+        async::Ret<Session> newReadOnlySession(
+            Details &details);
 
     private:
+        boost::asio::io_context &io;
         std::unique_ptr<DatabaseImpl> impl;
 };
 

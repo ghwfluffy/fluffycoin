@@ -3,8 +3,6 @@
 #include <fluffycoin/svc/ServiceScene.h>
 #include <fluffycoin/svc/Log.h>
 
-#include <fluffycoin/async/TreasureTrove.h>
-
 #include <fluffycoin/utils/Details.h>
 
 #include <google/protobuf/message.h>

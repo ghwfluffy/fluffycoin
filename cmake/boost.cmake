@@ -50,6 +50,7 @@ target_include_directories(
 target_compile_options(
     boost
     PUBLIC
+        # Needed by ozo
         -DBOOST_HANA_CONFIG_ENABLE_STRING_UDL
 )
 

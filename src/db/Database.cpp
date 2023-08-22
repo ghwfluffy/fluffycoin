@@ -1,6 +1,12 @@
+#define BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT 1
 #include <fluffycoin/db/Database.h>
+#include <fluffycoin/db/priv/SessionImpl.h>
 
 #include <ozo/ozo.h>
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/use_awaitable.hpp>
+#include <boost/asio/redirect_error.hpp>
 
 using namespace fluffycoin;
 using namespace fluffycoin::db;
@@ -10,22 +16,19 @@ namespace fluffycoin::db
 
 struct DatabaseImpl
 {
-    using PoolType = ozo::connection_pool<
-        ozo::connection_info<
-            ozo::oid_map_t<>, ozo::none_t>,
-        ozo::thread_safety<true> >;
-
-    std::unique_ptr<PoolType> pool;
+    std::unique_ptr<db::priv::Ozo::ConnectionPool> pool;
 };
 
 }
 
-Database::Database()
+Database::Database(boost::asio::io_context &io)
+        : io(io)
 {
 }
 
 Database::Database(Database &&rhs)
-        : impl(std::move(rhs.impl))
+        : io(rhs.io)
+        , impl(std::move(rhs.impl))
 {
 }
 
@@ -56,21 +59,65 @@ void Database::connect(
     impl = std::make_unique<DatabaseImpl>();
     try {
         const ozo::connection_info connection_info(params);
-        impl->pool = std::make_unique<DatabaseImpl::PoolType>(connection_info, connection_pool_config);
+        impl->pool = std::make_unique<db::priv::Ozo::ConnectionPool>(connection_info, connection_pool_config);
     } catch (const std::exception &e) {
         details.setError(log::Db, ErrorCode::DatabaseError, "connect",
             "Failed to connect to database: {}", e.what());
     }
 }
 
-async::Ret<Session> Database::newSession(Details &details)
+async::Ret<Session> Database::newSession(
+    Details &details)
 {
-    (void)details;
-    co_return Session();
+    if (!impl)
+    {
+        details.setError(log::Db, ErrorCode::NotConnected, "new_session",
+            "Database is not connected.");
+        co_return Session();
+    }
+
+    db::priv::Ozo::ConnectionProvider conn = (*impl->pool)[io];
+
+    boost::system::error_code ec;
+    db::priv::Ozo::Transaction trans = co_await ozo::begin(
+        conn,
+        boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+
+    if (ec) {
+        details.setError(log::Db, ErrorCode::ConnectError, "new_session",
+            "Failed to start database transaction: {}.",
+            db::priv::Ozo::error(ec, trans));
+        co_return Session();
+    }
+
+    std::unique_ptr<db::priv::SessionImpl> sess = std::make_unique<db::priv::SessionImpl>();
+    sess->transaction = std::move(trans);
+    sess->mode = db::priv::SessionImpl::Mode::Transaction;
+
+    co_return Session(std::move(sess));
 }
 
-async::Ret<Session> Database::newReadOnlySession(Details &details)
+async::Ret<Session> Database::newReadOnlySession(
+    Details &details)
 {
-    (void)details;
-    co_return Session();
+    if (!impl)
+    {
+        details.setError(log::Db, ErrorCode::NotConnected, "new_session",
+            "Database is not connected.");
+        co_return Session();
+    }
+
+    db::priv::Ozo::ConnectionProvider provider = (*impl->pool)[io];
+
+    boost::system::error_code ec;
+    db::priv::Ozo::Connection conn = co_await ozo::get_connection(
+        std::move(provider),
+        std::chrono::seconds(2),
+        boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+
+    std::unique_ptr<db::priv::SessionImpl> sess = std::make_unique<db::priv::SessionImpl>();
+    sess->connection = std::move(conn);
+    sess->mode = db::priv::SessionImpl::Mode::Connection;
+
+    co_return Session(std::move(sess));
 }
