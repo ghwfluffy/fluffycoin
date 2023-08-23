@@ -1,0 +1,12 @@
+diff --git a/third_party/abseil-cpp/absl/base/internal/direct_mmap.h b/third_party/abseil-cpp/absl/base/internal/direct_mmap.h
+index 815b8d23..5d4688be 100644
+--- a/third_party/abseil-cpp/absl/base/internal/direct_mmap.h
++++ b/third_party/abseil-cpp/absl/base/internal/direct_mmap.h
+@@ -26,6 +26,7 @@
+ 
+ #ifdef __linux__
+ 
++#define _LARGEFILE64_SOURCE
+ #include <sys/types.h>
+ #ifdef __BIONIC__
+ #include <sys/syscall.h>

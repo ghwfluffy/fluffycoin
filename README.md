@@ -122,42 +122,22 @@ Make sure you have the submodules checked out before building.
 git submodule update --init --recursive
 ```
 
-You can build the binaries using the docker build environment.
+You can build the binaries using the docker build environment (Recommended).
 ```
 make release-docker
 ```
 
-Or if you want to build the binaries for the host platform.
+Or if you want to build the binaries for the host platform (See dependencies).
 ```
 make release
 ```
 
-### Run unit tests
-
-You can build and run the unit/integration tests in a docker environment.
-```
-make debug-docker
-make build-containers
-make runtests-docker
-```
-
-### Build validator
+### Build tools and validator services
 
 Once the code is built, the runtime docker images can be built.
 
 ```
 make build-containers
-```
-
-### Run validator
-
-Once you have built the runtime containers, the easiest way to run the validator is with docker-compose.
-
-You will need to edit the env file to embed your validator key. When the alpha version is live I will provide a script and an endpoint on fluffyco.in to get free coins to stake.
-```
-cd docker/validator
-cat .env
-docker compose up -d
 ```
 
 ### Use Fluffycoin
@@ -181,6 +161,26 @@ fluffycoin-lottery: Buy a lottery ticket
 fluffycoin-loans: Submit actions related to loans
 fluffycoin-vote: Submit actions related to votes
 fluffycoin-stocks: Submit actions related to stocks
+```
+
+### Run validator
+
+Once you have built the runtime containers, the easiest way to run the validator is with docker-compose.
+
+You will need to edit the env file to embed your validator key. When the alpha version is live I will provide a script and an endpoint on fluffyco.in to get free coins to stake.
+```
+cd docker/validator
+cat .env
+docker compose up -d
+```
+
+### Run tests
+
+You can build and run the unit/integration tests in a docker environment.
+```
+make debug-docker
+make build-containers
+make runtests-docker
 ```
 
 ## Dependencies
