@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:edge
 LABEL maintainer="GhwFluffy <ghw@ghwfluffy.com>"
 LABEL description="Fluffycoin CLI"
 ENV LANG="en_US.utf8"

@@ -6,14 +6,20 @@ set -eu -o pipefail
 usage() {
     echo "Usage: $(basename "${0}") <Options>
 
-            -X --no-cache           Don't use docker cache" 1>&2
+            -X --no-cache           Don't use docker cache
+            -L --not-latest         Don't tag images as 'latest'" 1>&2
 }
 
 CACHE=""
+function latest() { echo "-t ${1}:latest"; }
 while [ $# -gt 0 ]; do
     case "${1}" in
         -X|--no-cache)
             CACHE="--no-cache"
+            shift
+            ;;
+        -L|--not-latest)
+            function latest() { echo -n ""; }
             shift
             ;;
         -h|--help)
@@ -46,7 +52,8 @@ for container in p2p curator; do
         ${CACHE} \
         "${TOP_DIR}" \
         -f "${DOCKER_DIR}/validator/${container}/Dockerfile" \
-        -t "fluffyco.in/${container}:${FLUFFYCOIN_TAG}"
+        -t "fluffyco.in/${container}:${FLUFFYCOIN_TAG}" \
+        `latest "fluffyco.in/${container}"`
 done
 
 # CLI runtime
@@ -54,12 +61,17 @@ docker build \
     ${CACHE} \
     "${TOP_DIR}" \
     -f "${DOCKER_DIR}/cli/Dockerfile" \
-    -t "fluffyco.in/cli:${FLUFFYCOIN_TAG}"
+    -t "fluffyco.in/cli:${FLUFFYCOIN_TAG}" \
+    `latest "fluffyco.in/cli"`
 
-# Unit tests
+# Unit and integration tests
 docker build \
     ${CACHE} \
     "${TOP_DIR}" \
-    -f "${DOCKER_DIR}/unit-tests/Dockerfile" \
+    -f "${DOCKER_DIR}/tests/Dockerfile" \
     --build-arg="FLUFFYCOIN_TAG=${FLUFFYCOIN_TAG}" \
-    -t "fluffyco.in/unit-tests:${FLUFFYCOIN_TAG}"
+    -t "fluffyco.in/tests:${FLUFFYCOIN_TAG}" \
+    `latest "fluffyco.in/tests"`
+
+# Postgres
+docker pull postgres:15-alpine3.18

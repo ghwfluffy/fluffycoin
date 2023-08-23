@@ -1,4 +1,3 @@
-#define BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT 1
 #include <fluffycoin/db/Database.h>
 #include <fluffycoin/db/priv/SessionImpl.h>
 
@@ -60,6 +59,7 @@ void Database::connect(
     try {
         const ozo::connection_info connection_info(params);
         impl->pool = std::make_unique<db::priv::Ozo::ConnectionPool>(connection_info, connection_pool_config);
+        log::info(log::Db, "Database pool initialized.");
     } catch (const std::exception &e) {
         details.setError(log::Db, ErrorCode::DatabaseError, "connect",
             "Failed to connect to database: {}", e.what());

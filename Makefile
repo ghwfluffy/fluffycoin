@@ -27,12 +27,12 @@ clean: ## Cleanup all previous build artifacts and distributables
 	./tools/buildscripts/build.sh -C
 
 .PHONY: runtests-docker
-runtests-docker: ## Run unit tests in docker build environment
-	./tools/tests/unit-in-docker.sh $(ARGS)
+runtests-docker: ## Run unit/integration tests in docker build environment
+	./tools/tests/test-in-docker.sh $(ARGS)
 
 .PHONY: build-containers
 build-containers: ## Build the runtime containers
-	./tools/buildscripts/build-containers.sh
+	./tools/buildscripts/build-containers.sh $(ARGS)
 
 .PHONY: runcli-docker
 runcli-docker: ## Drop into the CLI docker

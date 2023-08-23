@@ -9,11 +9,13 @@ usage() {
 
             -g                      Run in GDB
             -v                      Run in valgrind memcheck
-            -t <Value>              gtest_filter"
+            -t <Value>              gtest_filter
+            -D                      Don't run database integration tests"
 }
 
 ARGS=()
 FILTER=""
+TEST_DB=1
 ENTRYPOINT="${TOP_DIR}/dist/bin/fluffycoin-gtest"
 while [ $# -gt 0 ]; do
     case "${1}" in
@@ -36,6 +38,11 @@ while [ $# -gt 0 ]; do
                 "-v"
                 "${ENTRYPOINT}")
             ENTRYPOINT="valgrind"
+            shift
+            ;;
+        -D|--no-database)
+            TEST_DB=0
+            shift
             ;;
         -h|--help)
             usage
@@ -52,14 +59,54 @@ done
 # Get tag
 source "${TOP_DIR}/.env"
 
-# Run docker
+# Cleanup all the dockers we start
+cleanup() {
+    docker stop fcgtest 2> /dev/null || true
+    docker stop fcpgtest 2> /dev/null || true
+    docker network rm fc_testnetwork 2> /dev/null || true
+}
+trap cleanup EXIT
+cleanup
+
+echo "Setup docker network"
+docker network create fc_testnetwork
+
+# Running database integration tests?
+EXCLUDE=""
+if [ ${TEST_DB} -eq 0 ]; then
+    # Any test with Postgres in the name gets skipped
+    EXCLUDE="--gtest_filter=-*Postgres*"
+else
+    echo "Run postgres container"
+    docker run \
+        --rm \
+        --name fcpgtest \
+        --network fc_testnetwork \
+        -e POSTGRES_PASSWORD=fluffy \
+        -e PGUSER=fluffy \
+        -v "${TOP_DIR}/tools/tests/test.sql":/docker-entrypoint-initdb.d/init-db.sql \
+        -d \
+        postgres:15-alpine3.18
+
+    # Wait for postgres to start
+    # Not very scientific
+    sleep 3
+fi
+
+echo "Run tests"
 docker run \
     -ti \
+    --rm \
+    --name fcgtest \
+    --network fc_testnetwork \
     -v "${TOP_DIR}:${TOP_DIR}" \
     -v /etc/passwd:/etc/passwd:ro \
     -v /proc/cpuinfo:/proc/cpuinfo:ro \
     -u $(id -u):$(id -g) \
+    -e PGPASSWORD=fluffy \
+    -e PGUSER=fluffy \
     --entrypoint "${ENTRYPOINT}" \
     "fluffyco.in/unit-tests:${FLUFFYCOIN_TAG}" \
     "${ARGS[@]}" \
+    ${EXCLUDE} \
     ${FILTER}

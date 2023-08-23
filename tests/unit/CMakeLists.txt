@@ -22,13 +22,14 @@ target_link_libraries(
     fluffycoin-gtest
     PRIVATE
         gtest
-        fluffycoin-log
-        fluffycoin-utils
-        fluffycoin-ossl
-        fluffycoin-block
         fluffycoin-alg
-        fluffycoin-zmq
+        fluffycoin-block
+        fluffycoin-db
+        fluffycoin-log
+        fluffycoin-ossl
         fluffycoin-svc
+        fluffycoin-utils
+        fluffycoin-zmq
         fluffyproto-test
 )
 
@@ -36,6 +37,7 @@ target_link_libraries(
 include(cmake/headers.cmake)
 fluffytestlib(alg)
 fluffytestlib(block)
+fluffytestlib(db)
 fluffytestlib(ossl)
 fluffytestlib(svc)
 fluffytestlib(utils)

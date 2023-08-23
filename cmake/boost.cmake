@@ -52,6 +52,8 @@ target_compile_options(
     PUBLIC
         # Needed by ozo
         -DBOOST_HANA_CONFIG_ENABLE_STRING_UDL
+        # Needed by ozo + boost::asio::use_awaitable
+        -DBOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT=1
 )
 
 add_dependencies(

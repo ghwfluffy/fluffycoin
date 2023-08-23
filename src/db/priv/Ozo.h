@@ -36,11 +36,22 @@ namespace Ozo
     template<typename Conn>
     std::string error(ozo::error_code ec, const Conn &conn)
     {
+        // Convert error to string
         std::stringstream ss;
         ss << ec.message();
         if (!ozo::is_null_recursive(conn))
             ss << " - " << ozo::error_message(conn) << " (" << ozo::get_error_context(conn) << ")";
-        return ss.str();
+        std::string ret = ss.str();
+
+        // Remove empty context
+        size_t pos = ret.rfind(" ()");
+        if (pos != std::string::npos)
+            ret.resize(pos);
+
+        // Remove newline
+        std::erase(ret, '\n');
+
+        return ret;
     }
 }
 
