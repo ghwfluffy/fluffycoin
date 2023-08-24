@@ -3,7 +3,7 @@
 #include <fluffycoin/db/IResultData.h>
 
 #include <libpq-fe.h>
-#include <ozo/pg/handle.h>
+#include <ozo/result.h>
 
 namespace fluffycoin::db::priv
 {
@@ -27,6 +27,7 @@ class ResultCol : public IResultCol
         int32_t Int32() const final;
         int64_t Int64() const final;
         bool boolean() const final;
+        bool null() const final;
 
     private:
         int col;
@@ -62,7 +63,7 @@ class ResultRow : public IResultRow
 class ResultImpl : public IResultData
 {
     public:
-        ResultImpl(std::unique_ptr<pg_result, ozo::pg::safe_handle<pg_result>::deleter> result);
+        ResultImpl(ozo::result result);
         ResultImpl(ResultImpl &&) = default;
         ResultImpl(const ResultImpl &) = delete;
         ResultImpl &operator=(ResultImpl &&) = default;
@@ -75,7 +76,7 @@ class ResultImpl : public IResultData
         const IResultRow &next() final;
 
     private:
-        std::unique_ptr<pg_result, ozo::pg::safe_handle<pg_result>::deleter> result;
+        ozo::result result;
         ResultRow row;
 };
 

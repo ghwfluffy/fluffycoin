@@ -4,6 +4,8 @@
 #include <fluffycoin/log/Log.h>
 #include <fluffycoin/svc/Log.h>
 
+#include <fluffytest/db/Params.h>
+
 using namespace fluffycoin;
 
 int main(int argc, const char *argv[])
@@ -18,6 +20,9 @@ int main(int argc, const char *argv[])
     ossl::Initialize::initialize();
 
     svc::initLogger();
+
+    // Set database connection params
+    fluffytest::db::Params::set(getenv("PGCONNECT"));
 
     // Run tests
     int ret = RUN_ALL_TESTS();

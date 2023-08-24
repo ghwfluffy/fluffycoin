@@ -48,8 +48,9 @@ namespace Ozo
         if (pos != std::string::npos)
             ret.resize(pos);
 
-        // Remove newline
-        std::erase(ret, '\n');
+        // Remove end newline
+        if (!ret.empty() && ret.back() == '\n')
+            ret.resize(ret.length() - 1);
 
         return ret;
     }

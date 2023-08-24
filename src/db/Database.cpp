@@ -94,6 +94,7 @@ async::Ret<Session> Database::newSession(
     std::unique_ptr<db::priv::SessionImpl> sess = std::make_unique<db::priv::SessionImpl>();
     sess->transaction = std::move(trans);
     sess->mode = db::priv::SessionImpl::Mode::Transaction;
+    details.log().traffic(log::Db, "Created new transaction session.");
 
     co_return Session(std::move(sess));
 }
@@ -126,6 +127,7 @@ async::Ret<Session> Database::newReadOnlySession(
     std::unique_ptr<db::priv::SessionImpl> sess = std::make_unique<db::priv::SessionImpl>();
     sess->connection = std::move(conn);
     sess->mode = db::priv::SessionImpl::Mode::Connection;
+    details.log().traffic(log::Db, "Created new read only session.");
 
     co_return Session(std::move(sess));
 }

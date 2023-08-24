@@ -30,7 +30,7 @@ TEST(Postgres_Database, Connect)
 
     // Initialize ozo
     Details details;
-    ctx.db.connect("host=fcpgtest dbname=fluffycoin", details);
+    ctx.db.connect(fluffytest::db::Params::get(), details);
     EXPECT_TRUE(details.isOk());
 
     // Coroutine to start transaction
@@ -52,7 +52,7 @@ TEST(Postgres_Database, ConnectReadOnly)
 
     // Initialize ozo
     Details details;
-    ctx.db.connect("host=fcpgtest dbname=fluffycoin", details);
+    ctx.db.connect(fluffytest::db::Params::get(), details);
     EXPECT_TRUE(details.isOk());
 
     // Coroutine to start transaction

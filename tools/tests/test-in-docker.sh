@@ -10,11 +10,13 @@ usage() {
             -g                      Run in GDB
             -v                      Run in valgrind memcheck
             -t <Value>              gtest_filter
-            -D                      Don't run database integration tests"
+            -D                      Don't run database integration tests
+            -DD                     Dump postgres output"
 }
 
 ARGS=()
 FILTER=""
+DUMP_DB=0
 TEST_DB=1
 ENTRYPOINT="${TOP_DIR}/dist/bin/fluffycoin-gtest"
 while [ $# -gt 0 ]; do
@@ -42,6 +44,10 @@ while [ $# -gt 0 ]; do
             ;;
         -D|--no-database)
             TEST_DB=0
+            shift
+            ;;
+        -DD|--debug-database)
+            DUMP_DB=1
             shift
             ;;
         -h|--help)
@@ -83,7 +89,6 @@ else
         --name fcpgtest \
         --network fc_testnetwork \
         -e POSTGRES_PASSWORD=fluffy \
-        -e PGUSER=fluffy \
         -v "${TOP_DIR}/tools/tests/test.sql":/docker-entrypoint-initdb.d/init-db.sql \
         -d \
         postgres:15-alpine3.18
@@ -93,6 +98,7 @@ else
     sleep 3
 fi
 
+RET=0
 echo "Run tests"
 docker run \
     -ti \
@@ -103,10 +109,18 @@ docker run \
     -v /etc/passwd:/etc/passwd:ro \
     -v /proc/cpuinfo:/proc/cpuinfo:ro \
     -u $(id -u):$(id -g) \
-    -e PGPASSWORD=fluffy \
     -e PGUSER=fluffy \
+    -e PGPASSWORD=fluffy \
+    -e PGCONNECT="host=fcpgtest dbname=fluffycoin" \
     --entrypoint "${ENTRYPOINT}" \
     "fluffyco.in/unit-tests:${FLUFFYCOIN_TAG}" \
     "${ARGS[@]}" \
     ${EXCLUDE} \
-    ${FILTER}
+    ${FILTER} || RET=$?
+
+# Dump postgres output
+if [ ${TEST_DB} -eq 1 ] && [ ${DUMP_DB} -eq 1 ]; then
+    docker logs fcpgtest
+fi
+
+exit ${RET}

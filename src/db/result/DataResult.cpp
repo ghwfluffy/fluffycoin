@@ -31,6 +31,7 @@ class : public IResultRow
                 int32_t Int32() const final { return int32_t(); }
                 int64_t Int64() const final { return int64_t(); }
                 bool boolean() const final { return false; }
+                bool null() const final { return true; }
         } col;
 } nullRow;
 

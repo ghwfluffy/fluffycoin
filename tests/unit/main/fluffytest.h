@@ -4,3 +4,6 @@
 
 // Custom printers
 #include <fluffytest/utils/BinData.h>
+
+// DB params
+#include <fluffytest/db/Params.h>

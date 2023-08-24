@@ -20,6 +20,7 @@ class IResultCol
         virtual int32_t Int32() const = 0;
         virtual int64_t Int64() const = 0;
         virtual bool boolean() const = 0;
+        virtual bool null() const = 0;
 
     protected:
         IResultCol() = default;

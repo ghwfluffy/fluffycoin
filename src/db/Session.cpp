@@ -5,6 +5,7 @@
 #include <ozo/execute.h>
 #include <ozo/request.h>
 #include <ozo/query.h>
+#include <ozo/shortcuts.h>
 
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/asio/redirect_error.hpp>
@@ -15,15 +16,13 @@ using namespace fluffycoin::db;
 namespace
 {
 
-template<typename Conn>
-size_t getAffectedRows(Conn &conn)
+size_t getAffectedRows(
+    ozo::result &result)
 {
-    auto uptrResult = ozo::pg::make_safe(PQgetResult(get_native_handle(conn)));
-    const char *sz = PQcmdTuples(uptrResult.get());
+    PGresult *presult = result.native_handle();
+    const char *sz = PQcmdTuples(presult);
     int affectedRows = sz ? atoi(sz) : 0;
-    if (affectedRows > 0)
-        return static_cast<size_t>(affectedRows);
-    return 0;
+    return affectedRows > 0 ? static_cast<size_t>(affectedRows) : 0;
 }
 
 }
@@ -73,7 +72,8 @@ async::Ret<Result> Session::query(
     boost::system::error_code ec;
     if (impl->isTransaction())
     {
-        auto trans = co_await ozo::execute(std::move(impl->transaction), ozo::make_query(query),
+        ozo::result result;
+        auto trans = co_await ozo::request(std::move(impl->transaction), ozo::make_query(query), ozo::into(result),
             boost::asio::redirect_error(boost::asio::use_awaitable, ec));
         // Check error
         if (ec)
@@ -82,15 +82,17 @@ async::Ret<Result> Session::query(
                 "Failed to query database: {}.",
                 db::priv::Ozo::error(ec, trans));
         }
+        // Get affected rows
         else
         {
-            ret.setAffectedRows(getAffectedRows(trans));
+            ret.setAffectedRows(getAffectedRows(result));
         }
         impl->transaction = std::move(trans);
     }
     else
     {
-        auto conn = co_await ozo::execute(std::move(impl->connection), ozo::make_query(query),
+        ozo::result result;
+        auto conn = co_await ozo::request(std::move(impl->connection), ozo::make_query(query), ozo::into(result),
             boost::asio::redirect_error(boost::asio::use_awaitable, ec));
         // Check error
         if (ec)
@@ -99,9 +101,10 @@ async::Ret<Result> Session::query(
                 "Failed to query database: {}.",
                 db::priv::Ozo::error(ec, conn));
         }
+        // Get affected rows
         else
         {
-            ret.setAffectedRows(getAffectedRows(conn));
+            ret.setAffectedRows(getAffectedRows(result));
         }
         impl->connection = std::move(conn);
     }
@@ -128,11 +131,11 @@ async::Ret<DataResult> Session::select(
     details.log().traffic(log::Db, "{}", query);
 
     // Do query
-    std::unique_ptr<pg_result, ozo::pg::safe_handle<pg_result>::deleter> result;
+    ozo::result result;
     boost::system::error_code ec;
     if (impl->isTransaction())
     {
-        auto trans = co_await ozo::execute(std::move(impl->transaction), ozo::make_query(query),
+        auto trans = co_await ozo::request(std::move(impl->transaction), ozo::make_query(query), ozo::into(result),
             boost::asio::redirect_error(boost::asio::use_awaitable, ec));
         // Check error
         if (ec)
@@ -141,15 +144,11 @@ async::Ret<DataResult> Session::select(
                 "Failed to query database: {}.",
                 db::priv::Ozo::error(ec, trans));
         }
-        else
-        {
-            result = ozo::pg::make_safe(PQgetResult(get_native_handle(trans)));
-        }
         impl->transaction = std::move(trans);
     }
     else
     {
-        auto conn = co_await ozo::execute(std::move(impl->connection), ozo::make_query(query),
+        auto conn = co_await ozo::request(std::move(impl->connection), ozo::make_query(query), ozo::into(result),
             boost::asio::redirect_error(boost::asio::use_awaitable, ec));
         // Check error
         if (ec)
@@ -157,10 +156,6 @@ async::Ret<DataResult> Session::select(
             details.setError(log::Db, ErrorCode::DatabaseError, "query",
                 "Failed to query database: {}.",
                 db::priv::Ozo::error(ec, conn));
-        }
-        else
-        {
-            result = ozo::pg::make_safe(PQgetResult(get_native_handle(conn)));
         }
         impl->connection = std::move(conn);
     }

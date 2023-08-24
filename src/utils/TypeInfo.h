@@ -14,9 +14,11 @@ namespace TypeInfo
     std::string name(const T &t)
     {
         int status = 0;
-        char *realname = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        char *realname = abi::__cxa_demangle(typeid(t).name(), nullptr, nullptr, &status);
         std::string result(realname);
         free(realname);
         return result;
     }
+}
+
 }
