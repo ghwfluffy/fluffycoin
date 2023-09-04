@@ -46,6 +46,14 @@ class ErrorStatus
             set(log, log::Category::catToInt(cat), code, field, std::move(msg));
         }
 
+        void extend(log::Logger &log, size_t cat, const char *field, std::string msg);
+
+        template<typename Category>
+        void extend(log::Logger &log, Category cat, const char *field, std::string msg)
+        {
+            extend(log, log::Category::catToInt(cat), field, std::move(msg));
+        }
+
     private:
         log::Level level;
         ErrorCode errorCode;

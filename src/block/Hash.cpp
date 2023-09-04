@@ -1,5 +1,6 @@
 #include <fluffycoin/block/Hash.h>
 #include <fluffycoin/ossl/convert.h>
+#include <fluffycoin/ossl/encode.h>
 #include <fluffycoin/ossl/Hash.h>
 
 #include <openssl/asn1t.h>
@@ -68,6 +69,15 @@ void Hash::fromAsn1(const asn1::Hash &t)
 {
     sha2 = ossl::toBin(*t.sha2);
     sha3 = ossl::toBin(*t.sha3);
+}
+
+BinData Hash::encode() const
+{
+    asn1::Hash *obj = asn1::Hash_new();
+    toAsn1(*obj);
+    BinData data = ossl::encode(*obj, asn1::i2d_Hash);
+    asn1::Hash_free(obj);
+    return data;
 }
 
 bool Hash::operator==(const Hash &rhs) const

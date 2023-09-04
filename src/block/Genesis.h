@@ -67,6 +67,7 @@ class Genesis
         void toAsn1(asn1::Genesis &) const;
         void fromAsn1(const asn1::Genesis &);
 
+        // TODO: Duplicate of encode namespace
         BinData encode() const;
 
     private:

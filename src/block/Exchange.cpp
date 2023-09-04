@@ -21,6 +21,8 @@ ASN1_SEQUENCE(Exchange) =
   , ASN1_SIMPLE(Exchange, amount, Specie)
 } ASN1_SEQUENCE_END(Exchange)
 
+IMPLEMENT_ASN1_FUNCTIONS(Exchange)
+
 }
 
 }

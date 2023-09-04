@@ -22,6 +22,10 @@ namespace FileTools
         const std::string &path,
         std::string &data);
 
+    bool read(
+        const std::string &path,
+        BinData &data);
+
     bool write(
         const std::string &path,
         const std::string &data);

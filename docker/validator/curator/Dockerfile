@@ -18,11 +18,20 @@ RUN set -eux; \
 
 # Runtime environment
 RUN set -eux; \
-    mkdir -p /var/log/fluffycoin
+    mkdir -p /var/log/fluffycoin; \
+    mkdir -p /usr/share/fluffycoin/sql; \
+    true
 
 # Binaries
 COPY ./dist/bin/fluffycoin-curator /usr/bin/
 COPY ./dist/lib/* /usr/lib/
 
+# Schema
+COPY ./doc/schema.sql /usr/share/fluffycoin/sql/
+
+# Persistent data
+VOLUME /var/log/fluffycoin
+
 # Entrypoint
-ENTRYPOINT ["/usr/bin/fluffycoin-curator"]
+COPY entrypoint /
+ENTRYPOINT ["/entrypoint"]

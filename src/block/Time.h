@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fluffycoin/utils/Strings.h>
+
 #include <chrono>
 #include <stdint.h>
 
@@ -54,5 +56,7 @@ class Time
 };
 
 }
+
+std::string to_string(const block::Time &);
 
 }

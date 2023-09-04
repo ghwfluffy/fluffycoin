@@ -32,11 +32,11 @@ class Session
         ~Session();
 
         async::Ret<Result> query(
-            std::string query,
+            const std::string &query,
             Details &details);
 
         async::Ret<DataResult> select(
-            std::string query,
+            const std::string &query,
             Details &details);
 
     private:

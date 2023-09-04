@@ -23,8 +23,11 @@ uint64_t Time::get() const
 
 std::chrono::time_point<std::chrono::system_clock> Time::getSystemClock() const
 {
-    return std::chrono::system_clock::from_time_t(
-        static_cast<std::time_t>(sinceEpoch) + static_cast<std::time_t>(fluffyEpochDelta));
+    std::chrono::time_point<std::chrono::system_clock> tp =
+        std::chrono::system_clock::from_time_t(
+            static_cast<std::time_t>(sinceEpoch / 1000LL) + static_cast<std::time_t>(fluffyEpochDelta));
+    tp += std::chrono::milliseconds(sinceEpoch % 1000LL);
+    return tp;
 }
 
 void Time::set(uint64_t time)
@@ -96,4 +99,21 @@ bool Time::operator==(const Time &rhs) const
 bool Time::operator!=(const Time &rhs) const
 {
     return sinceEpoch != rhs.sinceEpoch;
+}
+
+std::string fluffycoin::to_string(const block::Time &rhs)
+{
+    // Convert time_point to time_t
+    std::chrono::time_point<std::chrono::system_clock> tp(rhs.getSystemClock());
+    std::time_t tt = std::chrono::system_clock::to_time_t(tp);
+    std::tm *gmt = std::gmtime(&tt);
+
+    // Extract milliseconds
+    auto duration = tp.time_since_epoch();
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() % 1000;
+
+    std::stringstream ss;
+    ss << std::put_time(gmt, "%Y-%m-%d %H:%M:%S");
+    ss << '.' << std::setfill('0') << std::setw(3) << millis;
+    return ss.str();
 }

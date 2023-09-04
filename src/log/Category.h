@@ -15,6 +15,7 @@ enum BasicCategory
     Comm,
     Db,
     Auth,
+    Init,
 };
 
 /**

@@ -54,7 +54,7 @@ Session::~Session()
 }
 
 async::Ret<Result> Session::query(
-    std::string query,
+    const std::string &query,
     Details &details)
 {
     if (!impl)
@@ -117,7 +117,7 @@ async::Ret<Result> Session::query(
 }
 
 async::Ret<DataResult> Session::select(
-    std::string query,
+    const std::string &query,
     Details &details)
 {
     if (!impl)

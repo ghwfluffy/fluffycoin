@@ -1,4 +1,5 @@
 #include <fluffycoin/block/Block.h>
+#include <fluffycoin/ossl/encode.h>
 #include <fluffycoin/log/Log.h>
 
 #include <openssl/asn1t.h>
@@ -27,6 +28,8 @@ ASN1_CHOICE(Block) =
   , ASN1_IMP(Block, u.reconciliation, Reconciliation, 2)
   , ASN1_IMP(Block, u.node, Node, 3)
 } ASN1_CHOICE_END(Block)
+
+IMPLEMENT_ASN1_FUNCTIONS(Block)
 
 }
 
@@ -190,4 +193,31 @@ void Block::fromAsn1(const asn1::Block &t)
             log::error("Invalid fromAsn1 block type {}.", t.type);
             break;
     }
+}
+
+BinData Block::encode() const
+{
+    asn1::Block *obj = asn1::Block_new();
+    toAsn1(*obj);
+    BinData data = ossl::encode(*obj, asn1::i2d_Block);
+    asn1::Block_free(obj);
+    return data;
+}
+
+std::string fluffycoin::to_string(block::Block::Type type)
+{
+    switch (type)
+    {
+        case block::Block::Type::Genesis:
+            return "Genesis";
+        case block::Block::Type::Reconciliation:
+            return "Reconciliation";
+        case block::Block::Type::Node:
+            return "Node";
+        default:
+        case block::Block::Type::None:
+            break;
+    }
+
+    return "None";
 }

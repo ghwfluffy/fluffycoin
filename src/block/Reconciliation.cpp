@@ -12,12 +12,27 @@ namespace fluffycoin
 namespace asn1
 {
 
+typedef struct ReconciliationShardInfo_t
+{
+    Hash *hash;
+    ASN1_INTEGER *blocks;
+} ReconciliationShardInfo;
+
+ASN1_SEQUENCE(ReconciliationShardInfo) =
+{
+    ASN1_SIMPLE(ReconciliationShardInfo, hash, Hash)
+  , ASN1_SIMPLE(ReconciliationShardInfo, blocks, ASN1_INTEGER)
+} ASN1_SEQUENCE_END(ReconciliationShardInfo)
+
+IMPLEMENT_ASN1_FUNCTIONS(ReconciliationShardInfo)
+FLUFFYCOIN_DEFINE_STACK_FUNCTIONS_VEC(ReconciliationShardInfo)
+
 typedef struct ReconciliationContent_t
 {
     ASN1_INTEGER *protocol;
     Time *time;
     ASN1_INTEGER *chainId;
-    STACK_OF(Hash) *shardHashes;
+    STACK_OF(ReconciliationShardInfo) *shardInfo;
     ASN1_OCTET_STRING *leader;
 } ReconciliationContent;
 
@@ -28,7 +43,7 @@ ASN1_SEQUENCE(ReconciliationContent) =
     ASN1_SIMPLE(ReconciliationContent, protocol, ASN1_INTEGER)
   , ASN1_SIMPLE(ReconciliationContent, time, ASN1_INTEGER)
   , ASN1_SIMPLE(ReconciliationContent, chainId, ASN1_INTEGER)
-  , ASN1_SEQUENCE_OF(ReconciliationContent, shardHashes, Hash)
+  , ASN1_SEQUENCE_OF(ReconciliationContent, shardInfo, ReconciliationShardInfo)
   , ASN1_SIMPLE(ReconciliationContent, leader, ASN1_OCTET_STRING)
 } ASN1_SEQUENCE_END(ReconciliationContent)
 
@@ -84,14 +99,14 @@ void Reconciliation::setChainId(uint64_t chainId)
     this->chainId = chainId;
 }
 
-const std::list<Hash> &Reconciliation::getShardHashes() const
+const std::vector<ReconciliationShardInfo> &Reconciliation::getShardInfo() const
 {
-    return shardHashes;
+    return shardInfo;
 }
 
-void Reconciliation::setShardHashes(std::list<Hash> hashes)
+void Reconciliation::setShardInfo(std::vector<ReconciliationShardInfo> infos)
 {
-    this->shardHashes = std::move(hashes);
+    this->shardInfo = std::move(infos);
 }
 
 const Address &Reconciliation::getLeader() const
@@ -128,7 +143,7 @@ void Reconciliation::toAsn1(asn1::Reconciliation &t) const
 {
     ossl::fromUInt32(*t.content->protocol, protocol);
     ossl::fromUInt64(*t.content->chainId, chainId);
-    asn1::toHashStack(*t.content->shardHashes, shardHashes);
+    asn1::toReconciliationShardInfoStack(*t.content->shardInfo, shardInfo);
     leader.toAsn1(*t.content->leader);
     signature.toAsn1(*t.signature);
     asn1::toValidationStack(*t.votes, votes);
@@ -138,7 +153,7 @@ void Reconciliation::fromAsn1(const asn1::Reconciliation &t)
 {
     protocol = ossl::toUInt32(*t.content->protocol);
     chainId = ossl::toUInt64(*t.content->chainId);
-    asn1::fromHashStack(shardHashes, *t.content->shardHashes);
+    asn1::fromReconciliationShardInfoStack(shardInfo, *t.content->shardInfo);
     leader.fromAsn1(*t.content->leader);
     signature.fromAsn1(*t.signature);
     asn1::fromValidationStack(votes, *t.votes);
@@ -160,4 +175,24 @@ BinData Reconciliation::encode() const
     BinData data = ossl::encode(*obj, asn1::i2d_Reconciliation);
     asn1::Reconciliation_free(obj);
     return data;
+}
+
+ReconciliationShardInfo::ReconciliationShardInfo(
+    Hash hash,
+    uint32_t blocks)
+        : hash(std::move(hash))
+        , blocks(blocks)
+{
+}
+
+void ReconciliationShardInfo::toAsn1(asn1::ReconciliationShardInfo &t) const
+{
+    hash.toAsn1(*t.hash);
+    ossl::fromUInt32(*t.blocks, blocks);
+}
+
+void ReconciliationShardInfo::fromAsn1(const asn1::ReconciliationShardInfo &t)
+{
+    hash.fromAsn1(*t.hash);
+    blocks = ossl::toUInt32(*t.blocks);
 }

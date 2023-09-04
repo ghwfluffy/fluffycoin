@@ -41,6 +41,8 @@ class Hash
         void toAsn1(asn1::Hash &) const;
         void fromAsn1(const asn1::Hash &);
 
+        BinData encode() const;
+
         bool operator==(const Hash &rhs) const;
         bool operator!=(const Hash &rhs) const;
 

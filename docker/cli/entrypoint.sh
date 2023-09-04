@@ -18,8 +18,15 @@ fluffycoin-vote: Submit actions related to votes
 fluffycoin-stocks: Submit actions related to stocks
 CLI
 
-if [ -v HOME ]; then
-    cd ${HOME}/.fluffycoin &> /dev/null || true
+# Persistent data location
+if [ ! -v FLUFFYCOIN_RESOURCE_DIR ]; then
+    if [ -v HOME ]; then
+        FLUFFYCOIN_RESOURCE_DIR="${HOME}/.fluffycoin"
+    else
+        FLUFFYCOIN_RESOURCE_DIR="/"
+    fi
 fi
+
+cd "${FLUFFYCOIN_RESOURCE_DIR}" &> /dev/null || true
 
 exec /bin/bash

@@ -58,6 +58,11 @@ Validation              ::=SEQUENCE {
     signature           Signature
 }
 
+ReconciliationShardInfo ::=SEQUENCE {
+    hash                Hash,
+    blocks              INTEGER (0..MAX)
+}
+
 -- Every so often all of the chains recombine into a single block
 -- This is a bit of a bottleneck that synchronizes all of the sub-chains
 -- It is used to count an arbitrary amount of time in blockchain operations
@@ -69,10 +74,11 @@ ReconciliationContent   ::=SEQUENCE {
     time                Time,
     -- Monotomically increments every reconciliation block starting at zero
     chainId             INTEGER (0..MAX),
-    -- Ordered hashes of the last node of every sub-chain
-    shardHashes         SEQUENCE OF Hash SIZE (1..64),
+    -- Ordered hashes of the last node and total number of nodes of every sub-chain
+    shardInfo           SEQUENCE OF ReconciliationShardInfo SIZE (1..64),
     -- The round leader for the reconciliation block
     leader              Address,
+    -- TODO: This was removed from C++
     newLeaderKey        PublicKey,
     newAddress          Address
 }

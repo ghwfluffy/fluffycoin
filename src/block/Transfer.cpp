@@ -21,6 +21,8 @@ ASN1_SEQUENCE(Transfer) =
   , ASN1_SIMPLE(Transfer, coin, ASN1_UTF8STRING)
 } ASN1_SEQUENCE_END(Transfer)
 
+IMPLEMENT_ASN1_FUNCTIONS(Transfer)
+
 }
 
 }

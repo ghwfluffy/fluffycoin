@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Wait for database to accept us
+echo "Waiting for database."
+TEST_SQL="BEGIN WORK; DROP TABLE IF EXISTS fctest; CREATE TABLE fctest(); ROLLBACK;"
+while ! psql "${PGDATABASE}" -c "${TEST_SQL}" &> /dev/null; do
+    sleep 0.1
+done
+
+# Initalize database if it is not already
+if psql "${PGDATABASE}" -c "SELECT 1 FROM patches" &> /dev/null; then
+    echo "Initializing database."
+    psql "${PGDATABASE}" < /usr/share/fluffycoin/sql/schema.sql
+fi
+
+# Curator service
+echo "Executing curator service."
+exec /usr/bin/fluffycoin-curator

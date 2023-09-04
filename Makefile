@@ -35,9 +35,10 @@ build-containers: ## Build the runtime containers
 	./tools/buildscripts/build-containers.sh $(ARGS)
 
 .PHONY: runcli-docker
+include .env
 runcli-docker: ## Drop into the CLI docker
-	@mkdir -p ~/.fluffycoin
-	docker run -ti -u $(shell id -u):$(shell id -g) -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v $(HOME)/.fluffycoin:$(HOME)/.fluffycoin fluffyco.in/cli:0.0.x
+	@mkdir -p "$(FLUFFYCOIN_RESOURCE_DIR)"
+	docker run -ti -u $(shell id -u):$(shell id -g) -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v $(HOME)/.fluffycoin:$(HOME)/.fluffycoin -e FLUFFYCOIN_RESOURCE_DIR="$(FLUFFYCOIN_RESOURCE_DIR)" fluffyco.in/cli:0.0.x
 
 # Show help menu
 .PHONY: help

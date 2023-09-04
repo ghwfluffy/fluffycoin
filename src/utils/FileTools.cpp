@@ -38,9 +38,13 @@ bool FileTools::isDir(const std::string &path)
     return std::filesystem::is_directory(path);
 }
 
-bool FileTools::read(
+namespace
+{
+
+template<typename Output>
+bool readT(
     const std::string &path,
-    std::string &data)
+    Output &data)
 {
     FILE *fp = fopen(expandTilde(path).c_str(), "rb");
     if (!fp)
@@ -67,6 +71,22 @@ bool FileTools::read(
     fclose(fp);
 
     return read == sizet;
+}
+
+}
+
+bool FileTools::read(
+    const std::string &path,
+    std::string &data)
+{
+    return ::readT(path, data);
+}
+
+bool FileTools::read(
+    const std::string &path,
+    BinData &data)
+{
+    return ::readT(path, data);
 }
 
 bool FileTools::write(

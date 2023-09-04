@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fluffycoin/curator/FsStorage.h>
+#include <fluffycoin/curator/fs/BlockStorage.h>
 
 #include <fluffycoin/svc/AbstractServiceParams.h>
 
@@ -57,7 +57,7 @@ class CuratorServiceParams : public svc::AbstractServiceParams
 
         const svc::ServiceScene *pctx;
         std::unique_ptr<db::Database> db;
-        FsStorage fs;
+        fs::BlockStorage fsBlocks;
 };
 
 }

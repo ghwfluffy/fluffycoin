@@ -1,5 +1,6 @@
 #include <fluffycoin/block/Specie.h>
 #include <fluffycoin/ossl/convert.h>
+#include <fluffycoin/log/Log.h>
 
 #include <openssl/asn1t.h>
 
@@ -53,6 +54,8 @@ uint32_t Specie::getFluffs() const
 void Specie::setFluffs(uint32_t fluffs)
 {
     this->fluffs = fluffs;
+    if (fluffs >= 100000000)
+        log::error(log::General, "Invalid fluff amount {}.", fluffs);
 }
 
 void Specie::toAsn1(asn1::Specie &t) const
@@ -65,4 +68,23 @@ void Specie::fromAsn1(const asn1::Specie &t)
 {
     coins = ossl::toUInt64(*t.coins);
     fluffs = ossl::toUInt32(*t.fluffs);
+}
+
+std::string fluffycoin::to_string(const block::Specie &specie)
+{
+    char szRet[64] = {};
+    int pos = snprintf(szRet, sizeof(szRet),
+        "%llu.%08u",
+        static_cast<unsigned long long>(specie.getCoins()),
+        static_cast<unsigned int>(specie.getFluffs()));
+
+    // Remove zeros from decimal place
+    while (pos > 1 && szRet[pos - 1] == '0')
+        szRet[--pos] = '\0';
+
+    // Remove decimal if no fluffs
+    if (szRet[pos - 1] == '.')
+        szRet[--pos] = '\0';
+
+    return std::string(szRet, static_cast<size_t>(pos));
 }

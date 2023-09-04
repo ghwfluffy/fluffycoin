@@ -1,7 +1,6 @@
 #include "fluffytest.h"
 
 #include <fluffycoin/block/Genesis.h>
-#include <fluffycoin/block/encode.h>
 
 #include <fluffycoin/alg/info.h>
 #include <fluffycoin/alg/Address.h>
@@ -31,6 +30,6 @@ TEST(Genesis, Encode)
     genesis.setGreed(greed);
     genesis.setSeed(BinData("GHW"));
 
-    BinData serial = block::encode(genesis);
+    BinData serial = genesis.encode();
     EXPECT_FALSE(serial.empty());
 }

@@ -6,6 +6,7 @@
 
 #include <fluffycoin/alg/info.h>
 #include <fluffycoin/alg/Wallet.h>
+#include <fluffycoin/alg/BlockFilename.h>
 
 #include <fluffycoin/utils/ArgParser.h>
 #include <fluffycoin/utils/FileTools.h>
@@ -100,6 +101,9 @@ namespace error
     R(WriteWallet);
 };
 
+// Need more than 1 greed to not deadlock the algorithm
+constexpr const uint64_t GREED_MINIMUM = 2;
+
 }
 
 int main(int argc, const char *argv[])
@@ -130,7 +134,7 @@ int main(int argc, const char *argv[])
     if (args.hasArg("greed"))
         greed = static_cast<uint64_t>(args.getSizeT("greed"));
 
-    if (!greed)
+    if (greed < GREED_MINIMUM)
     {
         fprintf(stderr, "Invalid greed.\n");
         parser.printHelp();
@@ -204,7 +208,7 @@ int main(int argc, const char *argv[])
     block::Reconciliation rec;
     rec.setProtocol(alg::PROTOCOL_VERSION);
     rec.setChainId(0);
-    rec.setShardHashes({block::Hash(genesisData)});
+    rec.setShardInfo({block::ReconciliationShardInfo(block::Hash(genesisData), 0)});
     rec.setLeader(wallet.getLatestAddressBin(alg::Wallet::KeyUsage::Validator));
     rec.setSignature(ossl::Curve25519::sign(*wallet.getLatestKey(alg::Wallet::KeyUsage::Validator), rec.toContent()));
 
@@ -227,13 +231,13 @@ int main(int argc, const char *argv[])
     }
 
     // Write out blocks
-    if (!FileTools::write(outputDir + "/00.der", genesisData))
+    if (!FileTools::write(outputDir + "/" + alg::BlockFilename::get(0, 0, 0), genesisData))
     {
         log::error("Failed to write genesis block to filesystem.");
         return error::WriteBlock;
     }
 
-    if (!FileTools::write(outputDir + "/01.der", recData))
+    if (!FileTools::write(outputDir + "/" + alg::BlockFilename::get(1, 0, 0), recData))
     {
         log::error("Failed to write initial reconciliation block to filesystem.");
         return error::WriteBlock;

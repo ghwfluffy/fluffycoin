@@ -21,6 +21,7 @@ void log::Category::init()
     log::Category::add(log::Comm, "COMM");
     log::Category::add(log::Db, "DATABASE");
     log::Category::add(log::Auth, "AUTH");
+    log::Category::add(log::Init, "INIT");
 }
 
 void log::Category::addInternal(std::size_t cat, const char *name)

@@ -3,6 +3,7 @@
 #include <fluffycoin/block/Genesis.h>
 #include <fluffycoin/block/Reconciliation.h>
 #include <fluffycoin/block/Node.h>
+#include <fluffycoin/utils/Strings.h>
 
 #include <openssl/asn1.h>
 
@@ -55,6 +56,8 @@ class Block
         void toAsn1(asn1::Block &) const;
         void fromAsn1(const asn1::Block &);
 
+        BinData encode() const;
+
     private:
         void resetChoice();
 
@@ -65,5 +68,7 @@ class Block
 };
 
 }
+
+std::string to_string(block::Block::Type);
 
 }

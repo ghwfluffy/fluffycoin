@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fluffycoin/utils/Strings.h>
+
 #include <stdint.h>
 
 #include <openssl/asn1.h>
@@ -45,5 +47,7 @@ class Specie
 };
 
 }
+
+std::string to_string(const block::Specie &specie);
 
 }

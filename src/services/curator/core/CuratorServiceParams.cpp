@@ -28,7 +28,7 @@ void CuratorServiceParams::setupScene(svc::ServiceScene &ctx)
     // TODO: OZO DB implementation
     //db = std::make_unique<db::Database>(ctx.asio);
     ctx.set(*db.get());
-    ctx.set(fs);
+    ctx.set(fsBlocks);
 }
 
 void CuratorServiceParams::initCmdLineParams(ArgParser &args) const
@@ -83,7 +83,7 @@ bool CuratorServiceParams::init(bool paused)
     if (paused)
         return true;
 
-    fs.setDirectory(fsStorageDir);
+    fsBlocks.setDirectory(fsStorageDir);
 
     boost::asio::co_spawn(pctx->asio, LoadFromFs::init(*pctx, reloadFrom), boost::asio::detached);
     return true;

@@ -1,28 +1,52 @@
--- [Genesis 0] -> [Reconciliation 0] ... -> [Reconciliation n]
+-- [Genesis 0] -> [Reconciliation 1] ... -> [Reconciliation n]
 --     -> [Reconciliation n, Shard 0, Block 0, Transaction 0]
---          First block of each start is number 1
+--          First block of each shard is number 1
 --          Reconciliation block is shard 0 block 0
 
 -- transaction_id = reconciliation.shard.block.transaction
 -- block_id = reconciliation.shard.block
 
-CREATE TABLE blocks
+-- Genesis=0,0,0
+-- First Recon=1,0,0
+-- First shard first block=1,1,1
+-- nth Recon = n,0,0
+
+BEGIN WORK;
+
+-- One row per shard, what is the most recent thing we imported
+-- We don't start importing the next reconciliation till the whole previous one is imported
+CREATE TABLE imported_blocks
 (
-    reconciliation BIGINT NOT NULL,
+    reconciliation INT NOT NULL,
+    shard INT NOT NULL,
+    block INT NOT NULL,
+    -- block::asn1::Hash
+    hash bytea NOT NULL,
+
+    PRIMARY KEY (reconciliation, shard)
+);
+
+-- Every vote from a validator
+CREATE TABLE validations
+(
+    reconciliation INT NOT NULL,
     shard INT NOT NULL,
     block INT NOT NULL,
 
-    block_id VARCHAR NOT NULL,
+    validator_address VARCHAR NOT NULL,
+    -- If they votes the block is good
+    vote BOOLEAN NOT NULL,
 
-    PRIMARY KEY(reconciliation, shard, block)
+    PRIMARY KEY(reconciliation, shard, block, validator_address)
 );
 
+-- Every transaction in a block
 CREATE TABLE transactions
 (
     -- Hash of primary key
     transaction_id VARCHAR NOT NULL,
 
-    reconciliation BIGINT NOT NULL,
+    reconciliation INT NOT NULL,
     shard INT NOT NULL,
     block INT NOT NULL,
     transaction_index INT NOT NULL,
@@ -40,6 +64,7 @@ CREATE TABLE transactions
     PRIMARY KEY(reconciliation, shard, block, transaction_index)
 );
 
+-- Every transfer transaction
 CREATE TABLE transfer_transactions
 (
     transaction_id VARCHAR NOT NULL,
@@ -57,7 +82,8 @@ CREATE TABLE transfer_transactions
     PRIMARY KEY(transaction_id)
 );
 
-CREATE TABLE validator_join_transactions
+-- Every validator onboarding
+CREATE TABLE validator_joins
 (
     transaction_id VARCHAR NOT NULL,
 
@@ -72,7 +98,8 @@ CREATE TABLE validator_join_transactions
     PRIMARY KEY(transaction_id)
 );
 
-CREATE TABLE validator_leave_transactions
+-- Every validator offboarding
+CREATE TABLE validator_leaves
 (
     transaction_id VARCHAR NOT NULL,
 
@@ -83,7 +110,8 @@ CREATE TABLE validator_leave_transactions
     PRIMARY KEY(transaction_id)
 );
 
-CREATE TABLE validator_rotate_transactions
+-- Every validator key rotation
+CREATE TABLE validator_rotates
 (
     transaction_id VARCHAR NOT NULL,
 
@@ -107,8 +135,6 @@ CREATE TABLE wallets
     coins BIGINT NOT NULL,
     fluffs INT NOT NULL,
 
-    staked_address VARCHAR,
-    staked_pubkey bytea,
     staked_coins BIGINT,
     staked_fluffs INT,
 
@@ -119,14 +145,14 @@ CREATE TABLE wallet_addresses
 (
     wallet_id BIGINT NOT NULL,
     address VARCHAR NOT NULL,
-    pubkey bitea,
+    pubkey bytea,
 
     PRIMARY KEY(wallet_id, address)
-)
+);
 
 CREATE TABLE validator_rewards
 (
-    reconciliation BIGINT NOT NULL,
+    reconciliation INT NOT NULL,
     shard INT NOT NULL,
     block INT NOT NULL,
 
@@ -143,3 +169,13 @@ CREATE TABLE validator_rewards
 
     PRIMARY KEY(reconciliation, shard, block)
 );
+
+-- Database patches that have been applied
+CREATE TABLE patches
+(
+    patch VARCHAR NOT NULL,
+    PRIMARY KEY (patch)
+);
+INSERT INTO patches (patch) VALUES ('init-1.0.0');
+
+COMMIT;

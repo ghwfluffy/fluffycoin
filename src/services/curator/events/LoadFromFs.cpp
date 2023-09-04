@@ -1,13 +1,11 @@
 #include <fluffycoin/curator/LoadFromFs.h>
-#include <fluffycoin/curator/FsStorage.h>
+#include <fluffycoin/curator/fs/BlockStorage.h>
 
 #include <fluffycoin/db/Database.h>
 
 #include <fluffycoin/async/BuriedTreasure.h>
 
 #include <fluffycoin/log/Log.h>
-
-#include <boost/asio/steady_timer.hpp>
 
 using namespace fluffycoin;
 using namespace fluffycoin::curator;
@@ -125,21 +123,113 @@ void delayedRetry(LoadState state)
 
 }
 
+    std::unique_ptr<asn1::Block> asn1Block = block::
+    asn1::Block asn1Block;
+    
+
+    asn1::block::Block block(
+        // In/Out
+        BinData readBlock(
+            uint32_t reconciliation,
+            uint32_t shard,
+            uint32_t block) const;
+    std::file = alg::BlockFilename::get(recon, shard, block);
+    if (!FileTools::read(file, data))
+        details.setError("Failed to read {}.", 
+
+    // TODO
+}
+#endif
+
+#if 0
+async::Ret<void> decodeGenesis(
+    Details &details)
+{
+    block::Genesis block;
+    if (!block::decode(data, block))
+    {
+        details.setError("Failed to decode genesis block.");
+        fs.clearBlock(recon, shard, block);
+        co_return;
+    }
+
+    // TODO
+}
+
+async::Ret<void> loadBlock(
+    fs::BlockStorage &fs,
+    uint32_t recon,
+    uint32_t shard,
+    uint32_t block,
+    Details &details)
+{
+    BinData data = fs.readBlock(recon, shard, block);
+    if (data.empty())
+    {
+        details.setError("Failed to read block ({}.{}.{}).", recon, shard, block);
+        fs.clearBlock(recon, shard, block);
+        co_return;
+    }
+
+    // Genesis block
+    if (recon == 0 && shard == 0 && block == 0)
+    {
+        co_await decodeGenesis(details);
+        co_return;
+    }
+    // Reconciliation block
+    else if (shard == 0 && block == 0)
+    {
+        co_await decodeRecon(recon, details);
+        co_return;
+    }
+
+    // Normal block
+    co_await decodeBlock(recon, shard, block, details);
+    co_return;
+}
 #endif
 
 async::Ret<void> LoadFromFs::init(
     const svc::ServiceScene &ctx,
     uint64_t reloadFrom)
 {
-#if 0
-    // Setup async state
-    LoadState state(ctx.trove, ctx);
-    state().reloadFrom = reloadFrom;
-
-    // Connect to DB
-    startDbSession(std::move(state));
-#endif
-    (void)reloadFrom;
+    (void)reloadFrom; // TODO
     Details details;
-    db::Session session = co_await ctx.get<db::Database>().newReadOnlySession(details);
+
+    // Need to have at least the genesis and reconciliation block to start decoding
+    fs::BlockStorage &fs = ctx.get<fs::BlockStorage>();
+    uint32_t endRecon = fs.getEndReconciliation();
+    if (endRecon == 0)
+    {
+        details.setError(log::Init, ErrorCode::InternalError, "load_from_fs", "No genesis block available.");
+        co_return;
+    }
+
+    if (endRecon == 1)
+    {
+        details.setError(log::Init, ErrorCode::InternalError, "load_from_fs", "No initial reconciliation block available.");
+        co_return;
+    }
+
+#if 0
+    db::Session session = co_await ctx.get<db::Database>().newSession(details);
+
+    // TODO
+    log::info("Loading {} reconciliation blocks from filesystem.", endRecon > 0 ? (endRecon - 1) : 0);
+    for (uint32_t uiRecon = 0; uiRecon < endRecon; uiRecon++)
+    {
+        uint32_t numShards = fs.getNumShards(uiRecond);
+        log::info("Loading {} shards for reconciliation block {}.", numShards, uiRecon);
+        for (uint32_t uiShard = 0; uiShard < numShards; uiShard++)
+        {
+            uint32_t numBlocks = fs.getNumBlocks(uiRecond, uiShard);
+            log::info("Loading {} blocks for shard {} of reconciliation block {}.", numBlocks, uiShard, uiRecon);
+            for (uint32_t uiBlock = 0; uiBlock < numBlocks; uiBlock++)
+            {
+                loadBlock(fs, uiRecon, uiShard, uiBlock, details);
+            }
+        }
+    }
+#endif
 }

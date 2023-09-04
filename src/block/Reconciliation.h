@@ -10,6 +10,7 @@
 #include <openssl/asn1.h>
 
 #include <list>
+#include <vector>
 #include <stdint.h>
 
 namespace fluffycoin
@@ -19,10 +20,33 @@ namespace asn1
 {
     typedef struct Reconciliation_t Reconciliation;
     DECLARE_ASN1_FUNCTIONS(Reconciliation);
+
+    typedef struct ReconciliationShardInfo_t ReconciliationShardInfo;
+    DECLARE_ASN1_FUNCTIONS(ReconciliationShardInfo);
 }
 
 namespace block
 {
+
+/**
+ * Information about one of the shards being combined into the reconciliation block
+ */
+struct ReconciliationShardInfo
+{
+    Hash hash;
+    uint32_t blocks = 0;
+
+    ReconciliationShardInfo() = default;
+    ReconciliationShardInfo(Hash hash, uint32_t blocks);
+    ReconciliationShardInfo(ReconciliationShardInfo &&) = default;
+    ReconciliationShardInfo(const ReconciliationShardInfo &) = default;
+    ReconciliationShardInfo &operator=(ReconciliationShardInfo &&) = default;
+    ReconciliationShardInfo &operator=(const ReconciliationShardInfo &) = default;
+    ~ReconciliationShardInfo() = default;
+
+    void toAsn1(asn1::ReconciliationShardInfo &) const;
+    void fromAsn1(const asn1::ReconciliationShardInfo &);
+};
 
 /**
  * Periodic block that combines all the shards before sharding again
@@ -43,8 +67,8 @@ class Reconciliation
         uint64_t getChainId() const;
         void setChainId(uint64_t chainId);
 
-        const std::list<Hash> &getShardHashes() const;
-        void setShardHashes(std::list<Hash> hashes);
+        const std::vector<ReconciliationShardInfo> &getShardInfo() const;
+        void setShardInfo(std::vector<ReconciliationShardInfo> hashes);
 
         const Address &getLeader() const;
         void setLeader(Address leader);
@@ -64,7 +88,7 @@ class Reconciliation
     private:
         uint32_t protocol;
         uint64_t chainId;
-        std::list<Hash> shardHashes;
+        std::vector<ReconciliationShardInfo> shardInfo;
         Address leader;
         Signature signature;
         std::list<Validation> votes;

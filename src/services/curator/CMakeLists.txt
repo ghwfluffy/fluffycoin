@@ -9,4 +9,6 @@ fluffyservice(
         fluffycoin-alg
         fluffycoin-db
         fluffycoin-svc
+    NAMESPACES
+        fs
 )

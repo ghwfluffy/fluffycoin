@@ -2,15 +2,21 @@ version: '3.8'
 
 x-env: &environment
   environment:
+    # Version
     - FLUFFYCOIN_TAG=${FLUFFYCOIN_TAG}
+    # Host directory to mount persistent data
     - FLUFFYCOIN_RESOURCE_DIR=${FLUFFYCOIN_RESOURCE_DIR}
+    # Database parameters
+    - PGDATA=${FLUFFYCOIN_RESOURCE_DIR}/db
     - PGUSER=fluffy
     - POSTGRES_PASSWORD=fluffy
     - PGPORT=5432
-    - PGDATA=${FLUFFYCOIN_RESOURCE_DIR}/db
+    - PGHOST=postgres # service hostname
+    - PGDATABASE=fluffycoin
 
 x-mounted-fs: &mounted-fs
   volumes:
+    # Allow writing persistent data to the host as the host user
     - ${FLUFFYCOIN_RESOURCE_DIR}:${FLUFFYCOIN_RESOURCE_DIR}:rw
     - /etc/passwd:/etc/passwd:ro
     - /etc/group:/etc/group:ro
@@ -34,8 +40,9 @@ services:
     <<: [*network, *environment]
     volumes:
       - ${FLUFFYCOIN_RESOURCE_DIR}/db:${FLUFFYCOIN_RESOURCE_DIR}/db:rw
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     expose:
-      - "1337" # API Port
+      - "5432" # Internal API Port
 
   p2p:
     image: fluffyco.in/p2p:${FLUFFYCOIN_TAG}
@@ -48,4 +55,4 @@ services:
     image: fluffyco.in/curator:${FLUFFYCOIN_TAG}
     <<: [*network, *environment, *mounted-fs]
     expose:
-      - "1337" # API Port
+      - "1337" # Internal API Port
