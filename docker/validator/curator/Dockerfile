@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:edge
 LABEL maintainer="GhwFluffy <ghw@ghwfluffy.com>"
 LABEL description="Fluffycoin curator"
 ENV LANG="en_US.utf8"
@@ -18,6 +18,7 @@ RUN set -eux; \
 
 # Runtime environment
 RUN set -eux; \
+    apk add --no-cache bash; \
     mkdir -p /var/log/fluffycoin; \
     mkdir -p /usr/share/fluffycoin/sql; \
     true
@@ -33,5 +34,5 @@ COPY ./doc/schema.sql /usr/share/fluffycoin/sql/
 VOLUME /var/log/fluffycoin
 
 # Entrypoint
-COPY entrypoint /
+COPY ./docker/validator/curator/entrypoint /
 ENTRYPOINT ["/entrypoint"]

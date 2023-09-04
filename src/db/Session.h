@@ -39,6 +39,9 @@ class Session
             const std::string &query,
             Details &details);
 
+        async::Ret<void> commit(
+            Details &details);
+
     private:
         std::unique_ptr<priv::SessionImpl> impl;
 };

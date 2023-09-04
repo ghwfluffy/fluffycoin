@@ -2,6 +2,7 @@
 
 #include <fluffycoin/utils/BinData.h>
 
+#include <list>
 #include <string>
 #include <stdint.h>
 
@@ -37,15 +38,13 @@ class BlockStorage
             uint32_t block,
             const BinData &data) const;
 
-        // Info
-        uint32_t getEndReconciliation() const;
-
-        uint32_t getNumShards(
-            uint32_t reconciliation) const;
-
-        uint32_t getNumBlocks(
+        void clearBlock(
             uint32_t reconciliation,
-            uint32_t shard) const;
+            uint32_t shard,
+            uint32_t block) const;
+
+        bool getFiles(
+            std::list<std::string> &files);
 
     private:
         std::string dir;

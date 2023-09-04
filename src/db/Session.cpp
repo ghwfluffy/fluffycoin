@@ -51,6 +51,39 @@ Session &Session::operator=(Session &&rhs)
 
 Session::~Session()
 {
+    if (impl && impl->transaction)
+        log::error(log::Db, "Database transaction never finalized.");
+}
+
+async::Ret<void> Session::commit(
+    Details &details)
+{
+    // Commit
+    if (!impl || !impl->transaction)
+    {
+        details.setError(log::Db, ErrorCode::InternalError, "commit",
+            "No database session active.");
+    }
+    else
+    {
+        boost::system::error_code ec;
+        auto conn = co_await ozo::commit(std::move(impl->transaction),
+            boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+        if (ec)
+        {
+            details.setError(log::Db, ErrorCode::DatabaseError, "query",
+                "Failed to finalize database session: {}.",
+                db::priv::Ozo::error(ec, conn));
+        }
+        else
+        {
+            details.log().traffic(log::Db, "Finalized database transaction.");
+        }
+    }
+
+    impl.reset();
+
+    co_return;
 }
 
 async::Ret<Result> Session::query(

@@ -45,7 +45,14 @@ Block::Block()
 
 Block::Block(Block &&rhs)
 {
+    resetChoice();
     operator=(std::move(rhs));
+}
+
+Block::Block(const Block &rhs)
+{
+    resetChoice();
+    operator=(rhs);
 }
 
 Block &Block::operator=(Block &&rhs)
@@ -60,6 +67,18 @@ Block &Block::operator=(Block &&rhs)
         this->node = std::move(rhs.node);
 
         rhs.resetChoice();
+    }
+
+    return (*this);
+}
+
+Block &Block::operator=(const Block &rhs)
+{
+    if (this != &rhs)
+    {
+        asn1::Block t = {};
+        rhs.toAsn1(t);
+        fromAsn1(t);
     }
 
     return (*this);

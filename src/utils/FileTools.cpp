@@ -150,3 +150,39 @@ bool FileTools::createDir(
 
     return true;
 }
+
+bool FileTools::listFiles(
+    const std::string &path,
+    std::list<std::string> &files,
+    bool recursive)
+{
+    if (!std::filesystem::exists(path))
+    {
+        log::error("Directory does not exist {}.", path);
+        return false;
+    }
+
+    if (recursive) {
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(path)) {
+            if (std::filesystem::is_regular_file(entry.status())) {
+                files.push_back(entry.path().string().substr(path.size() + 1));
+            }
+        }
+    } else {
+        for (const auto& entry : std::filesystem::directory_iterator(path)) {
+            if (std::filesystem::is_regular_file(entry.status())) {
+                files.push_back(entry.path().filename().string());
+            }
+        }
+    }
+
+    log::traffic("Enumerated {} files in directory '{}'.", files.size(), path);
+
+    return true;
+}
+
+bool FileTools::unlink(
+    const std::string &file)
+{
+    return std::filesystem::remove(file.c_str());
+}

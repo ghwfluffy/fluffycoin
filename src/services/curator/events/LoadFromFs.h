@@ -16,7 +16,7 @@ namespace LoadFromFs
 {
     async::Ret<void> init(
         const svc::ServiceScene &ctx,
-        uint64_t reloadFrom);
+        uint32_t reloadFrom);
 }
 
 }

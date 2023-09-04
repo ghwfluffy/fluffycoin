@@ -26,7 +26,11 @@ async::Ret<DbIntegrator::Result> DbIntegrator::init(
         "SELECT reconciliation, shard, block, hash FROM imported_blocks",
         details);
     if (!details.isOk())
+    {
+        details.extendError(log::Init, "integrate_init",
+            "Failed to select current import state.");
         co_return Result::DatabaseError;
+    }
 
     // We need the genesis block
     if (result.getNumResults() == 0)
@@ -80,7 +84,11 @@ async::Ret<DbIntegrator::Result> DbIntegrator::integrate(
     // Get a new database session
     db::Session dbsession = co_await database.newSession(details);
     if (!details.isOk())
+    {
+        details.extendError(log::Init, "dbintegrate_init",
+            "Failed to create database session for block integration.");
         co_return Result::NoDatabase;
+    }
 
     // Initialize what we're looking for next
     if (!initialized)
@@ -269,6 +277,9 @@ async::Ret<DbIntegrator::Result> DbIntegrator::integrateGenesis(
         co_return Result::DatabaseError;
     }
 
+    co_await dbsession.commit(details);
+    // TODO: Check details
+
     // Update cached state
     currentRecon = 1;
     ShardInfo genesisShard;
@@ -365,6 +376,9 @@ async::Ret<DbIntegrator::Result> DbIntegrator::integrateRecon(
         co_return Result::DatabaseError;
     }
 
+    co_await dbsession.commit(details);
+    // TODO: Check details
+
     // Update cache:
     // Increment currentRecon
     currentRecon++;
@@ -409,6 +423,9 @@ async::Ret<DbIntegrator::Result> DbIntegrator::integrateNode(
             block, shard, currentRecon, lastBlock + 1);
         co_return Result::NotReady;
     }
+
+    co_await dbsession.commit(details);
+    // TODO: Check details
 
     // TODO: For each transfer transaction:
     // modify the coins in the sender/receiver wallets

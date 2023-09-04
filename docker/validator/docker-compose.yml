@@ -9,6 +9,7 @@ x-env: &environment
     # Database parameters
     - PGDATA=${FLUFFYCOIN_RESOURCE_DIR}/db
     - PGUSER=fluffy
+    - PGPASSWORD=fluffy
     - POSTGRES_PASSWORD=fluffy
     - PGPORT=5432
     - PGHOST=postgres # service hostname

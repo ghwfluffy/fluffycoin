@@ -10,11 +10,11 @@ while ! psql "${PGDATABASE}" -c "${TEST_SQL}" &> /dev/null; do
 done
 
 # Initalize database if it is not already
-if psql "${PGDATABASE}" -c "SELECT 1 FROM patches" &> /dev/null; then
+if ! psql "${PGDATABASE}" -c "SELECT 1 FROM patches" &> /dev/null; then
     echo "Initializing database."
     psql "${PGDATABASE}" < /usr/share/fluffycoin/sql/schema.sql
 fi
 
 # Curator service
 echo "Executing curator service."
-exec /usr/bin/fluffycoin-curator
+exec /usr/bin/fluffycoin-curator --log-console --log-verbose

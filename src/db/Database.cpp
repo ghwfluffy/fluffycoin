@@ -46,9 +46,11 @@ void Database::connect(
     const std::string &params,
     Details &details)
 {
+    //log::traffic("Database connection parameters: {}.", params);
+
     // Static ozo configuration
     ozo::connection_pool_config connection_pool_config;
-    connection_pool_config.capacity = 1;
+    connection_pool_config.capacity = 10;
     connection_pool_config.queue_capacity = 10;
     connection_pool_config.idle_timeout = std::chrono::seconds(60);
     // Maximum lifetime for a connection prevents issues with postgres cache fragmentation
@@ -63,6 +65,7 @@ void Database::connect(
     } catch (const std::exception &e) {
         details.setError(log::Db, ErrorCode::DatabaseError, "connect",
             "Failed to connect to database: {}", e.what());
+        impl.reset();
     }
 }
 

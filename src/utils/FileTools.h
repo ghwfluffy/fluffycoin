@@ -2,8 +2,8 @@
 
 #include <fluffycoin/utils/BinData.h>
 
+#include <list>
 #include <string>
-
 #include <filesystem>
 
 namespace fluffycoin
@@ -50,6 +50,14 @@ namespace FileTools
             std::filesystem::perms::group_exec |
             std::filesystem::perms::others_read |
             std::filesystem::perms::others_exec));
+
+    bool listFiles(
+        const std::string &path,
+        std::list<std::string> &files,
+        bool recursive = true);
+
+    bool unlink(
+        const std::string &file);
 }
 
 }

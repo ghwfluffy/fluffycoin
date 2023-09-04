@@ -6,6 +6,7 @@
 
 #include <fluffycoin/alg/info.h>
 #include <fluffycoin/alg/Wallet.h>
+#include <fluffycoin/alg/DefaultPaths.h>
 #include <fluffycoin/alg/BlockFilename.h>
 
 #include <fluffycoin/utils/ArgParser.h>
@@ -103,6 +104,7 @@ namespace error
 
 // Need more than 1 greed to not deadlock the algorithm
 constexpr const uint64_t GREED_MINIMUM = 2;
+constexpr const uint32_t FIRST_RECON = 1;
 
 }
 
@@ -112,7 +114,7 @@ int main(int argc, const char *argv[])
 
     // Defaults
     uint64_t greed = 1000;
-    std::string outputDir = "~/.fluffycoin/blocks";
+    std::string outputDir = alg::DefaultPaths::FS_BLOCKS;
     std::string walletFile = "~/.fluffycoin/wallet.json";
 
     // Setup argument parser
@@ -207,7 +209,7 @@ int main(int argc, const char *argv[])
     // Make the first reconciliation block
     block::Reconciliation rec;
     rec.setProtocol(alg::PROTOCOL_VERSION);
-    rec.setChainId(0);
+    rec.setChainId(FIRST_RECON);
     rec.setShardInfo({block::ReconciliationShardInfo(block::Hash(genesisData), 0)});
     rec.setLeader(wallet.getLatestAddressBin(alg::Wallet::KeyUsage::Validator));
     rec.setSignature(ossl::Curve25519::sign(*wallet.getLatestKey(alg::Wallet::KeyUsage::Validator), rec.toContent()));
@@ -219,8 +221,6 @@ int main(int argc, const char *argv[])
     validation.setSignature(rec.getSignature());
     rec.setVotes({validation});
 
-    BinData recData = rec.encode();
-
     // Get output directory
     if (args.hasArg("output"))
         outputDir = args.getArg("output");
@@ -231,13 +231,17 @@ int main(int argc, const char *argv[])
     }
 
     // Write out blocks
-    if (!FileTools::write(outputDir + "/" + alg::BlockFilename::get(0, 0, 0), genesisData))
+    block::Block genesisBlock;
+    genesisBlock.setGenesis(std::move(gen));
+    if (!FileTools::write(outputDir + "/" + alg::BlockFilename::get(0, 0, 0), genesisBlock.encode()))
     {
         log::error("Failed to write genesis block to filesystem.");
         return error::WriteBlock;
     }
 
-    if (!FileTools::write(outputDir + "/" + alg::BlockFilename::get(1, 0, 0), recData))
+    block::Block reconBlock;
+    reconBlock.setReconciliation(std::move(rec));
+    if (!FileTools::write(outputDir + "/" + alg::BlockFilename::get(FIRST_RECON, 0, 0), reconBlock.encode()))
     {
         log::error("Failed to write initial reconciliation block to filesystem.");
         return error::WriteBlock;

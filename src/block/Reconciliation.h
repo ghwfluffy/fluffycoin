@@ -64,8 +64,8 @@ class Reconciliation
         uint32_t getProtocol() const;
         void setProtocol(uint32_t protocol);
 
-        uint64_t getChainId() const;
-        void setChainId(uint64_t chainId);
+        uint32_t getChainId() const;
+        void setChainId(uint32_t chainId);
 
         const std::vector<ReconciliationShardInfo> &getShardInfo() const;
         void setShardInfo(std::vector<ReconciliationShardInfo> hashes);
@@ -87,7 +87,7 @@ class Reconciliation
 
     private:
         uint32_t protocol;
-        uint64_t chainId;
+        uint32_t chainId;
         std::vector<ReconciliationShardInfo> shardInfo;
         Address leader;
         Signature signature;

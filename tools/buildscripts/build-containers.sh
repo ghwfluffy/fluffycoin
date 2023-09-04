@@ -64,6 +64,14 @@ docker build \
     -t "fluffyco.in/cli:${FLUFFYCOIN_TAG}" \
     `latest "fluffyco.in/cli"`
 
+# Build env
+docker build \
+    ${CACHE} \
+    "${TOP_DIR}" \
+    -f "${DOCKER_DIR}/buildenv/Dockerfile" \
+    -t "fluffyco.in/buildenv:${FLUFFYCOIN_TAG}" \
+    `latest "fluffyco.in/buildenv"`
+
 # Unit and integration tests
 docker build \
     ${CACHE} \

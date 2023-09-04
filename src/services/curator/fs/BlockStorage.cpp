@@ -37,26 +37,17 @@ bool BlockStorage::writeBlock(
     return FileTools::write(file, data);
 }
 
-uint32_t BlockStorage::getEndReconciliation() const
-{
-    // TODO
-    return 0;
-}
-
-uint32_t BlockStorage::getNumShards(
-    uint32_t reconciliation) const
-{
-    (void)reconciliation;
-    // TODO
-    return 0;
-}
-
-uint32_t BlockStorage::getNumBlocks(
+void BlockStorage::clearBlock(
     uint32_t reconciliation,
-    uint32_t shard) const
+    uint32_t shard,
+    uint32_t block) const
 {
-    (void)reconciliation;
-    (void)shard;
-    // TODO
-    return 0;
+    std::string file = dir + "/" + alg::BlockFilename::get(reconciliation, shard, block);
+    FileTools::unlink(file);
+}
+
+bool BlockStorage::getFiles(
+    std::list<std::string> &files)
+{
+    return FileTools::listFiles(dir, files, false);
 }

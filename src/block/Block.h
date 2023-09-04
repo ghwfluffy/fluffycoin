@@ -29,9 +29,9 @@ class Block
     public:
         Block();
         Block(Block &&);
-        Block(const Block &) = delete;
+        Block(const Block &);
         Block &operator=(Block &&);
-        Block &operator=(const Block &) = delete;
+        Block &operator=(const Block &);
         ~Block() = default;
 
         enum class Type : int

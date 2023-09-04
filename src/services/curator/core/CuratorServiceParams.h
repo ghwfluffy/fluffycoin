@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fluffycoin/curator/fs/BlockStorage.h>
+#include <fluffycoin/curator/BlockIntegrator.h>
 
 #include <fluffycoin/svc/AbstractServiceParams.h>
 
@@ -42,22 +43,19 @@ class CuratorServiceParams : public svc::AbstractServiceParams
         void addEventSubscriptions(svc::EventSubscriptionMap &handlers) const final;
 #endif
 
-        bool init(bool paused) final;
-#if 0
         bool preInit(bool paused) final;
-
-        void cleanup() final;
+        bool init(bool paused) final;
         void postCleanup() final;
-#endif
 
     private:
         bool paused;
-        uint64_t reloadFrom;
+        uint32_t reloadFrom;
         std::string fsStorageDir;
 
-        const svc::ServiceScene *pctx;
-        std::unique_ptr<db::Database> db;
+        svc::ServiceScene *pctx;
         fs::BlockStorage fsBlocks;
+        std::unique_ptr<db::Database> db;
+        std::unique_ptr<BlockIntegrator> integrator;
 };
 
 }

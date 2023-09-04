@@ -89,12 +89,12 @@ void Reconciliation::setProtocol(uint32_t protocol)
     this->protocol = protocol;
 }
 
-uint64_t Reconciliation::getChainId() const
+uint32_t Reconciliation::getChainId() const
 {
     return chainId;
 }
 
-void Reconciliation::setChainId(uint64_t chainId)
+void Reconciliation::setChainId(uint32_t chainId)
 {
     this->chainId = chainId;
 }
@@ -142,7 +142,7 @@ void Reconciliation::setVotes(std::list<Validation> votes)
 void Reconciliation::toAsn1(asn1::Reconciliation &t) const
 {
     ossl::fromUInt32(*t.content->protocol, protocol);
-    ossl::fromUInt64(*t.content->chainId, chainId);
+    ossl::fromUInt32(*t.content->chainId, chainId);
     asn1::toReconciliationShardInfoStack(*t.content->shardInfo, shardInfo);
     leader.toAsn1(*t.content->leader);
     signature.toAsn1(*t.signature);
@@ -152,7 +152,7 @@ void Reconciliation::toAsn1(asn1::Reconciliation &t) const
 void Reconciliation::fromAsn1(const asn1::Reconciliation &t)
 {
     protocol = ossl::toUInt32(*t.content->protocol);
-    chainId = ossl::toUInt64(*t.content->chainId);
+    chainId = ossl::toUInt32(*t.content->chainId);
     asn1::fromReconciliationShardInfoStack(shardInfo, *t.content->shardInfo);
     leader.fromAsn1(*t.content->leader);
     signature.fromAsn1(*t.signature);

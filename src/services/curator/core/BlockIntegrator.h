@@ -2,13 +2,12 @@
 
 #include <fluffycoin/curator/DbIntegrator.h>
 
-#include <fluffycoin/async/boost.h>
+#include <fluffycoin/db/Database.h>
+
+#include <fluffycoin/async/Ret.h>
 
 #include <map>
-#include <list>
-#include <atomic>
-#include <memory>
-#include <condition_variable>
+#include <mutex>
 
 namespace fluffycoin::curator
 {
@@ -27,34 +26,44 @@ class BlockIntegrator
         BlockIntegrator &operator=(const BlockIntegrator &) = delete;
         ~BlockIntegrator() = default;
 
-        void start();
-        void stop();
-
-        void addBlock(
+        async::Ret<void> addBlock(
             BinData data,
             uint32_t recon,
             uint32_t shard,
             uint32_t block);
 
     private:
+        async::Ret<bool> tryNext();
+        async::Ret<void> tryIntegrate();
+        void removeBlock(
+            uint32_t recon,
+            uint32_t shard,
+            uint32_t block);
+
         DbIntegrator dbIntegrator;
 
-        struct PendingShardBlock
+        struct PendingBlock
         {
+            bool init = false;
+            uint32_t recon = 0;
+            uint32_t shard = 0;
             uint32_t block = 0;
             block::Block data;
         };
-        struct PendingRecons
+
+        struct PendingShard
         {
-            block::Block data;
-            std::map<uint32_t, std::list<PendingShardBlocks>> pendingBlocks;
+            std::map<uint32_t, block::Block> pendingBlocks;
         };
-        std::map<uint32_t, BinData> pendingRecons;
+        struct PendingRecon
+        {
+            std::map<uint32_t, PendingShard> pendingShards;
+        };
+        std::map<uint32_t, PendingRecon> pendingRecons;
 
         std::mutex mtx;
-        std::condition_variable;
-        std::atomic<bool> running;
-        std::unique_ptr<std::thread> thread;
+
+        uint32_t shardCursor;
 };
 
 }
