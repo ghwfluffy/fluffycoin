@@ -6,6 +6,8 @@ ifneq ($(JOBS), )
     ARGS:=$(ARGS) -j $(JOBS)
 endif
 
+MKFILE:=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+
 .PHONY: debug-docker
 debug-docker: ## Build all debug distributables using docker - Default
 	./tools/buildscripts/build-in-docker.sh $(ARGS) -d
@@ -27,7 +29,7 @@ clean: ## Cleanup all previous build artifacts and distributables
 	./tools/buildscripts/build.sh -C
 
 .PHONY: runtests-docker
-runtests-docker: ## Run unit/integration tests in docker build environment
+runtests-docker: ## Run unit/integration tests in docker environment
 	./tools/tests/test-in-docker.sh $(ARGS)
 
 .PHONY: build-containers
@@ -43,4 +45,4 @@ runcli-docker: ## Drop into the CLI docker
 # Show help menu
 .PHONY: help
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MKFILE) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

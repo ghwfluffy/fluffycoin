@@ -16,6 +16,41 @@ A YouTuber named Biaheza used the name "Fluffy Coin" (with a space) to create an
 
 Many other names were considered but nothing else felt right. I'll give Biaheza some coins when the public network goes live and let him know I'm using the name. Check out his content on YouTube, I've been watching him for years.
 
+## Status
+
+Project is still under construction. Most of the work completed is the core infrastructure for the code base. Recently started tackling problems related to the actual blockchain, like serializing the current state of the blockchain to a database for fast validation of new blocks.
+
+Some very high level milestones are described below. The list will expand over time. This is not intended to be a professional project with a comprehensive design. I am just attacking problems and changing requirements as I feel like it.
+
+| Component | Status |
+| :--------: | :----: |
+| Twitch stream setup<BR/>https://twitch.tv/GhwFluffy | ✅ Complete |
+| High level design | ✅ Complete |
+| Build system | ✅ Complete |
+| Docker runtime | ✅ Complete |
+| Testing infrastructure | ✅ Complete |
+| C++ core/crypto utilities | ✅ Complete |
+| Async coroutine architecture | ✅ Complete |
+| Async database interface | ✅ Complete |
+| API and Pub/Sub architecture | ✅ Complete |
+| Microservice architecture | ✅ Complete |
+| Block serialization | ✅ Complete |
+| Genesis CLI | ✅ Complete |
+| Database model | 🟠 In Progress |
+| P2P discovery & auth | ⭕ Pending |
+| fluffyco.in registry | ⭕ Pending |
+| Block builder | ⭕ Pending |
+| Byzantine validator voting | ⭕ Pending |
+| Staking | ⭕ Pending |
+| Transfer transactions | ⭕ Pending |
+| Transactions CLI | ⭕ Pending |
+| Alpha network | ⭕ Pending |
+| Lotteries | ⭕ Pending |
+| Trinkets | ⭕ Pending |
+| Social voting | ⭕ Pending |
+| Liquid staking | ⭕ Pending |
+| Stocks | ⭕ Pending |
+| Public network | ⭕ Pending |
 
 ## Protocol Features
 
@@ -112,7 +147,8 @@ debug                          Build all debug distributables
 debug-docker                   Build all debug distributables using docker - Default
 release                        Build all release distributables
 release-docker                 Build all release distributables using docker
-runtests-docker                Run unit/integration tests in docker build environment
+runcli-docker                  Drop into the CLI docker
+runtests-docker                Run unit/integration tests in docker environment
 ```
 
 ### Build code
@@ -181,9 +217,19 @@ You can build and run the unit/integration tests in a docker environment.
 make debug-docker
 make build-containers
 make runtests-docker
+
+# Run specific test
+make runtests-docker ARGS="-t ApiPort"
+
+# Run test in GDB
+make runtests-docker ARGS="-g -t ApiPort"
 ```
 
 ## Dependencies
+
+Everything in this project builds and runs inside of docker containers. To make use of the project you only need docker, bash, and Unix makefiles for the convenient aliases.
+
+Below is a comprehensive list of the dependencies used by the project that are all handled by the Dockerfiles for you.
 
 * OpenSSL - Provides the underlying cryptographic algorithms and ASN.1 encoding
 * libzmq - 0MQ networking stack for IPC and P2P communication
