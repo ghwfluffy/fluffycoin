@@ -22,6 +22,8 @@ Project is still under construction. Most of the work completed is the core infr
 
 Some very high level milestones are described below. The list will expand over time. This is not intended to be a professional project with a comprehensive design. I am just attacking problems and changing requirements as I feel like it.
 
+<div style="margin-left: auto; margin-right: auto; width: 30%">
+
 | Component | Status |
 | :--------: | :----: |
 | Twitch stream setup<BR/>https://twitch.tv/GhwFluffy | ✅ Complete |
@@ -51,6 +53,8 @@ Some very high level milestones are described below. The list will expand over t
 | Liquid staking | ⭕ Pending |
 | Stocks | ⭕ Pending |
 | Public network | ⭕ Pending |
+
+</div>
 
 ## Protocol Features
 
