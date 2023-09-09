@@ -113,7 +113,7 @@ docker run \
     -e PGPASSWORD=fluffy \
     -e PGCONNECT="host=fcpgtest dbname=fluffycoin" \
     --entrypoint "${ENTRYPOINT}" \
-    "fluffyco.in/unit-tests:${FLUFFYCOIN_TAG}" \
+    "fluffyco.in/tests:${FLUFFYCOIN_TAG}" \
     "${ARGS[@]}" \
     ${EXCLUDE} \
     ${FILTER} || RET=$?
