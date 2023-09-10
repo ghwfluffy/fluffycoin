@@ -8,13 +8,11 @@ Fluffycoin is a decentralized indie-blockchain, a peer-to-peer protocol, a mecha
 
 ### Why?
 
-Why build a brand new blockchain? Surely making a layer 2 on top of Etherium, a Parachain on Polkadot, or a dapp on Solana would have more potential. Because it's fun. This requires a lot of complicated problems to solve, and it requires solving them with code. A lot of code. Code is my brush and vim is my canvas. I consider a fluffycoin to be more like an NFT than a cryptocurrency. If you hold a fluffycoin then you have a piece of art.
+Why build a brand new blockchain? Surely making a layer 2 on top of Etherium, a Parachain on Polkadot, or a dapp on Solana would have more potential. Because it's fun. This requires a lot of complicated problems to solve, and it requires solving them with code. A lot of code. Code is my brush and vim is my canvas. I consider a fluffycoin to be more like an art project than a cryptocurrency. If you hold a fluffycoin then you have a piece of art.
 
 ### This is not Fluffy \<space> Coin
 
-A YouTuber named Biaheza used the name "Fluffy Coin" (with a space) to create an ERC-20 smart contract on the Etherium blockchain for a video to explain how easy it is to setup an alt coin. I've been all talk and no code on this project since 2018, so I can only blame myself for letting the name get minted by someone else in late 2021.
-
-Many other names were considered but nothing else felt right. I'll give Biaheza some coins when the public network goes live and let him know I'm using the name. Check out his content on YouTube, I've been watching him for years.
+A YouTuber named Biaheza used the name "Fluffy Coin" (with a space) to create an ERC-20 smart contract on the Etherium blockchain for a video to explain how easy it is to setup an alt coin. I've been all talk and no code on this project since 2018, so I can only blame myself for letting the name get minted by someone else in late 2021. Many other names were considered but nothing else felt right.
 
 ## Status
 
@@ -28,6 +26,7 @@ Some very high level milestones are described below. The list will expand over t
 | :--------: | :----: |
 | Twitch stream setup<BR/>https://twitch.tv/GhwFluffy | ✅ Complete |
 | High level design | ✅ Complete |
+| Design serialized format | ✅ Complete |
 | Build system | ✅ Complete |
 | Docker runtime | ✅ Complete |
 | Testing infrastructure | ✅ Complete |
@@ -62,7 +61,7 @@ Some very high level milestones are described below. The list will expand over t
 
 The proof of stake algorithm allows you to take a cut of the transaction fees and requires setting up a validator node. Validator nodes communicate with eachother using a gossip protocol. They negotiate a consensus on the order of who gets to build the next block. The more you stake the more often you will be elected to build the next block.
 
-The validator that builds the block receives the largest portion of the transaction fees. All validators receive a small portion of the transaction fees. And another small percentage of the transaction fees get burned (not given to anyone).
+Validators receive rewards from a portion of the transaction fees. All validators who created a block since the last reconciliation block will receive a portion of the transaction fees from all the shards at the reconciliation block. A small percentage of the transaction fees get burned (not given to anyone).
 
 Validators are penalized for building invalid blocks, affirming invalid blocks, missing their turn to build a block, or not affirming enough blocks built by other validators.
 
@@ -76,13 +75,13 @@ The most basic type of transaction is a transfer of coins from one wallet to ano
 
 ### Trinkets
 
-NFTs and other objects can be minted and exchanged on the blockchain using a trinket transaction. There are some defined trinket formats that allow minting of on-chain or off-chain images as NFTs. Minting an NFT as an on-chain image requires a significant transaction fee depending on the size of the image. Absolutely any unique string of bytes be converted into an NFT.
+NFTs can be minted and exchanged on the blockchain using a trinket transaction. There are some defined trinket formats that allow minting of on-chain or off-chain images as NFTs. Minting an NFT as an on-chain image requires a significant transaction fee depending on the size of the image. Absolutely any unique string of bytes be converted into an NFT.
 
 ### Lottery
 
 New coins are exclusively minted through a lottery system. The lottery system is used to regulate how many total fluffycoins exist in the ecosystem. There is no specific maximum or minimum number of coins in the ecosystem, it scales based on the overall volume of transactions on the network. This ensures the more people that use the network, the more coins are available to enable transactions.
 
-Anyone can submit a Lottery Ticket transaction to create a new lottery ticket. The price of the lottery ticket is dynamic, and the more coins spent scales the amount received if the ticket is chosen as a winner but not the chance of winning. Every Reconciliation Block triggers a new lottery drawing with the results based on the entropy of all transactions since the previous Reconciliation Block.
+Anyone can submit a Lottery Ticket transaction to create a new lottery ticket. The price of the lottery ticket is chosen by the buyer, and the more coins spent scales the amount received if the ticket is chosen as a winner but not the chance of winning. Every Reconciliation Block triggers a new lottery drawing with the results based on the entropy of all transactions since the previous Reconciliation Block.
 
 ### Loans
 
