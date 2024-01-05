@@ -12,7 +12,7 @@ AnyMap &AnyMap::operator=(const AnyMap &t)
     if (this != &t)
     {
         data.clear();
-        for (auto &pair : data)
+        for (auto &pair : t.data)
             data.emplace(pair.first, pair.second->clone());
     }
     return (*this);
