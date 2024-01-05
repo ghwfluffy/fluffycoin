@@ -1,4 +1,4 @@
-set(BOOST_VERSION 1.28.0)
+set(BOOST_VERSION 1.82.0)
 set(BOOST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/boost)
 set(BOOST_EMPTY ${CMAKE_CURRENT_BINARY_DIR}/blank-boost.c)
 set(BOOST_CONFIG ${BOOST_DIR}/boost/config.hpp)
