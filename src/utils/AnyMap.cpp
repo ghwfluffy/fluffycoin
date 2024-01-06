@@ -13,7 +13,11 @@ AnyMap &AnyMap::operator=(const AnyMap &t)
     {
         data.clear();
         for (auto &pair : t.data)
-            data.emplace(pair.first, pair.second->clone());
+        {
+            auto pt = pair.second->clone();
+            if (pt)
+                data.emplace(pair.first, std::move(pt));
+        }
     }
     return (*this);
 }
@@ -34,7 +38,11 @@ AnyMap &AnyMap::operator+=(const AnyMap &rhs)
     if (this != &rhs)
     {
         for (auto &pair : rhs.data)
-            data[pair.first] = pair.second->clone();
+        {
+            auto pt = pair.second->clone();
+            if (pt)
+                data[pair.first] = pair.second->clone();
+        }
     }
 
     return (*this);

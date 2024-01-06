@@ -137,3 +137,13 @@ TEST(AnyMap, NotCopyable)
     AnyMap memory(std::move(map));
     EXPECT_EQ(memory.get<NoCopy>().i, 789);
 }
+
+TEST(AnyMap, CopyAssignment)
+{
+    AnyMap map;
+    map.get<int>() = 123;
+    AnyMap copy;
+    copy.get<int>() = 222;
+    copy = map;
+    EXPECT_EQ(copy.get<int>(), 123);
+}
